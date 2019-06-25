@@ -1,0 +1,50 @@
+version: "3.7"
+
+services:
+  db:
+    image: mariadb:10.3
+    environment:
+      - MYSQL_ROOT_PASSWORD: test
+      - MYSQL_DATABASE: passbolt
+      - MYSQL_USER: passbolt
+      - MYSQL_PASSWORD: P4ssb0lt
+    volumes:
+      - database_volume:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+  passbolt:
+    image: passbolt/passbolt:latest
+    tty: true
+    depends_on:
+      - db
+    environment:
+      - APP_FULL_BASE_URL: https://passbolt.local
+      - DATASOURCES_DEFAULT_HOST: db
+      - DATASOURCES_DEFAULT_DATABASE: passbolt
+      - DATASOURCES_DEFAULT_USERNAME: passbolt
+      - DATASOURCES_DEFAULT_PASSWORD: P4ssb0lt
+      - DATASOURCES_DEFAULT_PORT: 3306
+      - PASSBOLT_REGISTRATION_PUBLIC: true
+    volumes:
+      - gpg_volume:/var/www/passbolt/config/gpg
+    tmpfs:
+      - /run
+    command: ["/usr/bin/wait-for.sh", "db:3306", "--", "/docker-entrypoint.sh"]
+    ports:
+      - 80:80
+      - 443:443
+
+  standardnotes:
+    image: arugifa/standardnotes-server
+    depends_on:
+      - db
+
+
+volumes:
+  database_volume:
+  gpg_volume:
+
+
+# PASSBOLT : Once the container is running create your first admin user:
+# $ docker exec passbolt su -m -c "/var/www/passbolt/bin/cake passbolt register_user -u your@email.com -f yourname -l surname -r admin" -s /bin/sh www-data
