@@ -27,7 +27,6 @@ services:
       DATASOURCES_DEFAULT_USERNAME: passbolt
       DATASOURCES_DEFAULT_PASSWORD: P4ssb0lt
       DATASOURCES_DEFAULT_PORT: 3306
-#      PASSBOLT_REGISTRATION_PUBLIC: true
     volumes:
       - gpg_volume:/var/www/passbolt/config/gpg
     tmpfs:
