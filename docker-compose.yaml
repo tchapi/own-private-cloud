@@ -2,14 +2,16 @@ version: "3.7"
 
 services:
   db:
-    image: mariadb:10.3
+    container_name: db
+    image: mariadb:10.4
     environment:
-      - MYSQL_ROOT_PASSWORD: test
-      - MYSQL_DATABASE: passbolt
-      - MYSQL_USER: passbolt
-      - MYSQL_PASSWORD: P4ssb0lt
+      MYSQL_ROOT_PASSWORD: test
+      MYSQL_DATABASE: passbolt
+      MYSQL_USER: passbolt
+      MYSQL_PASSWORD: P4ssb0lt
     volumes:
       - database_volume:/var/lib/mysql
+      - scripts_volume:/docker-entrypoint-initdb.d
     ports:
       - "3306:3306"
 
@@ -19,13 +21,13 @@ services:
     depends_on:
       - db
     environment:
-      - APP_FULL_BASE_URL: https://passbolt.local
-      - DATASOURCES_DEFAULT_HOST: db
-      - DATASOURCES_DEFAULT_DATABASE: passbolt
-      - DATASOURCES_DEFAULT_USERNAME: passbolt
-      - DATASOURCES_DEFAULT_PASSWORD: P4ssb0lt
-      - DATASOURCES_DEFAULT_PORT: 3306
-      - PASSBOLT_REGISTRATION_PUBLIC: true
+      APP_FULL_BASE_URL: https://passbolt.local
+      DATASOURCES_DEFAULT_HOST: db
+      DATASOURCES_DEFAULT_DATABASE: passbolt
+      DATASOURCES_DEFAULT_USERNAME: passbolt
+      DATASOURCES_DEFAULT_PASSWORD: P4ssb0lt
+      DATASOURCES_DEFAULT_PORT: 3306
+#      PASSBOLT_REGISTRATION_PUBLIC: true
     volumes:
       - gpg_volume:/var/www/passbolt/config/gpg
     tmpfs:
@@ -39,12 +41,28 @@ services:
     image: arugifa/standardnotes-server
     depends_on:
       - db
-
+    environment:
+      RAILS_ENV: production
+      RAILS_SERVE_STATIC_FILES: "true"
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_DATABASE: standardfile
+      DB_USERNAME: standardfile
+      DB_PASSWORD: standardfile
+    command: >
+      bash -c 'while ! nc -vz db 3306 ; do sleep 10 ; done &&
+               sleep 2 &&
+               /data/src/docker/entrypoint bootstrap &&
+               /data/src/docker/entrypoint start'
+    ports:
+      - 3000:3000
 
 volumes:
   database_volume:
   gpg_volume:
-
-
-# PASSBOLT : Once the container is running create your first admin user:
-# $ docker exec passbolt su -m -c "/var/www/passbolt/bin/cake passbolt register_user -u your@email.com -f yourname -l surname -r admin" -s /bin/sh www-data
+  scripts_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${PWD}/scripts/db
