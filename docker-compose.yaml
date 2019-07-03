@@ -1,6 +1,17 @@
 version: "3.7"
 
 services:
+  reverse-proxy:
+    build:
+      context: ./
+      dockerfile: Dockerfile-reverse-proxy
+    image: reverse-proxy:custom
+    container_name: proxy
+    ports:
+        - 80:80
+        - 443:443
+    restart: always
+
   db:
     container_name: db
     image: mariadb:10.4
