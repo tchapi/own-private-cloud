@@ -15,57 +15,49 @@ services:
   db:
     container_name: db
     image: mariadb:10.4
-    environment:
-      MYSQL_ROOT_PASSWORD: test
-      MYSQL_DATABASE: passbolt
-      MYSQL_USER: passbolt
-      MYSQL_PASSWORD: P4ssb0lt
+    env_file:
+      - environment/production.env
     volumes:
       - database_volume:/var/lib/mysql
       - scripts_volume:/docker-entrypoint-initdb.d
-    ports:
-      - "3306:3306"
+    # ports:
+    #   - "3306:3306" # no need to have outsider access ? Or need I ?
 
   passbolt:
+    container_name: passbolt
     image: passbolt/passbolt:latest
     tty: true
     depends_on:
       - db
-    environment:
-      APP_FULL_BASE_URL: https://passbolt.local
-      DATASOURCES_DEFAULT_HOST: db
-      DATASOURCES_DEFAULT_DATABASE: passbolt
-      DATASOURCES_DEFAULT_USERNAME: passbolt
-      DATASOURCES_DEFAULT_PASSWORD: P4ssb0lt
-      DATASOURCES_DEFAULT_PORT: 3306
+      - reverse-proxy
+    env_file:
+      - environment/production.env
     volumes:
       - gpg_volume:/var/www/passbolt/config/gpg
     tmpfs:
       - /run
     command: ["/usr/bin/wait-for.sh", "db:3306", "--", "/docker-entrypoint.sh"]
-    ports:
-      - 80:80
-      - 443:443
+    # ports:
+    #   - 80:80
+    #   - 443:443
+    restart: always
 
   standardnotes:
+    container_name: notes
     image: arugifa/standardnotes-server
     depends_on:
       - db
-    environment:
-      RAILS_ENV: production
-      RAILS_SERVE_STATIC_FILES: "true"
-      DB_CONNECTION: mysql
-      DB_HOST: db
-      DB_DATABASE: standardfile
-      DB_USERNAME: standardfile
-      DB_PASSWORD: standardfile
+      - reverse-proxy
+    env_file:
+      - environment/production.env
     command: >
       bash -c 'while ! nc -vz db 3306 ; do sleep 10 ; done &&
                sleep 2 &&
                /data/src/docker/entrypoint bootstrap &&
                /data/src/docker/entrypoint start'
-    ports:
-      - 3000:3000
+    # ports:
+    #   - 3000:3000
+    restart: always
 
 volumes:
   database_volume:
