@@ -1,3 +1,8 @@
 FROM nginx:alpine
 
-COPY configurations/reverse-proxy/nginx.conf /etc/nginx/nginx.conf
+WORKDIR /etc/nginx/
+COPY configurations/reverse-proxy/nginx.conf nginx.conf
+
+RUN mkdir conf
+COPY configurations/reverse-proxy/options-ssl-nginx.conf conf/options-ssl-nginx.conf
+COPY configurations/reverse-proxy/ssl-dhparams.pem conf/ssl-dhparams.pem

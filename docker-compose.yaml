@@ -1,16 +1,29 @@
 version: "3.7"
 
 services:
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - letsencrypt_certs:/etc/letsencrypt
+      - letsencrypt_www:/var/www/letsencrypt
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
   reverse-proxy:
     build:
       context: ./
       dockerfile: Dockerfile-reverse-proxy
     image: reverse-proxy:custom
     container_name: proxy
+    volumes:
+      - letsencrypt_certs:/etc/letsencrypt
+      - letsencrypt_www:/var/www/letsencrypt
     ports:
         - 80:80
         - 443:443
     restart: always
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
 
   db:
     build:
@@ -65,6 +78,8 @@ services:
     restart: always
 
 volumes:
+  letsencrypt_certs: ~
+  letsencrypt_www: ~
   database_volume:
     driver: local
     driver_opts:
