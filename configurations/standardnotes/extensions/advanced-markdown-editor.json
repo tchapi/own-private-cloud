@@ -1,0 +1,11 @@
+{
+  "identifier": "org.standardnotes.extension.advanced-markdown-editor",
+  "name": "Advanced Markdown Editor",
+  "content_type": "SN|Component",
+  "area": "editor-editor",
+  "version": "1.3.4",
+  "description": "A full-fledged markdown editor",
+  "url": "https://notes.***REMOVED***.me/extensions/advanced-markdown-editor/index.html",
+  "download_url": "https://github.com/sn-extensions/advanced-markdown-editor/archive/1.3.4.zip",
+  "latest_url": "https://notes.***REMOVED***.me/extensions/advanced-markdown-editor.json"
+}

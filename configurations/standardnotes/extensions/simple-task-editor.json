@@ -1,0 +1,11 @@
+{
+  "identifier": "org.standardnotes.extension.tasks",
+  "name": "Simple Tasks Editor",
+  "content_type": "SN|Component",
+  "area": "editor-editor",
+  "version": "1.3.3",
+  "description": "A simple tasks editor",
+  "url": "https://notes.***REMOVED***.me/extensions/simple-task-editor/dist/index.html",
+  "download_url": "https://github.com/sn-extensions/simple-task-editor/archive/1.3.3.zip",
+  "latest_url": "https://notes.***REMOVED***.me/extensions/simple-task-editor.json"
+}

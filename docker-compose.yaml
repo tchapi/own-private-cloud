@@ -45,8 +45,11 @@ services:
     restart: always
 
   standardnotes:
+    build:
+      context: ./
+      dockerfile: Dockerfile-standardnotes
+    image: standardnotes:custom
     container_name: notes
-    image: arugifa/standardnotes-server
     depends_on:
       - db
       - reverse-proxy

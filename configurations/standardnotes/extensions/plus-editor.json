@@ -1,0 +1,11 @@
+{
+  "identifier": "org.standardnotes.extension.plus-editor",
+  "name": "Plus Editor",
+  "content_type": "SN|Component",
+  "area": "editor-editor",
+  "version": "1.3.2",
+  "description": "A full-fledged editor",
+  "url": "https://notes.***REMOVED***.me/extensions/plus-editor/index.html",
+  "download_url": "https://github.com/sn-extensions/plus-editor/archive/1.3.2.zip",
+  "latest_url": "https://notes.***REMOVED***.me/extensions/plus-editor.json"
+}

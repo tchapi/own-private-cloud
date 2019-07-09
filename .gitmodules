@@ -1,0 +1,15 @@
+[submodule "configurations/standardnotes/extensions/simple-task-editor"]
+	path = configurations/standardnotes/extensions/simple-task-editor
+	url = git@github.com:sn-extensions/simple-task-editor.git
+[submodule "configurations/standardnotes/extensions/advanced-markdown-editor"]
+	path = configurations/standardnotes/extensions/advanced-markdown-editor
+	url = git@github.com:sn-extensions/advanced-markdown-editor.git
+[submodule "configurations/standardnotes/extensions/autocomplete-tags"]
+	path = configurations/standardnotes/extensions/autocomplete-tags
+	url = git@github.com:sn-extensions/autocomplete-tags.git
+[submodule "configurations/standardnotes/extensions/plus-editor"]
+	path = configurations/standardnotes/extensions/plus-editor
+	url = git@github.com:sn-extensions/plus-editor.git
+[submodule "configurations/standardnotes/extensions/secure-spreadsheets"]
+	path = configurations/standardnotes/extensions/secure-spreadsheets
+	url = git@github.com:sn-extensions/secure-spreadsheets.git
