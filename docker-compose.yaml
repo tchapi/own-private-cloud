@@ -13,13 +13,15 @@ services:
     restart: always
 
   db:
+    build:
+      context: ./
+      dockerfile: Dockerfile-db
+    image: mariadb:custom
     container_name: db
-    image: mariadb:10.4
     env_file:
       - environment/production.env
     volumes:
       - database_volume:/var/lib/mysql
-      - scripts_volume:/docker-entrypoint-initdb.d
     # ports:
     #   - "3306:3306" # no need to have outsider access ? Or need I ?
 
@@ -61,10 +63,9 @@ services:
 
 volumes:
   database_volume:
-  gpg_volume:
-  scripts_volume:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: ${PWD}/scripts/db
+      device: /mnt/mysql
+  gpg_volume:
