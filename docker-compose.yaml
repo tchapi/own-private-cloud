@@ -76,10 +76,10 @@ services:
 volumes:
   letsencrypt_certs: ~
   letsencrypt_www: ~
-  database_volume:
+  database_volume: # This volume is actually an attached OpenStack Block storage
     driver: local
     driver_opts:
       o: bind
       type: none
       device: /mnt/mysql
-  gpg_volume:
+  gpg_volume: ~
