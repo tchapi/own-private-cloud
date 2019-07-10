@@ -38,8 +38,6 @@ services:
       - environment/production.env
     volumes:
       - database_volume:/var/lib/mysql
-    # ports:
-    #   - "3306:3306" # no need to have outsider access ? Or need I ?
 
   passbolt:
     container_name: passbolt
