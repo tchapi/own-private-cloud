@@ -3,3 +3,4 @@ FROM arugifa/standardnotes-server
 # Copy extensions in public folder
 WORKDIR $PROJECT_DIR
 COPY configurations/standardnotes/extensions public/extensions
+COPY configurations/standardnotes/index.html public/index.html
