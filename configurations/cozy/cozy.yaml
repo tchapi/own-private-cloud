@@ -3,7 +3,7 @@
 host: 0.0.0.0
 port: 8080
 
-subdomains: {{.Env.COZY_SUBDOMAINS}}
+subdomains: nested
 
 admin:
   host: 0.0.0.0
