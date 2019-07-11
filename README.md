@@ -59,6 +59,14 @@
 
     docker-compose up -d
 
+## Create the Passbolt admin user
+
+    ./scripts/passbolt/init-admin-user.sh
+
+# Tips
+
+> If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` on the host for the entrypoint script to be replayed entirely
+
 # Literature
 
   - Docker best practices : https://blog.docker.com/2019/07/intro-guide-to-dockerfile-best-practices/
