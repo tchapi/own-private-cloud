@@ -24,10 +24,18 @@
 
 > The volumes must be attached beforehand in the OpenStack console
 
+#### The databases volume :
+
     docker-machine ssh default 'sudo fdisk /dev/sdb # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdb1'
     docker-machine ssh default 'sudo mkdir /mnt/databases && sudo mount /dev/sdb1 /mnt/databases'
     docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch'
+
+#### The files volume :
+
+    docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
+    docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
+    docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
 
 ## Get environment variables to target the remote docker instace
 

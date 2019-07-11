@@ -25,6 +25,7 @@ services:
     depends_on:
       - passbolt
       - standardnotes
+      - cozy
     restart: always
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
 
@@ -71,6 +72,34 @@ services:
                /data/src/docker/entrypoint start'
     restart: always
 
+  # Database
+  couchdb:
+    image: couchdb:2.3
+    container_name: couchdb
+    restart: unless-stopped
+    env_file:
+      - environment/production.env
+    volumes:
+      - database_couch_volume:/opt/couchdb/data
+    ports:
+      - 5984:5984
+
+  # Cozy Stack
+  cozy:
+    image: cozy/cozy-stack
+    container_name: cozy
+    restart: unless-stopped
+    env_file:
+      - environment/production.env
+    depends_on:
+      - couchdb
+    volumes:
+      - files_volume:/var/lib/cozy/data
+      - ./configurations/cozy/cozy.yaml:/etc/cozy/cozy.yaml.local
+    ports:
+      - 8080:8080
+      - 6060:6060
+
 volumes:
   letsencrypt_certs: ~
   letsencrypt_www: ~
@@ -80,4 +109,16 @@ volumes:
       o: bind
       type: none
       device: /mnt/databases/mysql
+  database_couch_volume: # This volume is actually an attached OpenStack Block storage
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/databases/couch
+  files_volume: # This volume is actually an attached OpenStack Block storage. It stores the cozy files
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files
   gpg_volume: ~
