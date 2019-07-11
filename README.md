@@ -37,9 +37,13 @@
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
 
-## Get environment variables to target the remote docker instace
+## Get environment variables to target the remote docker instance
 
     eval $(docker-machine env default)
+
+## Init all submodules to retrieve up to date code
+
+    git submodule update --init
 
 ## Set the dummy SSL certificates, then launch nginx and retrieve the real certificates
 
@@ -48,10 +52,6 @@
 ## Set the Cozy instance
 
     ./scripts/cozy/init-cozycloud.sh
-
-## Init all submodules to retrieve up to date code
-
-    git submodule update --init
 
 ## Provision the whole thing in daemon mode
 
