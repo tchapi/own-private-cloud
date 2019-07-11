@@ -1,10 +1,8 @@
 #!/bin/bash
 
-cozy_url="cloud-staging.***REMOVED***.me"
-email="***REMOVED***@***REMOVED***.me"
-password="coucou1234"
+source ../../environment/production.env
 
 echo "### Creating cloud instance"
 docker-compose run --rm --entrypoint "export COZY_ADMIN_PASSWORD=${COZY_ADMIN_PASSPHRASE}" certbot
 docker-compose run --rm --entrypoint "\
-  cozy-stack instances add --apps contacts,drive,photos,settings ${cozy_url} --email ${email} --passphrase ${password}" certbot
+  cozy-stack instances add --apps contacts,drive,photos,settings ${CLOUD_DOMAIN} --email ${EMAIL} --passphrase ${CLOUD_MASTER_PASSWORD}" certbot
