@@ -45,6 +45,10 @@
 
     ./scripts/certbot/init-letsencrypt.sh
 
+## Set the Cozy instance
+
+    ./scripts/cozy/init-cozycloud.sh
+
 ## Provision the whole thing in daemon mode
 
 > Some containers have already been started by the init-letsencrypt script
