@@ -26,7 +26,8 @@
 
     docker-machine ssh default 'sudo fdisk /dev/sdb # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdb1'
-    docker-machine ssh default 'sudo mkdir /mnt/mysql && sudo mount /dev/sdb1 /mnt/mysql'
+    docker-machine ssh default 'sudo mkdir /mnt/databases && sudo mount /dev/sdb1 /mnt/databases'
+    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch'
 
 ## Get environment variables to target the remote docker instace
 

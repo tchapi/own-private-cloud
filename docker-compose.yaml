@@ -37,7 +37,7 @@ services:
     env_file:
       - environment/production.env
     volumes:
-      - database_volume:/var/lib/mysql
+      - database_mysql_volume:/var/lib/mysql
 
   passbolt:
     container_name: passbolt
@@ -74,10 +74,10 @@ services:
 volumes:
   letsencrypt_certs: ~
   letsencrypt_www: ~
-  database_volume: # This volume is actually an attached OpenStack Block storage
+  database_mysql_volume: # This volume is actually an attached OpenStack Block storage
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: /mnt/mysql
+      device: /mnt/databases/mysql
   gpg_volume: ~
