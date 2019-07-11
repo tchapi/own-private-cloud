@@ -29,12 +29,12 @@ services:
     restart: always
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
 
-  db:
+  mysql:
     build:
       context: ./
-      dockerfile: Dockerfile-db
+      dockerfile: Dockerfile-mysql
     image: mariadb:custom
-    container_name: db
+    container_name: mysql
     env_file:
       - environment/production.env
     volumes:
@@ -45,15 +45,15 @@ services:
     image: passbolt/passbolt:latest
     tty: true
     depends_on:
-      - db
+      - mysql
     env_file:
       - environment/production.env
     volumes:
       - gpg_volume:/var/www/passbolt/config/gpg
     tmpfs:
       - /run
-    command: ["/usr/bin/wait-for.sh", "db:3306", "--", "/docker-entrypoint.sh"]
-    restart: always
+    command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
+    restart: unless-stopped
 
   standardnotes:
     build:
@@ -62,11 +62,11 @@ services:
     image: standardnotes:custom
     container_name: notes
     depends_on:
-      - db
+      - mysql
     env_file:
       - environment/production.env
     command: >
-      bash -c 'while ! nc -vz db 3306 ; do sleep 10 ; done &&
+      bash -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
                sleep 2 &&
                /data/src/docker/entrypoint bootstrap &&
                /data/src/docker/entrypoint start'
