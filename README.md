@@ -49,6 +49,10 @@
 
     ./scripts/cozy/init-cozycloud.sh
 
+## Init all submodules to retrieve up to date code
+
+    git submodule update --init
+
 ## Provision the whole thing in daemon mode
 
 > Some containers have already been started by the init-letsencrypt script
