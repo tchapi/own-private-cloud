@@ -1,0 +1,45 @@
+FROM php:7.2-fpm
+
+### Configure Postfix options prior to installing the package to prevent the config screen from appearing
+#
+# These parameters are specific to your own Postfix relay!  Use your host and domain names.
+RUN echo "postfix postfix/mailname string calendar.example.org" | debconf-set-selections && \
+    echo "postfix postfix/main_mailer_type string 'Satellite system'" | debconf-set-selections && \
+    echo "postfix postfix/relayhost string smtpcal.example.org" | debconf-set-selections && \
+    echo "postfix postfix/root_address string cal-bounce@example.org" | debconf-set-selections
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl \
+        postfix \
+        mailutils \
+        unzip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
+    && docker-php-ext-install pdo_mysql
+
+### "Baikal-installation"
+RUN cd /tmp/ && curl --silent -LO https://github.com/sabre-io/Baikal/archive/0.5.3.zip \
+ && unzip /tmp/0.5.3.zip -d /var/www/ \
+ && rm -Rvf /var/www/Baikal-0.5.3/Specific/db/.empty && rm -f /tmp/0.5.3.zip 
+RUN mv /var/www/Baikal-0.5.3 /var/www/calendar_server
+
+WORKDIR /var/www/calendar_server
+
+# Scheduling and email delivery.  See:
+# http://sabre.io/dav/scheduling/
+# https://groups.google.com/forum/#!searchin/sabredav-discuss/scheduling|sort:relevance/sabredav-discuss/CrGZXqw4sRw/vsHYq6FDcnkJ
+# This needs to be patched on the Baikal start up Server.php, NOT in the SabreDAV server.
+COPY configurations/baikal/Server.php Core/Frameworks/Baikal/Core/Server.php
+
+# The Baikal administration wizard creates these two config files when first run.  Preserve them
+# and save them to the resources/ directory.  These files must be preserved for upgrades.
+# Both files are already in the .gitignore file.
+COPY configurations/baikal/config.php /var/www/calendar_server/Specific/
+COPY configurations/baikal/config.system.php /var/www/calendar_server/Specific/
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+RUN composer install --no-ansi --no-dev --no-interaction --no-progress --optimize-autoloader
+
+RUN chown -Rf www-data:www-data Specific
+RUN chmod -Rf g+w Specific

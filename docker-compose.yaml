@@ -19,6 +19,7 @@ services:
     volumes:
       - letsencrypt_certs:/etc/letsencrypt
       - letsencrypt_www:/var/www/letsencrypt
+      - baikal_www:/var/www/calendar_server
     ports:
         - 80:80
         - 443:443
@@ -26,6 +27,7 @@ services:
       - passbolt
       - standardnotes
       - cozy
+      - baikal
     restart: unless-stopped
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
 
@@ -100,6 +102,20 @@ services:
       - 8080:8080
       - 6060:6060
 
+  # Caldav server
+  baikal:
+    build:
+      context: ./
+      dockerfile: Dockerfile-baikal
+    image: baikal:custom
+    container_name: baikal
+    env_file:
+      - environment/production.env
+    depends_on:
+      - mysql
+    volumes:
+      - baikal_www:/var/www/calendar_server
+
 volumes:
   letsencrypt_certs: ~
   letsencrypt_www: ~
@@ -122,3 +138,4 @@ volumes:
       type: none
       device: /mnt/files
   gpg_volume: ~
+  baikal_www: ~
