@@ -119,6 +119,8 @@ services:
 volumes:
   letsencrypt_certs: ~
   letsencrypt_www: ~
+  gpg_volume: ~
+  baikal_www: ~
   database_mysql_volume: # This volume is actually an attached OpenStack Block storage
     driver: local
     driver_opts:
@@ -137,5 +139,3 @@ volumes:
       o: bind
       type: none
       device: /mnt/files
-  gpg_volume: ~
-  baikal_www: ~

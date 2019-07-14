@@ -1,12 +1,15 @@
 #!/bin/bash
 
-source ../../environment/production.env
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source $DIR/../../environment/production.env
 
-echo "### Creating dummy certificates"
+echo "### Cleaning up first"
 docker-compose run --rm --entrypoint "\
   rm -Rf /etc/letsencrypt/live && rm -Rf /etc/letsencrypt/archive && rm -Rf /etc/letsencrypt/renewal" certbot
 docker-compose run --rm --entrypoint "\
-  mkdir -p /etc/letsencrypt/live/${NOTES_DOMAIN} /etc/letsencrypt/live/${PASSWORDS_DOMAIN} /etc/letsencrypt/live/${CLOUD_DOMAIN}" certbot
+  mkdir -p /etc/letsencrypt/live/${NOTES_DOMAIN} /etc/letsencrypt/live/${PASSWORDS_DOMAIN} /etc/letsencrypt/live/${CLOUD_DOMAIN} /etc/letsencrypt/live/${CALENDAR_DOMAIN} /etc/letsencrypt/live/${BOOKMARKS_DOMAIN}" certbot
+
+echo "### Creating dummy certificates"
 docker-compose run --rm --entrypoint "\
   openssl req -x509 -nodes -newkey rsa:1024 -days 1\
     -keyout '/etc/letsencrypt/live/${NOTES_DOMAIN}/privkey.pem' \

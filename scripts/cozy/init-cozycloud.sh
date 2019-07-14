@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source ../../environment/production.env
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+source $DIR/../../environment/production.env
 
 echo "### Creating cloud instance"
 docker-compose run --rm --entrypoint "export COZY_ADMIN_PASSWORD=${COZY_ADMIN_PASSPHRASE}" certbot
