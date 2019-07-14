@@ -116,6 +116,29 @@ services:
     volumes:
       - baikal_www:/var/www/calendar_server
 
+  # # XBS = X-browser sync
+  # xbs:
+  #   container_name: xbs
+  #   env_file:
+  #     - environment/production.env
+  #   depends_on:
+  #     - mongo
+  #   image: xbrowsersync/api:1.1.9
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./configurations/xbs/settings.json:/usr/src/api/config/settings.json
+
+  # # XBS Database
+  # mongo:
+  #   container_name: mongo
+  #   env_file:
+  #     - environment/production.env
+  #   image: mongo:4.0.10
+  #   restart: unless-stopped
+  #   volumes:
+  #     - database_mongo_volume:/data/db
+  #     - ./configurations/xbs/mongoconfig.js:/docker-entrypoint-initdb.d/mongoconfig.js
+
 volumes:
   letsencrypt_certs: ~
   letsencrypt_www: ~
@@ -133,6 +156,12 @@ volumes:
       o: bind
       type: none
       device: /mnt/databases/couch
+  # database_mongo_volume: # This volume is actually an attached OpenStack Block storage
+  #   driver: local
+  #   driver_opts:
+  #     o: bind
+  #     type: none
+  #     device: /mnt/databases/mongo
   files_volume: # This volume is actually an attached OpenStack Block storage. It stores the cozy files
     driver: local
     driver_opts:

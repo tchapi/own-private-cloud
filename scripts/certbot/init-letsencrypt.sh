@@ -25,9 +25,19 @@ docker-compose run --rm --entrypoint "\
     -keyout '/etc/letsencrypt/live/${CLOUD_DOMAIN}/privkey.pem' \
     -out '/etc/letsencrypt/live/${CLOUD_DOMAIN}/fullchain.pem' \
     -subj '/CN=localhost'" certbot
+docker-compose run --rm --entrypoint "\
+  openssl req -x509 -nodes -newkey rsa:1024 -days 1\
+    -keyout '/etc/letsencrypt/live/${CALENDAR_DOMAIN}/privkey.pem' \
+    -out '/etc/letsencrypt/live/${CALENDAR_DOMAIN}/fullchain.pem' \
+    -subj '/CN=localhost'" certbot
+docker-compose run --rm --entrypoint "\
+  openssl req -x509 -nodes -newkey rsa:1024 -days 1\
+    -keyout '/etc/letsencrypt/live/${BOOKMARKS_DOMAIN}/privkey.pem' \
+    -out '/etc/letsencrypt/live/${BOOKMARKS_DOMAIN}/fullchain.pem' \
+    -subj '/CN=localhost'" certbot
 
-echo "### Starting nginx ..."
 # This will spin up the whole thing because of dependencies
+echo "### Starting nginx ..."
 docker-compose up --force-recreate -d reverse-proxy
 
 echo "### Deleting all certificates"
@@ -53,6 +63,20 @@ docker-compose run --rm --entrypoint "\
   certbot certonly --webroot -w /var/www/letsencrypt \
     --email ${EMAIL} \
     -d ${CLOUD_DOMAIN} -d settings.${CLOUD_DOMAIN} -d drive.${CLOUD_DOMAIN} -d photos.${CLOUD_DOMAIN} -d contacts.${CLOUD_DOMAIN} \
+    --rsa-key-size 4096 \
+    --agree-tos \
+    --force-renewal" certbot
+docker-compose run --rm --entrypoint "\
+  certbot certonly --webroot -w /var/www/letsencrypt \
+    --email ${EMAIL} \
+    -d ${CALENDAR_DOMAIN} \
+    --rsa-key-size 4096 \
+    --agree-tos \
+    --force-renewal" certbot
+docker-compose run --rm --entrypoint "\
+  certbot certonly --webroot -w /var/www/letsencrypt \
+    --email ${EMAIL} \
+    -d ${BOOKMARKS_DOMAIN} \
     --rsa-key-size 4096 \
     --agree-tos \
     --force-renewal" certbot

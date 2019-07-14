@@ -29,7 +29,7 @@
     docker-machine ssh default 'sudo fdisk /dev/sdb # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdb1'
     docker-machine ssh default 'sudo mkdir /mnt/databases && sudo mount /dev/sdb1 /mnt/databases'
-    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch'
+    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch /mnt/databases/mongo'
 
 #### The files volume :
 
@@ -82,3 +82,4 @@
   - Passbolt : https://hub.docker.com/r/passbolt/passbolt/
   - Standard Notes : https://github.com/arugifa/standardnotes-server-docker/blob/master/Dockerfile
   - MariaDB : https://github.com/docker-library/mariadb/blob/master/10.4/docker-entrypoint.sh
+  - x-browser-sync : https://github.com/xbrowsersync/api-docker
