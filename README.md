@@ -99,3 +99,14 @@ Services :
   - Standard Notes : https://github.com/arugifa/standardnotes-server-docker/blob/master/Dockerfile
   - MariaDB : https://github.com/docker-library/mariadb/blob/master/10.4/docker-entrypoint.sh
   - x-browser-sync : https://github.com/xbrowsersync/api-docker
+
+## Other alternatives
+
+See https://github.com/Kickball/awesome-selfhosted for more awesome self-hosted alternatives.
+
+### CalDav / CardDav projects
+
+  - SoGo : https://sogo.nu/support/faq/how-to-install-sogo-on-debian.html
+  - Radicale : https://radicale.org/
+  - Calendar Server:  https://www.calendarserver.org/ (Apple)
+  
