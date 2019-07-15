@@ -13,7 +13,7 @@ services:
   reverse-proxy:
     build:
       context: ./
-      dockerfile: Dockerfile-reverse-proxy
+      dockerfile: ./build/Dockerfile-reverse-proxy
     image: reverse-proxy:custom
     container_name: proxy
     volumes:
@@ -34,7 +34,7 @@ services:
   mysql:
     build:
       context: ./
-      dockerfile: Dockerfile-mysql
+      dockerfile: ./build/Dockerfile-mysql
     image: mariadb:custom
     container_name: mysql
     env_file:
@@ -60,7 +60,7 @@ services:
   standardnotes:
     build:
       context: ./
-      dockerfile: Dockerfile-standardnotes
+      dockerfile: ./build/Dockerfile-standardnotes
     image: standardnotes:custom
     container_name: notes
     depends_on:
@@ -95,13 +95,12 @@ services:
       - couchdb
     volumes:
       - files_volume:/var/lib/cozy/data
-      - ./configurations/cozy/cozy.yaml:/etc/cozy/cozy.yaml.local
 
   # Caldav server
   baikal:
     build:
       context: ./
-      dockerfile: Dockerfile-baikal
+      dockerfile: ./build/Dockerfile-baikal
     image: baikal:custom
     container_name: baikal
     env_file:
@@ -113,26 +112,29 @@ services:
 
   # XBS = X-browser sync
   xbs:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-xbs
+    image: xbs:custom
     container_name: xbs
     env_file:
       - environment/production.env
     depends_on:
       - mongo
-    image: xbrowsersync/api:1.1.9
     restart: unless-stopped
-    volumes:
-      - ./configurations/xbs/settings.json:/usr/src/api/config/settings.json
 
   # XBS Database
   mongo:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-mongo
+    image: mongo:custom
     container_name: mongo
     env_file:
       - environment/production.env
-    image: mongo:4.0.10
     restart: unless-stopped
     volumes:
       - database_mongo_volume:/data/db
-      - ./configurations/xbs/mongoconfig.sh:/docker-entrypoint-initdb.d/mongoconfig.sh
 
 volumes:
   letsencrypt_certs: ~

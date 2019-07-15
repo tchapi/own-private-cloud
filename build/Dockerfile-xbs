@@ -1,0 +1,3 @@
+FROM xbrowsersync/api:1.1.9
+
+COPY configurations/xbs/settings.json /usr/src/api/config/

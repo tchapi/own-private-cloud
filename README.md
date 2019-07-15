@@ -57,6 +57,10 @@ Services :
 
     git submodule update --init
 
+## Build all custom images
+
+    docker-compose build
+
 ## Set the dummy SSL certificates, then launch nginx and retrieve the real certificates
 
     ./scripts/certbot/init-letsencrypt.sh
