@@ -8,13 +8,13 @@
 define("PROJECT_TIMEZONE", "Europe/Paris");
 
 # CardDAV ON/OFF switch; default TRUE
-define("BAIKAL_CARD_ENABLED", TRUE);
+define("BAIKAL_CARD_ENABLED", true);
 
 # CalDAV ON/OFF switch; default TRUE
-define("BAIKAL_CAL_ENABLED", TRUE);
+define("BAIKAL_CAL_ENABLED", true);
 
 # WebDAV authentication type; default Digest
 define("BAIKAL_DAV_AUTH_TYPE", "Digest");
 
 # Baïkal Web admin password hash; Set via Baïkal Web Admin
-define("BAIKAL_ADMIN_PASSWORDHASH", '5fe794627e1f841f8debba065e2c807a'); // test
+define("BAIKAL_ADMIN_PASSWORDHASH", md5('admin:'.$_ENV['BAIKAL_AUTH_REALM'].':'.$_ENV['CALENDAR_ADMIN_PASSWORD']));

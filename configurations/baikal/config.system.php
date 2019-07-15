@@ -37,7 +37,7 @@
 #
 
 # If you change this value, you'll have to re-generate passwords for all your users
-define("BAIKAL_AUTH_REALM", 'BaikalDAV');
+define("BAIKAL_AUTH_REALM", $_ENV['BAIKAL_AUTH_REALM']);
 
 # Should begin and end with a "/"
 define("BAIKAL_CARD_BASEURI", PROJECT_BASEURI . "card.php/");
@@ -52,19 +52,19 @@ define("BAIKAL_DAV_BASEURI", PROJECT_BASEURI . "dav.php/");
 define("PROJECT_SQLITE_FILE", PROJECT_PATH_SPECIFIC . "db/db.sqlite");
 
 # MySQL > Use MySQL instead of SQLite ?
-define("PROJECT_DB_MYSQL", TRUE);
+define("PROJECT_DB_MYSQL", true);
 
 # MySQL > Host, including ':portnumber' if port is not the default one (3306)
 define("PROJECT_DB_MYSQL_HOST", 'mysql');
 
 # MySQL > Database name
-define("PROJECT_DB_MYSQL_DBNAME", 'baikal');
+define("PROJECT_DB_MYSQL_DBNAME", $_ENV['BAIKAL_DATABASE']);
 
 # MySQL > Username
-define("PROJECT_DB_MYSQL_USERNAME", 'baikal');
+define("PROJECT_DB_MYSQL_USERNAME", $_ENV['BAIKAL_USERNAME']);
 
 # MySQL > Password
-define("PROJECT_DB_MYSQL_PASSWORD", 'test');
+define("PROJECT_DB_MYSQL_PASSWORD", $_ENV['BAIKAL_PASSWORD']);
 
 # A random 32 bytes key that will be used to encrypt data
 define("BAIKAL_ENCRYPTION_KEY", 'a06ee64f0666d42f958d7b13bc8659de');
