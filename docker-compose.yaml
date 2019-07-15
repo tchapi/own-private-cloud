@@ -83,8 +83,6 @@ services:
       - environment/production.env
     volumes:
       - database_couch_volume:/opt/couchdb/data
-    ports:
-      - 5984:5984
 
   # Cozy Stack
   cozy:
@@ -98,9 +96,6 @@ services:
     volumes:
       - files_volume:/var/lib/cozy/data
       - ./configurations/cozy/cozy.yaml:/etc/cozy/cozy.yaml.local
-    ports:
-      - 8080:8080
-      - 6060:6060
 
   # Caldav server
   baikal:
@@ -124,8 +119,6 @@ services:
     depends_on:
       - mongo
     image: xbrowsersync/api:1.1.9
-    ports:
-      - 8080:8080
     restart: unless-stopped
     volumes:
       - ./configurations/xbs/settings.json:/usr/src/api/config/settings.json
@@ -137,8 +130,6 @@ services:
       - environment/production.env
     image: mongo:4.0.10
     restart: unless-stopped
-    ports:
-      - 27017:27017
     volumes:
       - database_mongo_volume:/data/db
       - ./configurations/xbs/mongoconfig.sh:/docker-entrypoint-initdb.d/mongoconfig.sh
