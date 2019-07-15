@@ -1,5 +1,11 @@
 {
   "db": {
     "host": "mongo"
-  }
+  },
+  "status": {
+    "message": "Yeah, hi. Fuck off.",
+    "allowNewSyncs": false
+  },
+  "maxSyncs": 1,
+  "maxSyncSize": 10240000
 }
