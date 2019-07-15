@@ -75,6 +75,10 @@ Services :
 
     ./scripts/passbolt/init-admin-user.sh
 
+## Init the Baikal instance if needed (_if the tables do not already exist_)
+
+    ./scripts/baikal/init-mysql-tables.sh
+
 # Tips
 
 > If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` on the host for the entrypoint script to be replayed entirely
