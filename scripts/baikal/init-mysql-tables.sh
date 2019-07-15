@@ -8,4 +8,5 @@ tables=$(wget https://raw.githubusercontent.com/sabre-io/Baikal/master/Core/Reso
 docker exec -it mysql bash -c "mysql -uroot -p${MYSQL_ROOT_PASSWORD} -D${BAIKAL_DATABASE} <<-EOSQL 
     ${tables} 
 EOSQL"
+echo "### Done."
 
