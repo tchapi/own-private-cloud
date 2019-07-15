@@ -2,6 +2,8 @@ FROM nginx:alpine
 
 WORKDIR /etc/nginx/
 COPY configurations/reverse-proxy/nginx.conf nginx.conf
+COPY configurations/reverse-proxy/cloud.conf cloud.conf
+
 
 RUN mkdir conf
 COPY configurations/reverse-proxy/options-ssl-nginx.conf conf/options-ssl-nginx.conf
