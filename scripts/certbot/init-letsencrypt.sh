@@ -7,7 +7,7 @@ echo "### Cleaning up first"
 docker-compose run --rm --entrypoint "\
   rm -Rf /etc/letsencrypt/live && rm -Rf /etc/letsencrypt/archive && rm -Rf /etc/letsencrypt/renewal" certbot
 docker-compose run --rm --entrypoint "\
-  mkdir -p /etc/letsencrypt/live/${NOTES_DOMAIN} /etc/letsencrypt/live/${PASSWORDS_DOMAIN} /etc/letsencrypt/live/${CLOUD_DOMAIN} /etc/letsencrypt/live/${CALENDAR_DOMAIN} /etc/letsencrypt/live/${BOOKMARKS_DOMAIN}" certbot
+  mkdir -p /etc/letsencrypt/live/${NOTES_DOMAIN} /etc/letsencrypt/live/${PASSWORDS_DOMAIN} /etc/letsencrypt/live/${CLOUD_DOMAIN} /etc/letsencrypt/live/${CALENDAR_DOMAIN} /etc/letsencrypt/live/${BOOKMARKS_DOMAIN} /etc/letsencrypt/live/${SYNC_DOMAIN}" certbot
 
 echo "### Creating dummy certificates"
 docker-compose run --rm --entrypoint "\
@@ -34,6 +34,11 @@ docker-compose run --rm --entrypoint "\
   openssl req -x509 -nodes -newkey rsa:1024 -days 1\
     -keyout '/etc/letsencrypt/live/${BOOKMARKS_DOMAIN}/privkey.pem' \
     -out '/etc/letsencrypt/live/${BOOKMARKS_DOMAIN}/fullchain.pem' \
+    -subj '/CN=localhost'" certbot
+docker-compose run --rm --entrypoint "\
+  openssl req -x509 -nodes -newkey rsa:1024 -days 1\
+    -keyout '/etc/letsencrypt/live/${SYNC_DOMAIN}/privkey.pem' \
+    -out '/etc/letsencrypt/live/${SYNC_DOMAIN}/fullchain.pem' \
     -subj '/CN=localhost'" certbot
 
 # This will spin up the whole thing because of dependencies
@@ -77,6 +82,13 @@ docker-compose run --rm --entrypoint "\
   certbot certonly --webroot -w /var/www/letsencrypt \
     --email ${EMAIL} \
     -d ${BOOKMARKS_DOMAIN} \
+    --rsa-key-size 4096 \
+    --agree-tos \
+    --force-renewal" certbot
+docker-compose run --rm --entrypoint "\
+  certbot certonly --webroot -w /var/www/letsencrypt \
+    --email ${EMAIL} \
+    -d ${SYNC_DOMAIN} \
     --rsa-key-size 4096 \
     --agree-tos \
     --force-renewal" certbot

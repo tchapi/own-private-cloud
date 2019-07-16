@@ -136,6 +136,20 @@ services:
     volumes:
       - database_mongo_volume:/data/db
 
+  # Syncthing
+  syncthing:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-syncthing
+    image: syncthing:custom
+    container_name: syncthing
+    env_file:
+      - environment/production.env
+    ports:
+      - 22000:22000 # We must expose this port for Syncthing to work
+    volumes:
+      - sync_volume:/var/syncthing/data
+
 volumes:
   letsencrypt_certs: ~
   letsencrypt_www: ~
@@ -165,3 +179,9 @@ volumes:
       o: bind
       type: none
       device: /mnt/files
+  sync_volume: # This volume is actually an attached OpenStack Block storage. It stores the syncthing data
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/sync
