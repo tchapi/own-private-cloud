@@ -49,6 +49,12 @@ Services :
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
 
+#### The sync volume :
+
+    docker-machine ssh default 'sudo fdisk /dev/sdd # n, p, w'
+    docker-machine ssh default 'sudo mkfs.ext4 /dev/sdd1'
+    docker-machine ssh default 'sudo mkdir /mnt/sync && sudo mount /dev/sdd1 /mnt/sync'
+
 ## Get environment variables to target the remote docker instance
 
     eval $(docker-machine env default)

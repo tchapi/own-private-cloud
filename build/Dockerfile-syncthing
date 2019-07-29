@@ -1,3 +1,4 @@
 FROM syncthing/syncthing:1.2.0
 
 COPY configurations/syncthing/config.xml /var/syncthing/config/config.xml
+RUN mdkir /var/syncthing/data
