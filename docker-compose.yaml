@@ -9,6 +9,8 @@ services:
       - letsencrypt_certs:/etc/letsencrypt
       - letsencrypt_www:/var/www/letsencrypt
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+    networks:
+      - front_network
 
   reverse-proxy:
     build:
@@ -30,6 +32,14 @@ services:
       - baikal
     restart: unless-stopped
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    networks:
+      - front_network
+      - sesame_network
+      - notes_network
+      - cloud_network
+      - calendar_network
+      - bookmarks_network
+      - sync_network
 
   mysql:
     build:
@@ -41,6 +51,10 @@ services:
       - environment/production.env
     volumes:
       - database_mysql_volume:/var/lib/mysql
+    networks:
+      - sesame_network
+      - notes_network
+      - calendar_network
 
   passbolt:
     container_name: passbolt
@@ -56,6 +70,8 @@ services:
       - /run
     command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
     restart: unless-stopped
+    networks:
+      - sesame_network
 
   standardnotes:
     build:
@@ -73,6 +89,8 @@ services:
                /data/src/docker/entrypoint bootstrap &&
                /data/src/docker/entrypoint start'
     restart: unless-stopped
+    networks:
+      - notes_network
 
   # Cozy Database
   couchdb:
@@ -83,6 +101,8 @@ services:
       - environment/production.env
     volumes:
       - database_couch_volume:/opt/couchdb/data
+    networks:
+      - cloud_network
 
   # Cozy Stack
   cozy:
@@ -95,6 +115,8 @@ services:
       - couchdb
     volumes:
       - files_volume:/var/lib/cozy/data
+    networks:
+      - cloud_network
 
   # Caldav server
   baikal:
@@ -109,6 +131,8 @@ services:
       - mysql
     volumes:
       - baikal_www:/var/www/calendar_server
+    networks:
+      - calendar_network
 
   # XBS = X-browser sync
   xbs:
@@ -122,6 +146,8 @@ services:
     depends_on:
       - mongo
     restart: unless-stopped
+    networks:
+      - bookmarks_network
 
   # XBS Database
   mongo:
@@ -135,6 +161,8 @@ services:
     restart: unless-stopped
     volumes:
       - database_mongo_volume:/data/db
+    networks:
+      - bookmarks_network
 
   # Syncthing
   syncthing:
@@ -149,6 +177,17 @@ services:
       - 22000:22000 # We must expose this port for Syncthing to work
     volumes:
       - sync_volume:/var/syncthing/data
+    networks:
+      - sync_network
+
+networks:
+  front_network: ~
+  sesame_network: ~
+  notes_network: ~
+  cloud_network: ~
+  calendar_network: ~
+  bookmarks_network: ~
+  sync_network: ~
 
 volumes:
   letsencrypt_certs: ~
