@@ -7,6 +7,7 @@ Services :
   - Passbolt — A free, open-source, extensible, OpenPGP-based password manager
   - X-browser Sync — A free and open-source browser syncing tool
   - Baïkal — A GPLv3 Cal and CardDAV server, based on sabre/dav
+  - Wekan — A MIT Kanban board manager, comparable to Trello
 
 > All services are served through an HTTPS proxy based on Nginx, certificates are provided by Let's Encrypt.
 

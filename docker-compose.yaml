@@ -40,6 +40,7 @@ services:
       - calendar_network
       - bookmarks_network
       - sync_network
+      - tasks_network
 
   mysql:
     build:
@@ -149,7 +150,7 @@ services:
     networks:
       - bookmarks_network
 
-  # XBS Database
+  # XBS Database / Wekan database
   mongo:
     build:
       context: ./
@@ -163,6 +164,7 @@ services:
       - database_mongo_volume:/data/db
     networks:
       - bookmarks_network
+      - tasks_network
 
   # Syncthing
   syncthing:
@@ -180,6 +182,18 @@ services:
     networks:
       - sync_network
 
+  # Wekan (tasks)
+  wekan:
+    image: wekanteam/wekan
+    container_name: tasks
+    restart: unless-stopped
+    depends_on:
+      - mongo
+    env_file:
+      - environment/production.env
+    networks:
+      - tasks_network
+
 networks:
   front_network: ~
   sesame_network: ~
@@ -188,6 +202,7 @@ networks:
   calendar_network: ~
   bookmarks_network: ~
   sync_network: ~
+  tasks_network: ~
 
 volumes:
   letsencrypt_certs: ~
