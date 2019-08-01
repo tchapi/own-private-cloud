@@ -74,6 +74,7 @@ Services :
 ## Provision the whole thing in daemon mode
 
 > Some containers have already been started by the init-letsencrypt script
+> This should only start certbot
 
     docker-compose up -d
 
