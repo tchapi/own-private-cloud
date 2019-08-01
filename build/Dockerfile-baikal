@@ -3,10 +3,9 @@ FROM php:7.2-fpm
 ### Configure Postfix options prior to installing the package to prevent the config screen from appearing
 #
 # These parameters are specific to your own Postfix relay!  Use your host and domain names.
-RUN echo "postfix postfix/mailname string calendar.example.org" | debconf-set-selections && \
-    echo "postfix postfix/main_mailer_type string 'Satellite system'" | debconf-set-selections && \
-    echo "postfix postfix/relayhost string smtpcal.example.org" | debconf-set-selections && \
-    echo "postfix postfix/root_address string cal-bounce@example.org" | debconf-set-selections
+RUN echo "postfix postfix/mailname string ***REMOVED***.me" | debconf-set-selections && \
+    echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
+    echo "postfix postfix/relayhost string [ssl0.ovh.net]:465" | debconf-set-selections
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
@@ -32,6 +31,12 @@ WORKDIR /var/www/calendar_server
 # https://groups.google.com/forum/#!searchin/sabredav-discuss/scheduling|sort:relevance/sabredav-discuss/CrGZXqw4sRw/vsHYq6FDcnkJ
 # This needs to be patched on the Baikal start up Server.php, NOT in the SabreDAV server.
 COPY configurations/baikal/Server.php Core/Frameworks/Baikal/Core/Server.php
+
+COPY configurations/baikal/sasl_passwd /etc/postfix/sasl_passwd
+RUN postmap /etc/postfix/sasl_passwd
+RUN chown root:root /etc/postfix/sasl_passwd /etc/postfix/sasl_passwd.db
+RUN chmod 0600 /etc/postfix/sasl_passwd /etc/postfix/sasl_passwd.db
+RUN mkfifo /var/spool/postfix/public/pickup
 
 # The Baikal administration wizard creates these two config files when first run.  Preserve them
 # and save them to the resources/ directory.  These files must be preserved for upgrades.
