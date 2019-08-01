@@ -20,7 +20,7 @@ Services :
 ## Create the machine
 
     docker-machine create -d openstack \
-    --openstack-flavor-name="s1-2" \
+    --openstack-flavor-name="b2-7" \
     --openstack-region="GRA5" \
     --openstack-image-name="Debian 9" \
     --openstack-net-name="Ext-Net" \
@@ -49,12 +49,7 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-
-#### The sync volume :
-
-    docker-machine ssh default 'sudo fdisk /dev/sdd # n, p, w'
-    docker-machine ssh default 'sudo mkfs.ext4 /dev/sdd1'
-    docker-machine ssh default 'sudo mkdir /mnt/sync && sudo mount /dev/sdd1 /mnt/sync'
+    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/sync'
 
 ## Get environment variables to target the remote docker instance
 

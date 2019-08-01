@@ -30,6 +30,9 @@ services:
       - standardnotes
       - cozy
       - baikal
+      - syncthing
+      - xbs
+      - wekan
     restart: unless-stopped
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     networks:
@@ -48,6 +51,7 @@ services:
       dockerfile: ./build/Dockerfile-mysql
     image: mariadb:custom
     container_name: mysql
+    restart: unless-stopped
     env_file:
       - environment/production.env
     volumes:
@@ -115,7 +119,7 @@ services:
     depends_on:
       - couchdb
     volumes:
-      - files_volume:/var/lib/cozy/data
+      - files_cozy_volume:/var/lib/cozy/data
     networks:
       - cloud_network
 
@@ -126,6 +130,7 @@ services:
       dockerfile: ./build/Dockerfile-baikal
     image: baikal:custom
     container_name: baikal
+    restart: unless-stopped
     env_file:
       - environment/production.env
     depends_on:
@@ -173,12 +178,13 @@ services:
       dockerfile: ./build/Dockerfile-syncthing
     image: syncthing:custom
     container_name: syncthing
+    restart: unless-stopped
     env_file:
       - environment/production.env
     ports:
       - 22000:22000 # We must expose this port for Syncthing to work
     volumes:
-      - sync_volume:/var/syncthing/data
+      - files_sync_volume:/var/syncthing/data
     networks:
       - sync_network
 
@@ -227,15 +233,15 @@ volumes:
       o: bind
       type: none
       device: /mnt/databases/mongo
-  files_volume: # This volume is actually an attached OpenStack Block storage. It stores the cozy files
+  files_cozy_volume: # This volume is actually an attached OpenStack Block storage. It stores the cozy files
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: /mnt/files
-  sync_volume: # This volume is actually an attached OpenStack Block storage. It stores the syncthing data
+      device: /mnt/files/cozy
+  files_sync_volume: # This volume is actually an attached OpenStack Block storage. It stores the syncthing data
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: /mnt/sync
+      device: /mnt/files/sync
