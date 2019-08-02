@@ -88,6 +88,13 @@ Services :
 
 # Run & Maintenance
 
+To prevent user registration in the notes container :
+
+    docker exec -it notes sed -i 's/\(post "auth" =>\)/# \1/' /data/src/config/routes.rb
+    docker-compose restart standardnotes
+
+To prevent user registration in wekan, just go in the settings page (https://tasks.***REMOVED***.me/setting) and deactivate it.
+
 To see the disk usage :
 
     docker-machine ssh default "df -h | grep '^/dev'"
