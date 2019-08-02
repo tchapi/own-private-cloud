@@ -34,11 +34,12 @@ use PDO;
  *
  * This class sets up the underlying Sabre\DAV\Server object.
  *
- * @copyright Copyright (C) Jérôme Schneider <mail@jeromeschneider.fr>
- * @author Evert Pot (http://evertpot.com/)
- * @license http://sabre.io/license/ GPLv2
+ * @author    Jérôme Schneider <mail@jeromeschneider.fr>
+ * @copyright 2013 Jérôme Schneider
+ * @license   http://sabre.io/license/ GPLv2
  */
-class Server {
+class Server
+{
 
     /**
      * Is CalDAV enabled?
@@ -48,7 +49,7 @@ class Server {
     protected $enableCalDAV;
 
     /**
-     * is CardDAV enabled?
+     * Is CardDAV enabled?
      *
      * @var bool
      */
@@ -76,7 +77,7 @@ class Server {
     protected $pdo;
 
     /**
-     * baseUri for the sabre/dav server
+     * Base Uri for the sabre/dav server
      *
      * @var string
      */
@@ -93,14 +94,15 @@ class Server {
     /**
      * Creates the server object.
      *
-     * @param bool $enableCalDAV
-     * @param bool $enableCardDAV
+     * @param bool   $enableCalDAV
+     * @param bool   $enableCardDAV
      * @param string $authType
      * @param string $authRealm
-     * @param PDO $pdo
+     * @param PDO    $pdo
      * @param string $baseUri
      */
-    function __construct($enableCalDAV, $enableCardDAV, $authType, $authRealm, PDO $pdo, $baseUri) {
+    function __construct($enableCalDAV, $enableCardDAV, $authType, $authRealm, PDO $pdo, $baseUri)
+    {
 
         $this->enableCalDAV = $enableCalDAV;
         $this->enableCardDAV = $enableCardDAV;
@@ -110,7 +112,6 @@ class Server {
         $this->baseUri = $baseUri;
 
         $this->initServer();
-
     }
 
     /**
@@ -118,10 +119,10 @@ class Server {
      *
      * @return void
      */
-    function start() {
+    function start()
+    {
 
         $this->server->exec();
-
     }
 
     /**
@@ -129,7 +130,8 @@ class Server {
      *
      * @return void
      */
-    protected function initServer() {
+    protected function initServer()
+    {
 
         if ($this->authType === 'Basic') {
             $authBackend = new \Baikal\Core\PDOBasicAuth($this->pdo, $this->authRealm);
@@ -158,9 +160,11 @@ class Server {
         $this->server->addPlugin(new \Sabre\DAVACL\Plugin());
         $this->server->addPlugin(new \Sabre\DAV\Browser\Plugin());
 
-        $this->server->addPlugin(new \Sabre\DAV\PropertyStorage\Plugin(
-            new \Sabre\DAV\PropertyStorage\Backend\PDO($this->pdo)
-        ));
+        $this->server->addPlugin(
+            new \Sabre\DAV\PropertyStorage\Plugin(
+                new \Sabre\DAV\PropertyStorage\Backend\PDO($this->pdo)
+            )
+        );
 
         // WebDAV-Sync!
         $this->server->addPlugin(new \Sabre\DAV\Sync\Plugin());
@@ -173,13 +177,11 @@ class Server {
             // http://sabre.io/dav/scheduling/
             // https://groups.google.com/forum/#!searchin/sabredav-discuss/scheduling|sort:relevance/sabredav-discuss/CrGZXqw4sRw/vsHYq6FDcnkJ
             // This needs to be patched on the Baikal start up Server.php, NOT in the SabreDAV server.
-            $this->server->addPlugin(new \Sabre\CalDAV\Schedule\IMipPlugin('***REMOVED***@***REMOVED***.me'));
+            $this->server->addPlugin(new \Sabre\CalDAV\Schedule\IMipPlugin($_ENV['EMAIL']));
         }
         if ($this->enableCardDAV) {
             $this->server->addPlugin(new \Sabre\CardDAV\Plugin());
             $this->server->addPlugin(new \Sabre\CardDAV\VCFExportPlugin());
         }
-
     }
-
 }

@@ -118,6 +118,12 @@ services:
     build:
       context: ./
       dockerfile: ./build/Dockerfile-baikal
+      args:
+        email: ${EMAIL}
+        mail_host: ${MAIL_HOST}
+        calendar_domain: ${CALENDAR_DOMAIN}
+        mail_username: ${MAIL_USERNAME}
+        mail_password: ${MAIL_PASSWORD}
     image: baikal:custom
     container_name: baikal
     restart: unless-stopped

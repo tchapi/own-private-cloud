@@ -1,18 +1,28 @@
 FROM php:7.2-fpm
 
-### Configure Postfix options prior to installing the package to prevent the config screen from appearing
-#
-# These parameters are specific to your own Postfix relay!  Use your host and domain names.
-RUN echo "postfix postfix/mailname string ***REMOVED***.me" | debconf-set-selections && \
-    echo "postfix postfix/main_mailer_type string 'Internet Site'" | debconf-set-selections && \
-    echo "postfix postfix/relayhost string [ssl0.ovh.net]:465" | debconf-set-selections
+ARG email
+ARG mail_host
+ARG calendar_domain
+ARG mail_username
+ARG mail_password
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
-        postfix \
-        mailutils \
         unzip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# MAILS
+RUN curl -O http://cdn-fastly.deb.debian.org/debian/pool/main/s/ssmtp/ssmtp_2.64.orig.tar.bz2 && \
+    bunzip2 ssmtp_2.64.orig.tar.bz2 && \
+    tar -xvf ssmtp_2.64.orig.tar && \
+    cd ssmtp-2.64 && ./configure && make && \
+    echo "echo 'Skipping config generation'" > generate_config && make install && \
+    cd .. && rm -rf ssmtp-2.64 && rm ssmtp_2.64.orig.tar
+
+COPY configurations/baikal/php-mail.ini /usr/local/etc/php/conf.d/mail.ini
+RUN echo "root=${email}\nmailhub=${mail_host}\nrewriteDomain= \
+          \nhostname=${calendar_domain}\nFromLineOverride=YES \
+          \nAuthUser=${mail_username}\nAuthPass=${mail_password}\n" > /usr/local/etc/ssmtp/ssmtp.conf
 
 RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
     && docker-php-ext-install pdo_mysql \
@@ -31,12 +41,6 @@ WORKDIR /var/www/calendar_server
 # https://groups.google.com/forum/#!searchin/sabredav-discuss/scheduling|sort:relevance/sabredav-discuss/CrGZXqw4sRw/vsHYq6FDcnkJ
 # This needs to be patched on the Baikal start up Server.php, NOT in the SabreDAV server.
 COPY configurations/baikal/Server.php Core/Frameworks/Baikal/Core/Server.php
-
-COPY configurations/baikal/sasl_passwd /etc/postfix/sasl_passwd
-RUN postmap /etc/postfix/sasl_passwd
-RUN chown root:root /etc/postfix/sasl_passwd /etc/postfix/sasl_passwd.db
-RUN chmod 0600 /etc/postfix/sasl_passwd /etc/postfix/sasl_passwd.db
-RUN mkfifo /var/spool/postfix/public/pickup
 
 # The Baikal administration wizard creates these two config files when first run.  Preserve them
 # and save them to the resources/ directory.  These files must be preserved for upgrades.
