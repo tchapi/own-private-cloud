@@ -99,7 +99,6 @@ To see the disk usage :
 
     docker-machine ssh default "df -h | grep '^/dev'"
 
-
 # Tips
 
 > If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (`mongo`, or `couch` too if needed) on the host for the entrypoint script to be replayed entirely
