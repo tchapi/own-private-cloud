@@ -8,6 +8,7 @@ services:
     volumes:
       - letsencrypt_certs:/etc/letsencrypt
       - letsencrypt_www:/var/www/letsencrypt
+    env_file: .env
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     networks:
       - front_network
@@ -34,6 +35,7 @@ services:
       - xbs
       - wekan
     restart: unless-stopped
+    env_file: .env
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     networks:
       - front_network
@@ -52,6 +54,7 @@ services:
     image: mariadb:custom
     container_name: mysql
     restart: unless-stopped
+    env_file: .env
     volumes:
       - database_mysql_volume:/var/lib/mysql
     networks:
@@ -71,6 +74,7 @@ services:
       - /run
     command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
     restart: unless-stopped
+    env_file: .env
     networks:
       - sesame_network
 
@@ -88,6 +92,7 @@ services:
                /data/src/docker/entrypoint bootstrap &&
                /data/src/docker/entrypoint start'
     restart: unless-stopped
+    env_file: .env
     networks:
       - notes_network
 
@@ -96,6 +101,7 @@ services:
     image: couchdb:2.3
     container_name: couchdb
     restart: unless-stopped
+    env_file: .env
     volumes:
       - database_couch_volume:/opt/couchdb/data
     networks:
@@ -106,6 +112,7 @@ services:
     image: cozy/cozy-stack
     container_name: cozy
     restart: unless-stopped
+    env_file: .env
     depends_on:
       - couchdb
     volumes:
@@ -127,6 +134,7 @@ services:
     image: baikal:custom
     container_name: baikal
     restart: unless-stopped
+    env_file: .env
     depends_on:
       - mysql
     volumes:
@@ -144,6 +152,7 @@ services:
     depends_on:
       - mongo
     restart: unless-stopped
+    env_file: .env
     networks:
       - bookmarks_network
 
@@ -155,6 +164,7 @@ services:
     image: mongo:custom
     container_name: mongo
     restart: unless-stopped
+    env_file: .env
     volumes:
       - database_mongo_volume:/data/db
     networks:
@@ -169,6 +179,7 @@ services:
     image: syncthing:custom
     container_name: syncthing
     restart: unless-stopped
+    env_file: .env
     ports:
       - 22000:22000 # We must expose this port for Syncthing to work
     volumes:
@@ -181,6 +192,7 @@ services:
     image: wekanteam/wekan
     container_name: tasks
     restart: unless-stopped
+    env_file: .env
     depends_on:
       - mongo
     networks:
