@@ -1,16 +1,8 @@
 <configuration version="29">
-    <device id="PT2BMK6-IFW2TGH-NJMQ6JN-CEIWP4P-JRZE6VN-5VO5C4U-OJFPB4D-NP454QY" name="sync" compression="metadata" introducer="false" skipIntroductionRemovals="false" introducedBy="">
-        <address>tcp://sync.***REMOVED***.me</address>
-        <paused>false</paused>
-        <autoAcceptFolders>false</autoAcceptFolders>
-        <maxSendKbps>0</maxSendKbps>
-        <maxRecvKbps>0</maxRecvKbps>
-        <maxRequestKiB>0</maxRequestKiB>
-    </device>
     <gui enabled="true" tls="true" debugging="false">
         <address>0.0.0.0:8384</address>
         <user>***REMOVED***</user>
-        <password>$2a$10$PWW6xNaDiXRHchT7Wr8o7uMdzVE43nCaQ3EcCbbSN4HH1BlfVmZjC</password>
+        <password>$***REMOVED***</password>
         <apikey>***REMOVED***</apikey>
         <theme>default</theme>
     </gui>
