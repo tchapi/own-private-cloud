@@ -3,7 +3,7 @@
 Services :
 
   - Standard notes — A free, open-source, and completely encrypted notes app
-  - Cozy Cloud (_Drive, photos and settings only_) — A smart personal cloud to gather all your data
+  - Cozy Cloud (_Drive and settings only_) — A smart personal cloud to gather all your data
   - Passbolt — A free, open-source, extensible, OpenPGP-based password manager
   - X-browser Sync — A free and open-source browser syncing tool
   - Baïkal — A GPLv3 Cal and CardDAV server, based on sabre/dav
