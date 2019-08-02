@@ -99,6 +99,20 @@ To see the disk usage :
 
     docker-machine ssh default "df -h | grep '^/dev'"
 
+When making a block storage bigger :
+
+  1. First **stop** the container using it (cozy + syncthing, or many more if it's the databases)
+  2. Unmount the `/dev/sd*1` volume
+  3. Change the size in the Public Cloud interface
+  4. WARNING The volume will change name
+  4. Delete (d,w) / recreate the partition (n,p,w) / `sudo e2fsck -f /dev/sd*1` / `sudo resize2fs /dev/sd*1`
+  5. Remount it
+  6. Restart the container
+  7. :tada:
+
+See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for more info
+
+
 # Tips
 
 > If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (`mongo`, or `couch` too if needed) on the host for the entrypoint script to be replayed entirely
