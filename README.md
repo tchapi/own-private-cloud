@@ -129,4 +129,5 @@ See https://github.com/Kickball/awesome-selfhosted for more awesome self-hosted 
   - SoGo : https://sogo.nu/support/faq/how-to-install-sogo-on-debian.html
   - Radicale : https://radicale.org/
   - Calendar Server:  https://www.calendarserver.org/ (Apple)
+  - An android client app for CalDav / CardDav : https://gitlab.com/bitfireAT/davx5-ose - https://f-droid.org/packages/at.bitfire.davdroid/
   
