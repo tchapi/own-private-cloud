@@ -125,6 +125,7 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
   - Lets Encrypt with Docker (alt) : https://medium.com/@pentacent/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71
   - Create and configure a block volume in OVH Public Cloud : https://docs.ovh.com/fr/public-cloud/creer-et-configurer-un-disque-supplementaire-sur-une-instance/
   - Shell command  / Entrypoint in Docker : https://stackoverflow.com/questions/41512237/how-to-execute-a-shell-command-before-the-entrypoint-via-the-dockerfile
+  - Ignore files for Cozy drive : https://github.com/cozy-labs/cozy-desktop/blob/master/doc/usage/ignore_files.md
 
 ## Dockerfiles :
 
