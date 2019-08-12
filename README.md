@@ -8,6 +8,7 @@ Services :
   - X-browser Sync — A free and open-source browser syncing tool
   - Baïkal — A GPLv3 Cal and CardDAV server, based on sabre/dav
   - Wekan — A MIT Kanban board manager, comparable to Trello
+  - Syncthing — A continuous file synchronization program under the Mozilla Public License 2.0 license
 
 > All services are served through an HTTPS proxy based on Nginx, certificates are provided by Let's Encrypt.
 
@@ -134,6 +135,7 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
   - Standard Notes : https://github.com/arugifa/standardnotes-server-docker/blob/master/Dockerfile
   - MariaDB : https://github.com/docker-library/mariadb/blob/master/10.4/docker-entrypoint.sh
   - x-browser-sync : https://github.com/xbrowsersync/api-docker
+  - syncthing : https://github.com/syncthing/syncthing/blob/master/Dockerfile
 
 ## Other alternatives
 
