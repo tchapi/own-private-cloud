@@ -8,6 +8,7 @@ services:
     volumes:
       - letsencrypt_certs:/etc/letsencrypt
       - letsencrypt_www:/var/www/letsencrypt
+    env_file: .env
     entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     networks:
       - front_network
@@ -30,7 +31,11 @@ services:
       - standardnotes
       - cozy
       - baikal
+      - syncthing
+      - xbs
+      - wekan
     restart: unless-stopped
+    env_file: .env
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     networks:
       - front_network
@@ -48,8 +53,8 @@ services:
       dockerfile: ./build/Dockerfile-mysql
     image: mariadb:custom
     container_name: mysql
-    env_file:
-      - environment/production.env
+    restart: unless-stopped
+    env_file: .env
     volumes:
       - database_mysql_volume:/var/lib/mysql
     networks:
@@ -63,14 +68,13 @@ services:
     tty: true
     depends_on:
       - mysql
-    env_file:
-      - environment/production.env
     volumes:
       - gpg_volume:/var/www/passbolt/config/gpg
     tmpfs:
       - /run
     command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
     restart: unless-stopped
+    env_file: .env
     networks:
       - sesame_network
 
@@ -82,14 +86,13 @@ services:
     container_name: notes
     depends_on:
       - mysql
-    env_file:
-      - environment/production.env
     command: >
       bash -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
                sleep 2 &&
                /data/src/docker/entrypoint bootstrap &&
                /data/src/docker/entrypoint start'
     restart: unless-stopped
+    env_file: .env
     networks:
       - notes_network
 
@@ -98,8 +101,7 @@ services:
     image: couchdb:2.3
     container_name: couchdb
     restart: unless-stopped
-    env_file:
-      - environment/production.env
+    env_file: .env
     volumes:
       - database_couch_volume:/opt/couchdb/data
     networks:
@@ -110,12 +112,11 @@ services:
     image: cozy/cozy-stack
     container_name: cozy
     restart: unless-stopped
-    env_file:
-      - environment/production.env
+    env_file: .env
     depends_on:
       - couchdb
     volumes:
-      - files_volume:/var/lib/cozy/data
+      - files_cozy_volume:/var/lib/cozy/data
     networks:
       - cloud_network
 
@@ -124,10 +125,16 @@ services:
     build:
       context: ./
       dockerfile: ./build/Dockerfile-baikal
+      args:
+        email: ${EMAIL}
+        mail_host: ${MAIL_HOST}
+        calendar_domain: ${CALENDAR_DOMAIN}
+        mail_username: ${MAIL_USERNAME}
+        mail_password: ${MAIL_PASSWORD}
     image: baikal:custom
     container_name: baikal
-    env_file:
-      - environment/production.env
+    restart: unless-stopped
+    env_file: .env
     depends_on:
       - mysql
     volumes:
@@ -142,11 +149,10 @@ services:
       dockerfile: ./build/Dockerfile-xbs
     image: xbs:custom
     container_name: xbs
-    env_file:
-      - environment/production.env
     depends_on:
       - mongo
     restart: unless-stopped
+    env_file: .env
     networks:
       - bookmarks_network
 
@@ -157,9 +163,8 @@ services:
       dockerfile: ./build/Dockerfile-mongo
     image: mongo:custom
     container_name: mongo
-    env_file:
-      - environment/production.env
     restart: unless-stopped
+    env_file: .env
     volumes:
       - database_mongo_volume:/data/db
     networks:
@@ -173,12 +178,12 @@ services:
       dockerfile: ./build/Dockerfile-syncthing
     image: syncthing:custom
     container_name: syncthing
-    env_file:
-      - environment/production.env
+    restart: unless-stopped
+    env_file: .env
     ports:
       - 22000:22000 # We must expose this port for Syncthing to work
     volumes:
-      - sync_volume:/var/syncthing/data
+      - files_sync_volume:/var/syncthing/data
     networks:
       - sync_network
 
@@ -187,10 +192,9 @@ services:
     image: wekanteam/wekan
     container_name: tasks
     restart: unless-stopped
+    env_file: .env
     depends_on:
       - mongo
-    env_file:
-      - environment/production.env
     networks:
       - tasks_network
 
@@ -227,15 +231,15 @@ volumes:
       o: bind
       type: none
       device: /mnt/databases/mongo
-  files_volume: # This volume is actually an attached OpenStack Block storage. It stores the cozy files
+  files_cozy_volume: # This volume is actually an attached OpenStack Block storage. It stores the cozy files
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: /mnt/files
-  sync_volume: # This volume is actually an attached OpenStack Block storage. It stores the syncthing data
+      device: /mnt/files/cozy
+  files_sync_volume: # This volume is actually an attached OpenStack Block storage. It stores the syncthing data
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: /mnt/sync
+      device: /mnt/files/sync

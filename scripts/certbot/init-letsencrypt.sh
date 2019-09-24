@@ -1,7 +1,7 @@
 #!/bin/bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
-source $DIR/../../environment/production.env
+source $DIR/../../.env
 
 echo "### Cleaning up first"
 docker-compose run --rm --entrypoint "\
