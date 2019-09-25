@@ -63,8 +63,11 @@ services:
       - calendar_network
 
   passbolt:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-passbolt
+    image: passbolt:custom
     container_name: passbolt
-    image: passbolt/passbolt:latest
     tty: true
     depends_on:
       - mysql

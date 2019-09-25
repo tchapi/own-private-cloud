@@ -1,0 +1,4 @@
+FROM passbolt/passbolt:latest
+
+# Change the too small timeout for sessions to 3 days
+RUN sed -i "s/session.gc_maxlifetime = .*/session.gc_maxlifetime = 259200 ; 3 days/g" /usr/local/etc/php/php.ini
