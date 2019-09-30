@@ -62,6 +62,12 @@ Services :
 
 ## Build all custom images
 
+Build configuration files first :
+
+    ./scripts/build-configuration-files.sh
+
+And then build the images :
+
     docker-compose build
 
 ## Set the dummy SSL certificates, then launch nginx and retrieve the real certificates
