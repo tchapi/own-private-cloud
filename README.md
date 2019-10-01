@@ -62,7 +62,7 @@ Services :
 
 ## Build all custom images
 
-Build configuration files first :
+Build configuration files first (_so that environment variables are replaced correctly_):
 
     ./scripts/build-configuration-files.sh
 

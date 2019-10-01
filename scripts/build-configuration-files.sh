@@ -11,21 +11,21 @@ source $DIR/../.env
 expandVars()
 {
     eval "cat <<EOF
-$(< $1.template)
+$(< $1)
 EOF
-" 2> /dev/null 1> $1
+" 2> /dev/null 1> $2
 }
 
 echo "### Building configuration files"
 # Create the reverse-proxy configurations
-expandVars ./configurations/reverse-proxy/cloud.conf
-expandVars ./configurations/reverse-proxy/nginx.conf
+expandVars ./configurations/reverse-proxy/cloud.conf.template ./configurations/reverse-proxy/cloud.conf
+expandVars ./configurations/reverse-proxy/nginx.conf.template ./configurations/reverse-proxy/nginx.conf
 
 # Notes extensions
-expandVars ./configurations/standardnotes/extensions/advanced-markdown-editor.json
-expandVars ./configurations/standardnotes/extensions/autocomplete-tags.json
-expandVars ./configurations/standardnotes/extensions/plus-editor.json
-expandVars ./configurations/standardnotes/extensions/secure-spreadsheets.json
-expandVars ./configurations/standardnotes/extensions/simple-task-editor.json
+expandVars ./configurations/standardnotes/templates/advanced-markdown-editor.json.template ./configurations/standardnotes/extensions/advanced-markdown-editor.json
+expandVars ./configurations/standardnotes/templates/autocomplete-tags.json.template ./configurations/standardnotes/extensions/autocomplete-tags.json
+expandVars ./configurations/standardnotes/templates/plus-editor.json.template ./configurations/standardnotes/extensions/plus-editor.json
+expandVars ./configurations/standardnotes/templates/secure-spreadsheets.json.template ./configurations/standardnotes/extensions/secure-spreadsheets.json
+expandVars ./configurations/standardnotes/templates/simple-task-editor.json.template ./configurations/standardnotes/extensions/simple-task-editor.json
 
 echo "### Done."
