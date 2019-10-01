@@ -1,9 +1,9 @@
 <configuration version="29">
     <gui enabled="true" tls="true" debugging="false">
         <address>0.0.0.0:8384</address>
-        <user>***REMOVED***</user>
-        <password>$***REMOVED***</password>
-        <apikey>***REMOVED***</apikey>
+        <user>$USER</user>
+        <password>$SYNC_UI_PASSWORD</password>
+        <apikey>$SYNC_API_KEY</apikey>
         <theme>default</theme>
     </gui>
     <ldap></ldap>
