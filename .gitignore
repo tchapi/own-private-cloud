@@ -1,4 +1,12 @@
 .DS_Store
 
+# OpenStack configuration file
 openrc.sh
+
+# Environment vars
 .env
+
+# Built configuration files
+configurations/reverse-proxy/cloud.conf
+configurations/reverse-proxy/nginx.conf
+configurations/standardnotes/extensions/*.json
