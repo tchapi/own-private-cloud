@@ -1,5 +1,7 @@
 # Personal Infrastructure As A Service
 
+✅ See [this blogpost](https://www.foobarflies.io/your-own-public-cloud-why-not/) for a complete (and technical) explanation.
+
 Services :
 
   - Standard notes — A free, open-source, and completely encrypted notes app
@@ -108,17 +110,16 @@ To see the disk usage :
 
 When making a block storage bigger :
 
-  1. First **stop** the container using it (cozy + syncthing, or many more if it's the databases)
+  1. First **stop** the container using it (cozy + syncthing for instance, or many more if it's the databases)
   2. Unmount the `/dev/sd*1` volume
   3. Change the size in the Public Cloud interface
-  4. WARNING The volume will change name
-  4. Delete (d,w) / recreate the partition (n,p,w) / `sudo e2fsck -f /dev/sd*1` / `sudo resize2fs /dev/sd*1`
+  4. WARNING The volume name will likely change
+  4. Delete (`d`,`w`) / recreate the partition (`n`,`p`,`w`) / `sudo e2fsck -f /dev/sd*1` / `sudo resize2fs /dev/sd*1`
   5. Remount it
   6. Restart the container
   7. :tada:
 
 See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for more info
-
 
 # Tips
 
@@ -147,7 +148,7 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
 
 See https://github.com/Kickball/awesome-selfhosted for more awesome self-hosted alternatives.
 
-### CalDav / CardDav projects
+### Other CalDav / CardDav projects worth noting
 
   - SoGo : https://sogo.nu/support/faq/how-to-install-sogo-on-debian.html
   - Radicale : https://radicale.org/
