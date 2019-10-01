@@ -26,8 +26,8 @@ Services :
     --openstack-image-name="Debian 9" \
     --openstack-net-name="Ext-Net" \
     --openstack-ssh-user="debian" \
-    --openstack-keypair-name="PRIMUS" \
-    --openstack-private-key-file="/Users/***REMOVED***/.ssh/id_rsa" \
+    --openstack-keypair-name="MY_KEY_NAME_IN_OPENSTACK" \
+    --openstack-private-key-file="/path/to/.ssh/id_rsa" \
     default
 
 ## Install necessary packages on the host (for passbolt - to generate entropy)
@@ -100,7 +100,7 @@ To prevent user registration in the notes container :
     docker exec -it notes sed -i 's/\(post "auth" =>\)/# \1/' /data/src/config/routes.rb
     docker-compose restart standardnotes
 
-To prevent user registration in wekan, just go in the settings page (https://tasks.***REMOVED***.me/setting) and deactivate it.
+To prevent user registration in wekan, just go in the settings page (https://{my_subdomain_for_wekan.mydomain.com}/setting) and deactivate it.
 
 To see the disk usage :
 
