@@ -173,6 +173,9 @@ class Server
             $this->server->addPlugin(new \Sabre\CalDAV\Plugin());
             $this->server->addPlugin(new \Sabre\CalDAV\ICSExportPlugin());
             $this->server->addPlugin(new \Sabre\CalDAV\Schedule\Plugin());
+            $this->server->addPlugin(new \Sabre\DAV\Sharing\Plugin());
+            $this->server->addPlugin(new \Sabre\CalDAV\SharingPlugin());
+
             // Scheduling and email delivery.  See:
             // http://sabre.io/dav/scheduling/
             // https://groups.google.com/forum/#!searchin/sabredav-discuss/scheduling|sort:relevance/sabredav-discuss/CrGZXqw4sRw/vsHYq6FDcnkJ
@@ -183,5 +186,25 @@ class Server
             $this->server->addPlugin(new \Sabre\CardDAV\Plugin());
             $this->server->addPlugin(new \Sabre\CardDAV\VCFExportPlugin());
         }
+
+        $this->server->on('exception', [$this, 'exception']);
     }
+
+    /**
+     * Log failed accesses, for further processing by other tools (fail2ban)
+     *
+     * @return void
+     */
+    function exception($e) {
+        if ($e instanceof \Sabre\DAV\Exception\NotAuthenticated) {
+            // Applications may make their first call without auth so don't log these attempts
+            // Pattern from sabre/dav/lib/DAV/Auth/Backend/AbstractDigest.php
+            if (strpos($e->getMessage(), "No 'Authorization: Digest' header found.") === false) {
+                error_log('user not authorized: Baikal DAV: ' . $e->getMessage());
+            }
+        } else {
+            error_log($e);
+        }
+    }
+
 }

@@ -29,10 +29,10 @@ RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd \
     && docker-php-source delete
 
 ### "Baikal-installation"
-RUN cd /tmp/ && curl --silent -LO https://github.com/sabre-io/Baikal/archive/0.5.3.zip \
- && unzip /tmp/0.5.3.zip -d /var/www/ \
- && rm -Rvf /var/www/Baikal-0.5.3/Specific/db/.empty && rm -f /tmp/0.5.3.zip 
-RUN mv /var/www/Baikal-0.5.3 /var/www/calendar_server
+RUN cd /tmp/ && curl --silent -LO https://github.com/sabre-io/Baikal/archive/0.6.0.zip \
+ && unzip /tmp/0.6.0.zip -d /var/www/ \
+ && rm -Rvf /var/www/Baikal-0.6.0/Specific/db/.empty && rm -f /tmp/0.6.0.zip
+RUN mv /var/www/Baikal-0.6.0 /var/www/calendar_server
 
 WORKDIR /var/www/calendar_server
 
