@@ -99,18 +99,18 @@ http {
 
     # Cozy
     server {
-        server_name cloud.***REMOVED***.me;
+        server_name $CLOUD_DOMAIN;
 
         # redirect the root to the drive, to avoid an error on missing
-        # "home.cloud.***REMOVED***.me" app. A bit ugly, maybe improve later.
+        # "home.$CLOUD_DOMAIN" app. A bit ugly, maybe improve later.
         location = / {
-            return 301 https://drive.cloud.***REMOVED***.me;
+            return 301 https://drive.$CLOUD_DOMAIN;
         }
 
         include cloud.conf;
     }
     server {
-        server_name *.cloud.***REMOVED***.me;
+        server_name *.$CLOUD_DOMAIN;
         include cloud.conf;
     }
 
