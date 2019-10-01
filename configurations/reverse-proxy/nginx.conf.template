@@ -102,7 +102,7 @@ http {
         server_name cloud.***REMOVED***.me;
 
         # redirect the root to the drive, to avoid an error on missing
-        # home.cloud.***REMOVED***.me app. A bit ugly, maybe improve later.
+        # "home.cloud.***REMOVED***.me" app. A bit ugly, maybe improve later.
         location = / {
             return 301 https://drive.cloud.***REMOVED***.me;
         }
