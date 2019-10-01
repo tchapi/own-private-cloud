@@ -5,11 +5,11 @@ services:
   certbot:
     image: certbot/certbot
     container_name: certbot
+    env_file: .env
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     volumes:
       - letsencrypt_certs:/etc/letsencrypt
       - letsencrypt_www:/var/www/letsencrypt
-    env_file: .env
-    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     networks:
       - front_network
 
@@ -19,13 +19,9 @@ services:
       dockerfile: ./build/Dockerfile-reverse-proxy
     image: reverse-proxy:custom
     container_name: proxy
-    volumes:
-      - letsencrypt_certs:/etc/letsencrypt
-      - letsencrypt_www:/var/www/letsencrypt
-      - baikal_www:/var/www/calendar_server
-    ports:
-        - 80:80
-        - 443:443
+    env_file: .env
+    restart: unless-stopped
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     depends_on:
       - passbolt
       - standardnotes
@@ -34,18 +30,22 @@ services:
       - syncthing
       - xbs
       - wekan
-    restart: unless-stopped
-    env_file: .env
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    volumes:
+      - letsencrypt_certs:/etc/letsencrypt
+      - letsencrypt_www:/var/www/letsencrypt
+      - baikal_www:/var/www/calendar_server
     networks:
       - front_network
-      - sesame_network
+      - passwords_network
       - notes_network
       - cloud_network
       - calendar_network
       - bookmarks_network
       - sync_network
       - tasks_network
+    ports:
+      - 80:80
+      - 443:443
 
   mysql:
     build:
@@ -53,12 +53,12 @@ services:
       dockerfile: ./build/Dockerfile-mysql
     image: mariadb:custom
     container_name: mysql
-    restart: unless-stopped
     env_file: .env
+    restart: unless-stopped
     volumes:
       - database_mysql_volume:/var/lib/mysql
     networks:
-      - sesame_network
+      - passwords_network
       - notes_network
       - calendar_network
 
@@ -68,6 +68,9 @@ services:
       dockerfile: ./build/Dockerfile-passbolt
     image: passbolt:custom
     container_name: passbolt
+    env_file: .env
+    restart: unless-stopped
+    command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
     tty: true
     depends_on:
       - mysql
@@ -75,11 +78,8 @@ services:
       - gpg_volume:/var/www/passbolt/config/gpg
     tmpfs:
       - /run
-    command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
-    restart: unless-stopped
-    env_file: .env
     networks:
-      - sesame_network
+      - passwords_network
 
   standardnotes:
     build:
@@ -87,15 +87,15 @@ services:
       dockerfile: ./build/Dockerfile-standardnotes
     image: standardnotes:custom
     container_name: notes
-    depends_on:
-      - mysql
+    env_file: .env
+    restart: unless-stopped
     command: >
       bash -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
                sleep 2 &&
                /data/src/docker/entrypoint bootstrap &&
                /data/src/docker/entrypoint start'
-    restart: unless-stopped
-    env_file: .env
+    depends_on:
+      - mysql
     networks:
       - notes_network
 
@@ -103,8 +103,8 @@ services:
   couchdb:
     image: couchdb:2.3
     container_name: couchdb
-    restart: unless-stopped
     env_file: .env
+    restart: unless-stopped
     volumes:
       - database_couch_volume:/opt/couchdb/data
     networks:
@@ -114,8 +114,8 @@ services:
   cozy:
     image: cozy/cozy-stack
     container_name: cozy
-    restart: unless-stopped
     env_file: .env
+    restart: unless-stopped
     depends_on:
       - couchdb
     volumes:
@@ -136,8 +136,8 @@ services:
         mail_password: ${MAIL_PASSWORD}
     image: baikal:custom
     container_name: baikal
-    restart: unless-stopped
     env_file: .env
+    restart: unless-stopped
     depends_on:
       - mysql
     volumes:
@@ -152,10 +152,10 @@ services:
       dockerfile: ./build/Dockerfile-xbs
     image: xbs:custom
     container_name: xbs
+    env_file: .env
+    restart: unless-stopped
     depends_on:
       - mongo
-    restart: unless-stopped
-    env_file: .env
     networks:
       - bookmarks_network
 
@@ -166,8 +166,8 @@ services:
       dockerfile: ./build/Dockerfile-mongo
     image: mongo:custom
     container_name: mongo
-    restart: unless-stopped
     env_file: .env
+    restart: unless-stopped
     volumes:
       - database_mongo_volume:/data/db
     networks:
@@ -181,21 +181,21 @@ services:
       dockerfile: ./build/Dockerfile-syncthing
     image: syncthing:custom
     container_name: syncthing
-    restart: unless-stopped
     env_file: .env
-    ports:
-      - 22000:22000 # We must expose this port for Syncthing to work
+    restart: unless-stopped
     volumes:
       - files_sync_volume:/var/syncthing/data
     networks:
       - sync_network
+    ports:
+      - 22000:22000 # We must expose this port for Syncthing to work
 
   # Wekan (tasks)
   wekan:
     image: wekanteam/wekan
     container_name: tasks
-    restart: unless-stopped
     env_file: .env
+    restart: unless-stopped
     depends_on:
       - mongo
     networks:
@@ -203,7 +203,7 @@ services:
 
 networks:
   front_network: ~
-  sesame_network: ~
+  passwords_network: ~
   notes_network: ~
   cloud_network: ~
   calendar_network: ~
