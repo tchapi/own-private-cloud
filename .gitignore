@@ -10,3 +10,4 @@ openrc.sh
 configurations/reverse-proxy/cloud.conf
 configurations/reverse-proxy/nginx.conf
 configurations/standardnotes/extensions/*.json
+configurations/syncthing/config.xml
