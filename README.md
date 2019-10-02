@@ -11,6 +11,7 @@ Services :
   - Baïkal — A GPLv3 Cal and CardDAV server, based on sabre/dav
   - Wekan — A MIT Kanban board manager, comparable to Trello
   - Syncthing — A continuous file synchronization program under the Mozilla Public License 2.0 license
+  - OnlyOffice — a docs + spreadsheets editor / manager
 
 > All services are served through an HTTPS proxy based on Nginx, certificates are provided by Let's Encrypt.
 
@@ -47,12 +48,13 @@ Services :
     docker-machine ssh default 'sudo mkdir /mnt/databases && sudo mount /dev/sdb1 /mnt/databases'
     docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch /mnt/databases/mongo'
 
+
 #### The files volume :
 
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/sync'
+    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/sync /mnt/files/onlyoffice'
 
 ## Get environment variables to target the remote docker instance
 
@@ -134,6 +136,7 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
   - Create and configure a block volume in OVH Public Cloud : https://docs.ovh.com/fr/public-cloud/creer-et-configurer-un-disque-supplementaire-sur-une-instance/
   - Shell command  / Entrypoint in Docker : https://stackoverflow.com/questions/41512237/how-to-execute-a-shell-command-before-the-entrypoint-via-the-dockerfile
   - Ignore files for Cozy drive : https://github.com/cozy-labs/cozy-desktop/blob/master/doc/usage/ignore_files.md
+  - OnlyOffice w/ Docker : https://helpcenter.onlyoffice.com/server/docker/document/install-integrated.aspx
 
 ## Dockerfiles :
 
