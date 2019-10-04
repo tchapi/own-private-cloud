@@ -125,6 +125,18 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
 
 > If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (`mongo`, or `couch` too if needed) on the host for the entrypoint script to be replayed entirely
 
+### How-to rename a docker volume
+
+    echo "Creating destination volume ..."
+    docker volume create --name new_volume_name
+    echo "Copying data from source volume to destination volume ..."
+    docker run --rm \
+               -i \
+               -t \
+               -v old_volume_name:/from \
+               -v new_volume_name:/to \
+               alpine ash -c "cd /from ; cp -av . /to"
+
 # Literature
 
   - Docker best practices : https://blog.docker.com/2019/07/intro-guide-to-dockerfile-best-practices/
