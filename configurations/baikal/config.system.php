@@ -70,4 +70,4 @@ define("PROJECT_DB_MYSQL_PASSWORD", $_ENV['BAIKAL_PASSWORD']);
 define("BAIKAL_ENCRYPTION_KEY", 'a06ee64f0666d42f958d7b13bc8659de');
 
 # The currently configured Baïkal version
-define("BAIKAL_CONFIGURED_VERSION", '0.5.3');
+define("BAIKAL_CONFIGURED_VERSION", '0.6.0');
