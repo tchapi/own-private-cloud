@@ -212,10 +212,14 @@ networks:
   tasks_network: ~
 
 volumes:
-  letsencrypt_certs: ~
-  letsencrypt_www: ~
-  gpg_volume: ~
-  baikal_www: ~
+  letsencrypt_certs:
+    name: letsencrypt_certs
+  letsencrypt_www:
+    name: letsencrypt_www
+  gpg_volume:
+    name: gpg_volume
+  baikal_www:
+    name: baikal_www
   database_mysql_volume: # This volume is actually an attached OpenStack Block storage
     driver: local
     driver_opts:
