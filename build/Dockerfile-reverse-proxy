@@ -1,4 +1,6 @@
-FROM nginx:alpine
+FROM nginx:1.17.5-alpine
+
+LABEL maintainer="tchap@tchap.me"
 
 WORKDIR /etc/nginx/
 COPY configurations/reverse-proxy/nginx.conf nginx.conf

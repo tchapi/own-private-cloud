@@ -1,3 +1,5 @@
 FROM xbrowsersync/api:1.1.9
 
+LABEL maintainer="tchap@tchap.me"
+
 COPY configurations/xbs/settings.json /usr/src/api/config/

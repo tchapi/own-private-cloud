@@ -1,4 +1,6 @@
 FROM mongo:4.0.10
 
+LABEL maintainer="tchap@tchap.me"
+
 COPY configurations/xbs/mongoconfig.sh /docker-entrypoint-initdb.d/mongoconfig-xbs.sh
 COPY configurations/wekan/mongoconfig.sh /docker-entrypoint-initdb.d/mongoconfig-wekan.sh
