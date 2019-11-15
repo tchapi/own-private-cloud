@@ -93,7 +93,7 @@ And then build the images :
 
 ## Init the davis instance if needed (_if the tables do not already exist_)
 
-    ./scripts/baikal/init-mysql-tables.sh
+    ./scripts/davis/init-mysql-tables.sh
 
 # Run & Maintenance
 
