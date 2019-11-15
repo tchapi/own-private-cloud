@@ -8,7 +8,7 @@ Services :
   - Cozy Cloud (_Drive and settings only_) — A smart personal cloud to gather all your data
   - Passbolt — A free, open-source, extensible, OpenPGP-based password manager
   - X-browser Sync — A free and open-source browser syncing tool
-  - Baïkal — A GPLv3 Cal and CardDAV server, based on sabre/dav
+  - Davis — A MIT Cal and CardDAV server, based on sabre/dav
   - Wekan — A MIT Kanban board manager, comparable to Trello
   - Syncthing — A continuous file synchronization program under the Mozilla Public License 2.0 license
 
@@ -91,7 +91,7 @@ And then build the images :
 
     ./scripts/passbolt/init-admin-user.sh
 
-## Init the Baikal instance if needed (_if the tables do not already exist_)
+## Init the davis instance if needed (_if the tables do not already exist_)
 
     ./scripts/baikal/init-mysql-tables.sh
 

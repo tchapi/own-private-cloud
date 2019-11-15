@@ -23,8 +23,8 @@ http {
         server cozy:8080;
     }
 
-    upstream docker-baikal {
-        server baikal:9000;
+    upstream docker-davis {
+        server davis:9000;
     }
 
     upstream docker-xbrowsersync {
@@ -114,7 +114,7 @@ http {
         include cloud.conf;
     }
 
-    # Caldav / Carddav Baikal
+    # Caldav / Carddav
     server {
         listen 443 ssl http2;
         listen [::]:443 ssl http2;
@@ -127,11 +127,11 @@ http {
         include /etc/nginx/conf/options-ssl-nginx.conf;
         ssl_dhparam /etc/nginx/conf/ssl-dhparams.pem;
 
-        root /var/www/calendar_server/html/;
+        root /var/www/davis/public/;
         index index.php;
 
-        rewrite ^/.well-known/caldav /dav.php redirect;
-        rewrite ^/.well-known/carddav /dav.php redirect;
+        rewrite ^/.well-known/caldav /dav/ redirect;
+        rewrite ^/.well-known/carddav /dav/ redirect;
 
         charset utf-8;
 
@@ -147,7 +147,7 @@ http {
         location ~ ^(.+\.php)(.*)\$ {
             try_files       \$fastcgi_script_name =404;
             include         fastcgi_params;
-            fastcgi_pass    docker-baikal;
+            fastcgi_pass    docker-davis;
             fastcgi_param   SCRIPT_FILENAME  \$document_root\$fastcgi_script_name;
             fastcgi_param   PATH_INFO        \$fastcgi_path_info;
             fastcgi_split_path_info  ^(.+\.php)(.*)\$;

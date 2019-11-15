@@ -26,14 +26,14 @@ services:
       - passbolt
       - standardnotes
       - cozy
-      - baikal
+      - davis
       - syncthing
       - xbs
       - wekan
     volumes:
       - letsencrypt_certs:/etc/letsencrypt
       - letsencrypt_www:/var/www/letsencrypt
-      - baikal_www:/var/www/calendar_server
+      - davis_www:/var/www/davis
     networks:
       - front_network
       - passwords_network
@@ -123,25 +123,25 @@ services:
     networks:
       - cloud_network
 
-  # Caldav server
-  baikal:
+  # Caldav / Carddav server
+  davis:
     build:
       context: ./
-      dockerfile: ./build/Dockerfile-baikal
+      dockerfile: ./build/Dockerfile-davis
       args:
         email: ${EMAIL}
         mail_host: ${MAIL_HOST}
         calendar_domain: ${CALENDAR_DOMAIN}
         mail_username: ${MAIL_USERNAME}
         mail_password: ${MAIL_PASSWORD}
-    image: baikal:custom
-    container_name: baikal
+    image: davis:1.2.1
+    container_name: davis
     env_file: .env
     restart: unless-stopped
     depends_on:
       - mysql
     volumes:
-      - baikal_www:/var/www/calendar_server
+      - davis_www:/var/www/davis
     networks:
       - calendar_network
 
@@ -218,8 +218,8 @@ volumes:
     name: letsencrypt_www
   gpg_volume:
     name: gpg_volume
-  baikal_www:
-    name: baikal_www
+  davis_www:
+    name: davis_www
   database_mysql_volume: # This volume is actually an attached OpenStack Block storage
     driver: local
     driver_opts:
