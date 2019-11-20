@@ -131,7 +131,7 @@ services:
       args:
         email: ${EMAIL}
         mail_host: ${MAIL_HOST}
-        calendar_domain: ${CALENDAR_DOMAIN}
+        hostname: ${CALENDAR_DOMAIN}
         mail_username: ${MAIL_USERNAME}
         mail_password: ${MAIL_PASSWORD}
     image: davis:1.2.1
