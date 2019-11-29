@@ -10,3 +10,6 @@ COPY configurations/reverse-proxy/cloud.conf cloud.conf
 RUN mkdir conf
 COPY configurations/reverse-proxy/options-ssl-nginx.conf conf/options-ssl-nginx.conf
 COPY configurations/reverse-proxy/ssl-dhparams.pem conf/ssl-dhparams.pem
+
+RUN mkdir ssl
+COPY configurations/reverse-proxy/chain.pem ssl/chain.pem

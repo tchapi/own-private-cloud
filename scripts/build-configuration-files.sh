@@ -31,4 +31,8 @@ expandVars ./configurations/standardnotes/templates/simple-task-editor.json.temp
 # Syncthing configuration
 expandVars ./configurations/syncthing/config.xml.template ./configurations/syncthing/config.xml
 
+# Root LE Certificate
+echo "### Retrieving X3 Let's Encrypt certificate"
+wget -q -O ./configurations/reverse-proxy/chain.pem "https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem"
+
 echo "### Done."
