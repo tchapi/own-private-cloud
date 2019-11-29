@@ -52,7 +52,7 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/sync'
+    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/sync /mnt/files/mails'
 
 ## Get environment variables to target the remote docker instance
 
@@ -94,6 +94,14 @@ And then build the images :
 ## Init the Baikal instance if needed (_if the tables do not already exist_)
 
     ./scripts/baikal/init-mysql-tables.sh
+
+## To get the DKIM key (for the mails)
+
+    . .env && DKIM_KEY_VALUE=$(docker run -it opensmtpd:custom "/bin/cat" "/etc/mail/dkim/${TOP_DOMAIN}.pub" | sed '$d' | sed 1d)
+
+You can then create a DKIM DNS entry with something along those lines :
+
+    . .env && echo ${DKIM_SELECTOR}._domainkey.${TOP_DOMAIN}. IN TXT "v=DKIM1;k=rsa;p=${DKIM_KEY_VALUE//[$'\t\r\n ']};"
 
 # Run & Maintenance
 
@@ -147,6 +155,12 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
   - Create and configure a block volume in OVH Public Cloud : https://docs.ovh.com/fr/public-cloud/creer-et-configurer-un-disque-supplementaire-sur-une-instance/
   - Shell command  / Entrypoint in Docker : https://stackoverflow.com/questions/41512237/how-to-execute-a-shell-command-before-the-entrypoint-via-the-dockerfile
   - Ignore files for Cozy drive : https://github.com/cozy-labs/cozy-desktop/blob/master/doc/usage/ignore_files.md
+  - How to run your own mail server : https://www.c0ffee.net/blog/mail-server-guide/
+  - Mail servers are not hard : https://poolp.org/posts/2019-08-30/you-should-not-run-your-mail-server-because-mail-is-hard/
+  - NSA-proof your e-mail in 2 hours : https://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/
+  - Mail-in-a-Box : https://mailinabox.email/
+  - A set of Ansible playbooks to build and maintain your own private cloud : https://github.com/sovereign/sovereign/blob/master/README.md
+
 
 ## Dockerfiles :
 

@@ -42,7 +42,7 @@ http {
     # Only for certificates
     server {
         listen 80;
-        server_name $NOTES_DOMAIN, $PASSWORDS_DOMAIN, .$CLOUD_DOMAIN, $CALENDAR_DOMAIN, $BOOKMARKS_DOMAIN, $SYNC_DOMAIN, $TASKS_DOMAIN;
+        server_name $NOTES_DOMAIN, $PASSWORDS_DOMAIN, .$CLOUD_DOMAIN, $CALENDAR_DOMAIN, $BOOKMARKS_DOMAIN, $SYNC_DOMAIN, $TASKS_DOMAIN, $MAIL_DOMAIN;
 
         location /.well-known/acme-challenge/ {
             root /var/www/letsencrypt;

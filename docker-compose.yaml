@@ -201,6 +201,48 @@ services:
     networks:
       - tasks_network
 
+  # Mails (bound on a specific IP for th reverse to be unique)
+  dovecot:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-dovecot
+      args:
+        top_domain: ${TOP_DOMAIN}
+        mail_domain: ${MAIL_DOMAIN}
+    image: dovecot:custom
+    container_name: dovecot
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - mails_volume:/var/mail
+      - letsencrypt_certs:/etc/letsencrypt
+    networks:
+      - mail_network
+    ports:
+      - "${MAIL_HOST_IP}:143:143"
+      - "${MAIL_HOST_IP}:993:993"
+
+  smtpd:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-opensmtpd
+      args:
+        top_domain: ${TOP_DOMAIN}
+        mail_domain: ${MAIL_DOMAIN}
+    image: opensmtpd:custom
+    container_name: smtpd
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - mails_volume:/var/mail
+      - letsencrypt_certs:/etc/letsencrypt
+    networks:
+      - mail_network
+    ports:
+      - "${MAIL_HOST_IP}:25:25"
+      - "${MAIL_HOST_IP}:465:465"
+      - "${MAIL_HOST_IP}:587:587"
+
 networks:
   front_network: ~
   passwords_network: ~
@@ -210,6 +252,7 @@ networks:
   bookmarks_network: ~
   sync_network: ~
   tasks_network: ~
+  mail_network: ~
 
 volumes:
   letsencrypt_certs:
@@ -250,3 +293,9 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/sync
+  mails_volume: # This volume is actually an attached OpenStack Block storage. It stores the syncthing data
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/mails

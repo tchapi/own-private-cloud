@@ -1,0 +1,33 @@
+FROM alpine:3.10
+
+LABEL maintainer="tchap@tchap.me"
+
+ARG top_domain
+ARG mail_domain
+
+EXPOSE 143
+EXPOSE 993
+
+# Install necessary packages
+RUN apk add --no-cache \
+    dovecot \
+    dovecot-pigeonhole-plugin
+
+COPY configurations/mails/10-ssl.conf /etc/dovecot/conf.d/10-ssl.conf
+COPY configurations/mails/10-mail.conf /etc/dovecot/conf.d/10-mail.conf
+COPY configurations/mails/20-imap.conf /etc/dovecot/conf.d/20-imap.conf
+COPY configurations/mails/90-plugin.conf /etc/dovecot/conf.d/90-plugin.conf
+
+COPY configurations/mails/report-ham.sieve /usr/local/lib/dovecot/sieve/report-ham.sieve
+COPY configurations/mails/report-spam.sieve /usr/local/lib/dovecot/sieve/report-spam.sieve
+COPY configurations/mails/sa-learn-ham.sh /usr/local/lib/dovecot/sieve/sa-learn-ham.sh
+COPY configurations/mails/sa-learn-spam.sh /usr/local/lib/dovecot/sieve/sa-learn-spam.sh
+
+WORKDIR /usr/local/lib/dovecot/sieve/
+
+RUN sievec report-ham.sieve \
+    && sievec report-spam.sieve \
+    && chmod 755 sa-learn-ham.sh \
+    && chmod 755 sa-learn-spam.sh
+
+CMD ["dovecot", "-F"]

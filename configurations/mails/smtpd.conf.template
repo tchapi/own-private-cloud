@@ -1,0 +1,27 @@
+pki $MAIL_DOMAIN cert "/etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem"
+pki $MAIL_DOMAIN key "/etc/letsencrypt/live/$MAIL_DOMAIN/privkey.pem"
+
+filter check_dyndns phase connect match rdns regex { '.*\.dyn\..*', '.*\.dsl\..*' } disconnect "550 no residential connections"
+
+filter check_rdns phase connect match !rdns disconnect "550 no rDNS is so 80s"
+
+filter check_fcrdns phase connect match !fcrdns disconnect "550 no FCrDNS is so 80s"
+
+filter senderscore proc-exec "filter-senderscore -blockBelow 10 -junkBelow 70 -slowFactor 5000"
+
+filter rspamd proc-exec "filter-rspamd"
+
+table aliases file:/etc/mail/aliases
+
+listen on eth0 tls pki $MAIL_DOMAIN filter { check_dyndns, check_rdns, check_fcrdns, senderscore, rspamd }
+
+listen on eth0 port submission tls-require pki $MAIL_DOMAIN auth filter rspamd
+
+action "local_mail" maildir "/var/mail/%{rcpt.user}/Maildir" junk alias <aliases>
+action "outbound" relay helo $MAIL_DOMAIN
+
+match from any for domain "$TOP_DOMAIN" action "local_mail"
+match for local action "local_mail"
+
+match from any auth for any action "outbound"
+match for any action "outbound"

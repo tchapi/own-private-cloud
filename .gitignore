@@ -12,3 +12,6 @@ configurations/reverse-proxy/nginx.conf
 configurations/reverse-proxy/chain.pem
 configurations/standardnotes/extensions/*.json
 configurations/syncthing/config.xml
+configurations/mails/smtpd.conf
+configurations/mails/dkim_signing.conf
+configurations/mails/10-ssl.conf
