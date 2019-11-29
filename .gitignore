@@ -9,5 +9,6 @@ openrc.sh
 # Built configuration files
 configurations/reverse-proxy/cloud.conf
 configurations/reverse-proxy/nginx.conf
+configurations/reverse-proxy/chain.pem
 configurations/standardnotes/extensions/*.json
 configurations/syncthing/config.xml
