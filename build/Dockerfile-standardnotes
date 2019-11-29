@@ -1,4 +1,6 @@
-FROM arugifa/standardnotes-server
+FROM arugifa/standardnotes-server:0.0.0-rc.2019.08.02
+
+LABEL maintainer="tchap@tchap.me"
 
 # Copy extensions in public folder
 WORKDIR $PROJECT_DIR

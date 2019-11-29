@@ -1,4 +1,6 @@
 FROM syncthing/syncthing:1.2.0
 
+LABEL maintainer="tchap@tchap.me"
+
 COPY configurations/syncthing/config.xml /var/syncthing/config/config.xml
 RUN mkdir /var/syncthing/data

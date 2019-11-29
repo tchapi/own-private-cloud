@@ -13,6 +13,9 @@ define("BAIKAL_CARD_ENABLED", true);
 # CalDAV ON/OFF switch; default TRUE
 define("BAIKAL_CAL_ENABLED", true);
 
+# CalDAV invite From: mail address (comment or leave blank to disable notifications)
+define("BAIKAL_INVITE_FROM", $_ENV['EMAIL']);
+
 # WebDAV authentication type; default Digest
 define("BAIKAL_DAV_AUTH_TYPE", "Digest");
 

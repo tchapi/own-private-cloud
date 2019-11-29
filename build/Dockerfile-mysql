@@ -1,3 +1,5 @@
 FROM mariadb:10.4
 
+LABEL maintainer="tchap@tchap.me"
+
 COPY configurations/mysql/databases.sh /docker-entrypoint-initdb.d

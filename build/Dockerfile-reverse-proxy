@@ -1,4 +1,6 @@
-FROM nginx:alpine
+FROM nginx:1.17.5-alpine
+
+LABEL maintainer="tchap@tchap.me"
 
 WORKDIR /etc/nginx/
 COPY configurations/reverse-proxy/nginx.conf nginx.conf
@@ -8,3 +10,6 @@ COPY configurations/reverse-proxy/cloud.conf cloud.conf
 RUN mkdir conf
 COPY configurations/reverse-proxy/options-ssl-nginx.conf conf/options-ssl-nginx.conf
 COPY configurations/reverse-proxy/ssl-dhparams.pem conf/ssl-dhparams.pem
+
+RUN mkdir ssl
+COPY configurations/reverse-proxy/chain.pem ssl/chain.pem

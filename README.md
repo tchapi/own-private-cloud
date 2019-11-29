@@ -127,10 +127,23 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
 
 > If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (`mongo`, or `couch` too if needed) on the host for the entrypoint script to be replayed entirely
 
+### How-to rename a docker volume
+
+    echo "Creating destination volume ..."
+    docker volume create --name new_volume_name
+    echo "Copying data from source volume to destination volume ..."
+    docker run --rm \
+               -i \
+               -t \
+               -v old_volume_name:/from \
+               -v new_volume_name:/to \
+               alpine ash -c "cd /from ; cp -av . /to"
+
 # Literature
 
   - Docker best practices : https://blog.docker.com/2019/07/intro-guide-to-dockerfile-best-practices/
   - Nginx Reverse proxy : https://www.thepolyglotdeveloper.com/2017/03/nginx-reverse-proxy-containerized-docker-applications/
+  - nginx TLS / SSL configuration options : https://gist.github.com/konklone/6532544
   - Lets Encrypt with Docker : https://devsidestory.com/lets-encrypt-with-docker/
   - Lets Encrypt with Docker (alt) : https://medium.com/@pentacent/nginx-and-lets-encrypt-with-docker-in-less-than-5-minutes-b4b8a60d3a71
   - Create and configure a block volume in OVH Public Cloud : https://docs.ovh.com/fr/public-cloud/creer-et-configurer-un-disque-supplementaire-sur-une-instance/
