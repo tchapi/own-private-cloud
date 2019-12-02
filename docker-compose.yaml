@@ -90,8 +90,7 @@ services:
     env_file: .env
     restart: unless-stopped
     command: >
-      bash -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
-               sleep 2 &&
+        sh -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
                /data/src/docker/entrypoint bootstrap &&
                /data/src/docker/entrypoint start'
     depends_on:
