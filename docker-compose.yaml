@@ -128,7 +128,9 @@ services:
     build:
       context: ./
       dockerfile: ./build/Dockerfile-davis
-    image: davis:1.4.3
+      args:
+        version: "1.4.3"
+    image: davis:custom
     container_name: davis
     env_file: .env
     restart: unless-stopped
