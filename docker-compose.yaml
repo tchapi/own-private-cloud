@@ -128,13 +128,7 @@ services:
     build:
       context: ./
       dockerfile: ./build/Dockerfile-davis
-      args:
-        email: ${EMAIL}
-        mail_host: ${MAIL_HOST}
-        hostname: ${CALENDAR_DOMAIN}
-        mail_username: ${MAIL_USERNAME}
-        mail_password: ${MAIL_PASSWORD}
-    image: davis:1.2.1
+    image: davis:1.4.3
     container_name: davis
     env_file: .env
     restart: unless-stopped
