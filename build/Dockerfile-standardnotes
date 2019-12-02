@@ -1,4 +1,4 @@
-FROM arugifa/standardnotes-server:0.0.0-rc.2019.08.02
+FROM arugifa/standardnotes-server:0.0.0-rc.2019.11.12
 
 LABEL maintainer="tchap@tchap.me"
 
