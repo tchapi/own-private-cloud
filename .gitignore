@@ -10,5 +10,6 @@ openrc.sh
 configurations/reverse-proxy/cloud.conf
 configurations/reverse-proxy/nginx.conf
 configurations/reverse-proxy/chain.pem
+configurations/reverse-proxy/ssl-dhparams.pem
 configurations/standardnotes/extensions/*.json
 configurations/syncthing/config.xml
