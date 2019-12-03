@@ -128,7 +128,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-davis
       args:
-        version: "1.4.3"
+        version: "1.4.5"
     image: davis:custom
     container_name: davis
     env_file: .env
