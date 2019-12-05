@@ -1,4 +1,4 @@
-FROM mongo:4.0.10
+FROM mongo:4.0.13
 
 LABEL maintainer="tchap@tchap.me"
 
