@@ -20,4 +20,4 @@ define("BAIKAL_INVITE_FROM", $_ENV['EMAIL']);
 define("BAIKAL_DAV_AUTH_TYPE", "Digest");
 
 # Baïkal Web admin password hash; Set via Baïkal Web Admin
-define("BAIKAL_ADMIN_PASSWORDHASH", md5('admin:'.$_ENV['BAIKAL_AUTH_REALM'].':'.$_ENV['CALENDAR_ADMIN_PASSWORD']));
+define("BAIKAL_ADMIN_PASSWORDHASH", md5('admin:'.$_ENV['BAIKAL_AUTH_REALM'].':'.$_ENV['BAIKAL_ADMIN_PASSWORD']));

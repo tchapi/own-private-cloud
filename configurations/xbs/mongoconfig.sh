@@ -4,7 +4,7 @@ mongo -- "$MONGO_INITDB_DATABASE" <<- EOFMONGO
 
     var admin = db.getSiblingDB('admin');
     admin.auth('$MONGO_INITDB_ROOT_USERNAME', '$MONGO_INITDB_ROOT_PASSWORD');
-    admin.createUser({user: '$XBROWSERSYNC_DB_USER', pwd: '$XBROWSERSYNC_DB_PWD', roles: [{role: "readWrite", db:"$MONGO_INITDB_DATABASE"}]});
+    admin.createUser({user: '$XBS_DB_USERNAME', pwd: '$XBS_DB_PASSWORD', roles: [{role: "readWrite", db:"$MONGO_INITDB_DATABASE"}]});
 
     db.newsynclogs.createIndex( { "expiresAt": 1 }, { expireAfterSeconds: 0 } );
     db.newsynclogs.createIndex( { "ipAddress": 1 } );
