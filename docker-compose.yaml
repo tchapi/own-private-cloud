@@ -198,7 +198,6 @@ services:
       dockerfile: ./build/Dockerfile-xbs
     image: xbs:custom
     container_name: xbs
-    #env_file: .env
     environment:
       - XBS_API_HOSTNAME=${XBS_API_HOSTNAME}
       - XBROWSERSYNC_DB_USER=${XBS_DB_USERNAME}
@@ -216,7 +215,6 @@ services:
       dockerfile: ./build/Dockerfile-mongo
     image: mongo:custom
     container_name: mongo
-    #env_file: .env
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
