@@ -99,7 +99,7 @@ And then build the images :
 
 The given Nginx configuration (_SSL params, etc_), along with a proper DNS configuration (including a correct CAA entry — see [here](https://blog.qualys.com/ssllabs/2017/03/13/caa-mandated-by-cabrowser-forum)), will result in a **A+** rating in [SSLLabs](https://www.ssllabs.com) :
 
-![A+ Rating page](https://raw.githubusercontent.com/tchapi/own-public-cloud/master/_screenshots/ssl_rating.png)
+![A+ Rating page](https://raw.githubusercontent.com/tchapi/own-private-cloud/master/_screenshots/ssl_rating.png)
 
 # Run & Maintenance
 
