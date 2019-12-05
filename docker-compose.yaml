@@ -24,14 +24,14 @@ services:
       - passbolt
       - standardnotes
       - cozy
-      - baikal
+      - davis
       - syncthing
       - xbs
       - wekan
     volumes:
       - letsencrypt_certs:/etc/letsencrypt
       - letsencrypt_www:/var/www/letsencrypt
-      - baikal_www:/var/www/calendar_server
+      - davis_www:/var/www/davis
     networks:
       - front_network
       - passwords_network
@@ -59,9 +59,9 @@ services:
       - PASSBOLT_DATABASE=${PASSBOLT_DATABASE}
       - PASSBOLT_DB_USERNAME=${PASSBOLT_DB_USERNAME}
       - PASSBOLT_DB_PASSWORD=${PASSBOLT_DB_PASSWORD}
-      - BAIKAL_DATABASE=${BAIKAL_DATABASE}
-      - BAIKAL_DB_USERNAME=${BAIKAL_DB_USERNAME}
-      - BAIKAL_DB_PASSWORD=${BAIKAL_DB_PASSWORD}
+      - DAVIS_DATABASE=${DAVIS_DATABASE}
+      - DAVIS_DB_USERNAME=${DAVIS_DB_USERNAME}
+      - DAVIS_DB_PASSWORD=${DAVIS_DB_PASSWORD}
     restart: unless-stopped
     volumes:
       - database_mysql_volume:/var/lib/mysql
@@ -164,30 +164,33 @@ services:
     networks:
       - cloud_network
 
-  # Caldav server
-  baikal:
+  # Caldav / Carddav server
+  davis:
     build:
       context: ./
-      dockerfile: ./build/Dockerfile-baikal
+      dockerfile: ./build/Dockerfile-davis
       args:
-        email: ${EMAIL}
-        mail_host: ${MAIL_HOST}
-        calendar_domain: ${CALENDAR_DOMAIN}
-        mail_username: ${MAIL_USERNAME}
-        mail_password: ${MAIL_PASSWORD}
-    image: baikal:custom
-    container_name: baikal
+        version: "1.4.5"
+    image: davis:custom
+    container_name: davis
     environment:
-        - EMAIL=${EMAIL}
-        - BAIKAL_AUTH_REALM=${BAIKAL_AUTH_REALM}
-        - BAIKAL_DATABASE=${BAIKAL_DATABASE}
-        - BAIKAL_USERNAME=${BAIKAL_DB_USERNAME}
-        - BAIKAL_PASSWORD=${BAIKAL_DB_PASSWORD}
+      - APP_ENV=prod
+      - APP_SECRET=${DAVIS_APP_SECRET}
+      - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}
+      - MAILER_URL=smtp://${MAIL_HOST}:${MAIL_PORT}?username=${MAIL_USERNAME}&password=${MAIL_PASSWORD}
+      - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
+      - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
+      - AUTH_REALM=${DAVIS_AUTH_REALM}
+      - AUTH_METHOD=Digest
+      - CALDAV_ENABLED=true
+      - CARDDAV_ENABLED=true
+      - WEBDAV_ENABLED=false
+      - INVITE_FROM_ADDRESS=${EMAIL}
     restart: unless-stopped
     depends_on:
       - mysql
     volumes:
-      - baikal_www:/var/www/calendar_server
+      - davis_www:/var/www/davis
     networks:
       - calendar_network
 
@@ -283,8 +286,8 @@ volumes:
     name: letsencrypt_www
   gpg_volume:
     name: gpg_volume
-  baikal_www:
-    name: baikal_www
+  davis_www:
+    name: davis_www
   database_mysql_volume: # This volume is actually an attached OpenStack Block storage
     driver: local
     driver_opts:
