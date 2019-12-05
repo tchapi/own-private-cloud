@@ -77,7 +77,7 @@ services:
     image: passbolt:custom
     container_name: passbolt
     environment:
-      - APP_FULL_BASE_URL=${PASSBOLT_APP_FULL_BASE_URL}
+      - APP_FULL_BASE_URL=https://${PASSWORDS_DOMAIN}
       - DATASOURCES_DEFAULT_HOST=mysql
       - DATASOURCES_DEFAULT_DATABASE=${PASSBOLT_DATABASE}
       - DATASOURCES_DEFAULT_USERNAME=${PASSBOLT_DB_USERNAME}
@@ -199,7 +199,7 @@ services:
     image: xbs:custom
     container_name: xbs
     environment:
-      - XBS_API_HOSTNAME=${XBS_API_HOSTNAME}
+      - XBS_API_HOSTNAME=${BOOKMARKS_DOMAIN}
       - XBROWSERSYNC_DB_USER=${XBS_DB_USERNAME}
       - XBROWSERSYNC_DB_PWD=${XBS_DB_PASSWORD}
     restart: unless-stopped
@@ -257,7 +257,7 @@ services:
     container_name: tasks
     environment:
       - MONGO_URL=mongodb://${WEKAN_DB_USERNAME}:${WEKAN_DB_PASSWORD}@mongo:27017/${WEKAN_DATABASE}?authSource=admin
-      - ROOT_URL=${WEKAN_ROOT_URL}
+      - ROOT_URL=https://${TASKS_DOMAIN}
       - MAIL_URL=smtps://${MAIL_USERNAME}:${MAIL_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
       - MAIL_FROM=${WEKAN_MAIL_FROM}
     restart: unless-stopped
