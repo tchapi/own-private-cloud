@@ -53,6 +53,15 @@ services:
     container_name: mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - NOTES_DATABASE=${NOTES_DATABASE}
+      - NOTES_DB_USERNAME=${NOTES_DB_USERNAME}
+      - NOTES_DB_PASSWORD=${NOTES_DB_PASSWORD}
+      - PASSBOLT_DATABASE=${PASSBOLT_DATABASE}
+      - PASSBOLT_DB_USERNAME=${PASSBOLT_DB_USERNAME}
+      - PASSBOLT_DB_PASSWORD=${PASSBOLT_DB_PASSWORD}
+      - BAIKAL_DATABASE=${BAIKAL_DATABASE}
+      - BAIKAL_DB_USERNAME=${BAIKAL_DB_USERNAME}
+      - BAIKAL_DB_PASSWORD=${BAIKAL_DB_PASSWORD}
     restart: unless-stopped
     volumes:
       - database_mysql_volume:/var/lib/mysql
