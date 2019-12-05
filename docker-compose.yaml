@@ -140,7 +140,10 @@ services:
 
   # Cozy Stack
   cozy:
-    image: cozy/cozy-stack
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-cozy
+    image: cozy:custom
     container_name: cozy
     environment:
       - DOMAIN=${CLOUD_DOMAIN}
