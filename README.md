@@ -8,11 +8,11 @@ Services :
   - Cozy Cloud (_Drive and settings only_) — A smart personal cloud to gather all your data
   - Passbolt — A free, open-source, extensible, OpenPGP-based password manager
   - X-browser Sync — A free and open-source browser syncing tool
-  - Baïkal — A GPLv3 Cal and CardDAV server, based on sabre/dav
+  - Davis — A MIT Cal and CardDAV server, based on sabre/dav
   - Wekan — A MIT Kanban board manager, comparable to Trello
   - Syncthing — A continuous file synchronization program under the Mozilla Public License 2.0 license
 
-> All services are served through an HTTPS proxy based on Nginx, certificates are provided by Let's Encrypt.
+> All services are served through an HTTPS proxy based on Nginx, certificates are provided by Let's Encrypt. See below for more details.
 
 # Installation
 
@@ -91,9 +91,15 @@ And then build the images :
 
     ./scripts/passbolt/init-admin-user.sh
 
-## Init the Baikal instance if needed (_if the tables do not already exist_)
+## Init the davis instance if needed (_if the tables do not already exist_)
 
-    ./scripts/baikal/init-mysql-tables.sh
+    ./scripts/davis/init-mysql-tables.sh
+
+# SSL
+
+The given Nginx configuration (_SSL params, etc_), along with a proper DNS configuration (including a correct CAA entry — see [here](https://blog.qualys.com/ssllabs/2017/03/13/caa-mandated-by-cabrowser-forum)), will result in a **A+** rating in [SSLLabs](https://www.ssllabs.com) :
+
+![A+ Rating page](https://raw.githubusercontent.com/tchapi/own-private-cloud/master/_screenshots/ssl_rating.png)
 
 # Run & Maintenance
 
