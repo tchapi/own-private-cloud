@@ -28,6 +28,9 @@ expandVars ./configurations/standardnotes/templates/plus-editor.json.template ./
 expandVars ./configurations/standardnotes/templates/secure-spreadsheets.json.template ./configurations/standardnotes/extensions/secure-spreadsheets.json
 expandVars ./configurations/standardnotes/templates/simple-task-editor.json.template ./configurations/standardnotes/extensions/simple-task-editor.json
 
+# XBS configuration
+expandVars ./configurations/xbs/settings.json.template ./configurations/xbs/settings.json
+
 # Syncthing configuration
 expandVars ./configurations/syncthing/config.xml.template ./configurations/syncthing/config.xml
 

@@ -13,3 +13,4 @@ configurations/reverse-proxy/chain.pem
 configurations/reverse-proxy/ssl-dhparams.pem
 configurations/standardnotes/extensions/*.json
 configurations/syncthing/config.xml
+configurations/xbs/settings.json

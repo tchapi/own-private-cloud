@@ -209,9 +209,14 @@ services:
     container_name: mongo
     #env_file: .env
     environment:
-      - MONGO_INITDB_DATABASE=xbrowsersync
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - WEKAN_DATABASE=${WEKAN_DATABASE}
+      - WEKAN_DB_USERNAME=${WEKAN_DB_USERNAME}
+      - WEKAN_DB_PASSWORD=${WEKAN_DB_PASSWORD}
+      - XBS_DATABASE=${XBS_DATABASE}
+      - XBS_DB_USERNAME=${XBS_DB_USERNAME}
+      - XBS_DB_PASSWORD=${XBS_DB_PASSWORD}
     restart: unless-stopped
     volumes:
       - database_mongo_volume:/data/db
