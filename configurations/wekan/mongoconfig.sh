@@ -1,6 +1,6 @@
 #!/bin/bash
 
-mongo -- "$MONGO_INITDB_DATABASE" <<- EOFMONGO
+mongo <<- EOFMONGO
 
     use $WEKAN_DATABASE;
 
