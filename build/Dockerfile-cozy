@@ -1,9 +1,10 @@
 FROM golang:1.13 AS builder
 
+ARG version
+
 WORKDIR /go
-RUN git clone https://github.com/cozy/cozy-stack cozy-stack
+RUN git clone https://github.com/cozy/cozy-stack --branch ${version} cozy-stack
 WORKDIR /go/cozy-stack
-#RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o filter-rspamd .
 RUN CGO_ENABLED=0 GOOS=linux set -eux && \
     bash -ex ./scripts/build.sh release && \
     rm ./cozy-stack*.sha256

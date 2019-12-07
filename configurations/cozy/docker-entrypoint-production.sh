@@ -2,11 +2,9 @@
 set -eux
 
 
-
 echo "=========================================================================="
 echo "Starting $0, $(date)"
 echo "=========================================================================="
-
 
 
 # Generate passphrase if missing
@@ -22,14 +20,13 @@ then
 fi
 
 
-
 # Prepare stepping down from root to applicative user with chosen UID/GID
 USER_ID=${LOCAL_USER_ID:-3552}
 GROUP_ID=${LOCAL_GROUP_ID:-3552}
-groupadd -g $GROUP_ID -o cozy
-useradd --shell /bin/bash -u $USER_ID -g cozy -o -c "Cozy Stack user" -d /var/lib/cozy -m cozy
+groupadd -f -g $GROUP_ID -o cozy # force create group even if it already exists (in case the container restarts)
+# Do not create the user if it already exists (in case the container restarts)
+id -u cozy >/dev/null 2>&1 || useradd --shell /bin/bash -u $USER_ID -g cozy -o -c "Cozy Stack user" -d /var/lib/cozy -m cozy
 chown -R cozy: /var/lib/cozy
-
 
 
 # Ensuring CouchDB is ready if running an applicative subcommand
@@ -45,7 +42,7 @@ then
   done
 
   # And also wait for Redis if defined
-  if [ ! -z "$REDIS_ADDRS" ]
+  if [ ! -z ${REDIS_ADDRS+x} ] # https://stackoverflow.com/a/13864829/1741150
   then
     echo "Wait for Redis to be available..."
     wait-for-it.sh $REDIS_ADDRS -t 60
@@ -54,7 +51,6 @@ then
   # Then run the command itself as applicative user
   echo "Now running CMD with UID $USER_ID and GID $GROUP_ID"
   exec gosu cozy "$@"
-
 
 
 else
