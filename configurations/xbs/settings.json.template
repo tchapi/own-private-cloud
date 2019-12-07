@@ -1,6 +1,7 @@
 {
   "db": {
-    "host": "mongo"
+    "host": "mongo",
+    "name": "$XBS_DATABASE"
   },
   "status": {
     "message": "Yeah, hi. Fuck off.",

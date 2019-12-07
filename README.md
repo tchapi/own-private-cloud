@@ -8,11 +8,11 @@ Services :
   - Cozy Cloud (_Drive and settings only_) — A smart personal cloud to gather all your data
   - Passbolt — A free, open-source, extensible, OpenPGP-based password manager
   - X-browser Sync — A free and open-source browser syncing tool
-  - Baïkal — A GPLv3 Cal and CardDAV server, based on sabre/dav
+  - Davis — A MIT Cal and CardDAV server, based on sabre/dav
   - Wekan — A MIT Kanban board manager, comparable to Trello
   - Syncthing — A continuous file synchronization program under the Mozilla Public License 2.0 license
 
-> All services are served through an HTTPS proxy based on Nginx, certificates are provided by Let's Encrypt.
+> All services are served through an HTTPS proxy based on Nginx, certificates are provided by Let's Encrypt. See below for more details.
 
 # Installation
 
@@ -91,9 +91,15 @@ And then build the images :
 
     ./scripts/passbolt/init-admin-user.sh
 
-## Init the Baikal instance if needed (_if the tables do not already exist_)
+## Init the davis instance if needed (_if the tables do not already exist_)
 
-    ./scripts/baikal/init-mysql-tables.sh
+    ./scripts/davis/init-mysql-tables.sh
+
+# SSL
+
+The given Nginx configuration (_SSL params, etc_), along with a proper DNS configuration (including a correct CAA entry — see [here](https://blog.qualys.com/ssllabs/2017/03/13/caa-mandated-by-cabrowser-forum)), will result in a **A+** rating in [SSLLabs](https://www.ssllabs.com) :
+
+![A+ Rating page](https://raw.githubusercontent.com/tchapi/own-private-cloud/master/_screenshots/ssl_rating.png)
 
 ## To get the DKIM key (for the mails)
 
@@ -155,12 +161,12 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
   - Create and configure a block volume in OVH Public Cloud : https://docs.ovh.com/fr/public-cloud/creer-et-configurer-un-disque-supplementaire-sur-une-instance/
   - Shell command  / Entrypoint in Docker : https://stackoverflow.com/questions/41512237/how-to-execute-a-shell-command-before-the-entrypoint-via-the-dockerfile
   - Ignore files for Cozy drive : https://github.com/cozy-labs/cozy-desktop/blob/master/doc/usage/ignore_files.md
+  - Deploy your own SAAS : https://github.com/Atarity/deploy-your-own-saas/blob/master/README.md
   - How to run your own mail server : https://www.c0ffee.net/blog/mail-server-guide/
   - Mail servers are not hard : https://poolp.org/posts/2019-08-30/you-should-not-run-your-mail-server-because-mail-is-hard/
   - NSA-proof your e-mail in 2 hours : https://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/
   - Mail-in-a-Box : https://mailinabox.email/
   - A set of Ansible playbooks to build and maintain your own private cloud : https://github.com/sovereign/sovereign/blob/master/README.md
-
 
 ## Dockerfiles :
 

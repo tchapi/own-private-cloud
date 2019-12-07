@@ -28,6 +28,9 @@ expandVars ./configurations/standardnotes/templates/plus-editor.json.template ./
 expandVars ./configurations/standardnotes/templates/secure-spreadsheets.json.template ./configurations/standardnotes/extensions/secure-spreadsheets.json
 expandVars ./configurations/standardnotes/templates/simple-task-editor.json.template ./configurations/standardnotes/extensions/simple-task-editor.json
 
+# XBS configuration
+expandVars ./configurations/xbs/settings.json.template ./configurations/xbs/settings.json
+
 # Syncthing configuration
 expandVars ./configurations/syncthing/config.xml.template ./configurations/syncthing/config.xml
 
@@ -35,6 +38,10 @@ expandVars ./configurations/syncthing/config.xml.template ./configurations/synct
 expandVars ./configurations/mails/smtpd.conf.template ./configurations/mails/smtpd.conf
 expandVars ./configurations/mails/dkim_signing.conf.template ./configurations/mails/dkim_signing.conf
 expandVars ./configurations/mails/10-ssl.conf.template ./configurations/mails/10-ssl.conf
+
+# Recreate DH parameters (4096), only if it does not exist yet (it takes a long time)
+[ ! -f ./configurations/reverse-proxy/ssl-dhparams.pem ] && \
+  openssl dhparam -out ./configurations/reverse-proxy/ssl-dhparams.pem 4096
 
 # Root LE Certificate
 echo "### Retrieving X3 Let's Encrypt certificate"

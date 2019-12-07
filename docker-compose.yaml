@@ -5,7 +5,6 @@ services:
   certbot:
     image: certbot/certbot
     container_name: certbot
-    env_file: .env
     command: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
     volumes:
       - letsencrypt_certs:/etc/letsencrypt
@@ -19,21 +18,20 @@ services:
       dockerfile: ./build/Dockerfile-reverse-proxy
     image: reverse-proxy:custom
     container_name: proxy
-    env_file: .env
     restart: unless-stopped
     command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
     depends_on:
       - passbolt
       - standardnotes
       - cozy
-      - baikal
+      - davis
       - syncthing
       - xbs
       - wekan
     volumes:
       - letsencrypt_certs:/etc/letsencrypt
       - letsencrypt_www:/var/www/letsencrypt
-      - baikal_www:/var/www/calendar_server
+      - davis_www:/var/www/davis
     networks:
       - front_network
       - passwords_network
@@ -53,7 +51,17 @@ services:
       dockerfile: ./build/Dockerfile-mysql
     image: mariadb:custom
     container_name: mysql
-    env_file: .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - NOTES_DATABASE=${NOTES_DATABASE}
+      - NOTES_DB_USERNAME=${NOTES_DB_USERNAME}
+      - NOTES_DB_PASSWORD=${NOTES_DB_PASSWORD}
+      - PASSBOLT_DATABASE=${PASSBOLT_DATABASE}
+      - PASSBOLT_DB_USERNAME=${PASSBOLT_DB_USERNAME}
+      - PASSBOLT_DB_PASSWORD=${PASSBOLT_DB_PASSWORD}
+      - DAVIS_DATABASE=${DAVIS_DATABASE}
+      - DAVIS_DB_USERNAME=${DAVIS_DB_USERNAME}
+      - DAVIS_DB_PASSWORD=${DAVIS_DB_PASSWORD}
     restart: unless-stopped
     volumes:
       - database_mysql_volume:/var/lib/mysql
@@ -68,7 +76,18 @@ services:
       dockerfile: ./build/Dockerfile-passbolt
     image: passbolt:custom
     container_name: passbolt
-    env_file: .env
+    environment:
+      - APP_FULL_BASE_URL=https://${PASSWORDS_DOMAIN}
+      - DATASOURCES_DEFAULT_HOST=mysql
+      - DATASOURCES_DEFAULT_DATABASE=${PASSBOLT_DATABASE}
+      - DATASOURCES_DEFAULT_USERNAME=${PASSBOLT_DB_USERNAME}
+      - DATASOURCES_DEFAULT_PASSWORD=${PASSBOLT_DB_PASSWORD}
+      - EMAIL_DEFAULT_FROM=${EMAIL}
+      - EMAIL_TRANSPORT_DEFAULT_HOST=${MAIL_HOST}
+      - EMAIL_TRANSPORT_DEFAULT_PORT=${MAIL_PORT}
+      - EMAIL_TRANSPORT_DEFAULT_TLS=true
+      - EMAIL_TRANSPORT_DEFAULT_USERNAME=${MAIL_USERNAME}
+      - EMAIL_TRANSPORT_DEFAULT_PASSWORD=${MAIL_PASSWORD}
     restart: unless-stopped
     command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
     tty: true
@@ -87,11 +106,18 @@ services:
       dockerfile: ./build/Dockerfile-standardnotes
     image: standardnotes:custom
     container_name: notes
-    env_file: .env
+    environment:
+      - RAILS_ENV=production
+      - RAILS_SERVE_STATIC_FILES=true
+      - SECRET_KEY_BASE=${NOTES_SECRET_KEY_BASE}
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_DATABASE=${NOTES_DATABASE}
+      - DB_USERNAME=${NOTES_DB_USERNAME}
+      - DB_PASSWORD=${NOTES_DB_PASSWORD}
     restart: unless-stopped
     command: >
-      bash -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
-               sleep 2 &&
+        sh -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
                /data/src/docker/entrypoint bootstrap &&
                /data/src/docker/entrypoint start'
     depends_on:
@@ -103,7 +129,9 @@ services:
   couchdb:
     image: couchdb:2.3
     container_name: couchdb
-    env_file: .env
+    environment:
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
     restart: unless-stopped
     volumes:
       - database_couch_volume:/opt/couchdb/data
@@ -112,9 +140,27 @@ services:
 
   # Cozy Stack
   cozy:
-    image: cozy/cozy-stack
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-cozy
+      args:
+        version: "1.4.1"
+    image: cozy:custom
     container_name: cozy
-    env_file: .env
+    environment:
+      - DOMAIN=${CLOUD_DOMAIN}
+      - COUCHDB_PROTOCOL=http
+      - COUCHDB_HOST=couchdb
+      - COUCHDB_PORT=5984
+      - COUCHDB_USER=${COUCHDB_USER}
+      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+      - COZY_ADMIN_PASSPHRASE=${COZY_ADMIN_PASSPHRASE}
+      - MAIL_HOST=${MAIL_HOST}
+      - MAIL_PORT=${MAIL_PORT}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_DISABLE_TLS=false
+      - MAIL_SKIP_CERTIFICATE_VALIDATION=false
     restart: unless-stopped
     depends_on:
       - couchdb
@@ -123,25 +169,33 @@ services:
     networks:
       - cloud_network
 
-  # Caldav server
-  baikal:
+  # Caldav / Carddav server
+  davis:
     build:
       context: ./
-      dockerfile: ./build/Dockerfile-baikal
+      dockerfile: ./build/Dockerfile-davis
       args:
-        email: ${EMAIL}
-        mail_host: ${MAIL_HOST}
-        calendar_domain: ${CALENDAR_DOMAIN}
-        mail_username: ${MAIL_USERNAME}
-        mail_password: ${MAIL_PASSWORD}
-    image: baikal:custom
-    container_name: baikal
-    env_file: .env
+        version: "1.4.5"
+    image: davis:custom
+    container_name: davis
+    environment:
+      - APP_ENV=prod
+      - APP_SECRET=${DAVIS_APP_SECRET}
+      - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}
+      - MAILER_URL=smtp://${MAIL_HOST}:${MAIL_PORT}?username=${MAIL_USERNAME}&password=${MAIL_PASSWORD}
+      - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
+      - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
+      - AUTH_REALM=${DAVIS_AUTH_REALM}
+      - AUTH_METHOD=Digest
+      - CALDAV_ENABLED=true
+      - CARDDAV_ENABLED=true
+      - WEBDAV_ENABLED=false
+      - INVITE_FROM_ADDRESS=${EMAIL}
     restart: unless-stopped
     depends_on:
       - mysql
     volumes:
-      - baikal_www:/var/www/calendar_server
+      - davis_www:/var/www/davis
     networks:
       - calendar_network
 
@@ -152,21 +206,32 @@ services:
       dockerfile: ./build/Dockerfile-xbs
     image: xbs:custom
     container_name: xbs
-    env_file: .env
+    environment:
+      - XBS_API_HOSTNAME=${BOOKMARKS_DOMAIN}
+      - XBROWSERSYNC_DB_USER=${XBS_DB_USERNAME}
+      - XBROWSERSYNC_DB_PWD=${XBS_DB_PASSWORD}
     restart: unless-stopped
     depends_on:
       - mongo
     networks:
       - bookmarks_network
 
-  # XBS Database / Wekan database
+  # XBS + Wekan database
   mongo:
     build:
       context: ./
       dockerfile: ./build/Dockerfile-mongo
     image: mongo:custom
     container_name: mongo
-    env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - WEKAN_DATABASE=${WEKAN_DATABASE}
+      - WEKAN_DB_USERNAME=${WEKAN_DB_USERNAME}
+      - WEKAN_DB_PASSWORD=${WEKAN_DB_PASSWORD}
+      - XBS_DATABASE=${XBS_DATABASE}
+      - XBS_DB_USERNAME=${XBS_DB_USERNAME}
+      - XBS_DB_PASSWORD=${XBS_DB_PASSWORD}
     restart: unless-stopped
     volumes:
       - database_mongo_volume:/data/db
@@ -181,7 +246,11 @@ services:
       dockerfile: ./build/Dockerfile-syncthing
     image: syncthing:custom
     container_name: syncthing
-    env_file: .env
+    environment:
+      - PUID=${SYNC_PUID}
+      - PGID=${SYNC_PGID}
+      - SYNC_UI_PASSWORD=${SYNC_UI_PASSWORD}
+      - SYNC_API_KEY=${SYNC_API_KEY}
     restart: unless-stopped
     volumes:
       - files_sync_volume:/var/syncthing/data
@@ -194,7 +263,11 @@ services:
   wekan:
     image: wekanteam/wekan
     container_name: tasks
-    env_file: .env
+    environment:
+      - MONGO_URL=mongodb://${WEKAN_DB_USERNAME}:${WEKAN_DB_PASSWORD}@mongo:27017/${WEKAN_DATABASE}?authSource=admin
+      - ROOT_URL=https://${TASKS_DOMAIN}
+      - MAIL_URL=smtps://${MAIL_USERNAME}:${MAIL_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
+      - MAIL_FROM=${WEKAN_MAIL_FROM}
     restart: unless-stopped
     depends_on:
       - mongo
@@ -261,8 +334,8 @@ volumes:
     name: letsencrypt_www
   gpg_volume:
     name: gpg_volume
-  baikal_www:
-    name: baikal_www
+  davis_www:
+    name: davis_www
   database_mysql_volume: # This volume is actually an attached OpenStack Block storage
     driver: local
     driver_opts:
