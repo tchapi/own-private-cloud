@@ -17,9 +17,8 @@ EOF
 }
 
 echo "### Building configuration files"
-# Create the reverse-proxy configurations
-expandVars ./configurations/reverse-proxy/cloud.conf.template ./configurations/reverse-proxy/cloud.conf
-expandVars ./configurations/reverse-proxy/nginx.conf.template ./configurations/reverse-proxy/nginx.conf
+# Traefik configuration
+expandVars ./configurations/traefik/traefik.toml.template ./configurations/traefik/traefik.toml
 
 # Notes extensions
 expandVars ./configurations/standardnotes/templates/advanced-markdown-editor.json.template ./configurations/standardnotes/extensions/advanced-markdown-editor.json
@@ -33,13 +32,5 @@ expandVars ./configurations/xbs/settings.json.template ./configurations/xbs/sett
 
 # Syncthing configuration
 expandVars ./configurations/syncthing/config.xml.template ./configurations/syncthing/config.xml
-
-# Recreate DH parameters (4096), only if it does not exist yet (it takes a long time)
-[ ! -f ./configurations/reverse-proxy/ssl-dhparams.pem ] && \
-  openssl dhparam -out ./configurations/reverse-proxy/ssl-dhparams.pem 4096
-
-# Root LE Certificate
-echo "### Retrieving X3 Let's Encrypt certificate"
-wget -q -O ./configurations/reverse-proxy/chain.pem "https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.pem"
 
 echo "### Done."

@@ -1,0 +1,6 @@
+FROM traefik:v2.0
+
+LABEL maintainer="tchap@tchap.me"
+
+COPY ./configurations/traefik/traefik.toml /traefik.toml
+COPY ./configurations/traefik/dynamic.toml /dynamic.toml

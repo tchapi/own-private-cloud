@@ -1,0 +1,19 @@
+[providers.docker]
+  exposedByDefault = false
+
+[providers.file]
+  filename = "dynamic.toml"
+
+[api]
+  dashboard = true
+
+[entryPoints]
+  [entryPoints.websecure]
+    address = ":443"
+
+[certificatesResolvers]
+  [certificatesResolvers.default.acme]
+    # caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+    email = "$EMAIL"
+    storage = "/letsencrypt/acme.json"
+    [certificatesResolvers.default.acme.tlsChallenge]
