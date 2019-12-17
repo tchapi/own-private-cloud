@@ -289,7 +289,7 @@ services:
     networks:
       - sync_network
     ports:
-      - 22000:22000 # We must expose this port for Syncthing to work
+      - "22000:22000" # We must expose this port for Syncthing to work
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.syncthing.entrypoints=websecure"
