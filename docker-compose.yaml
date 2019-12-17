@@ -2,38 +2,17 @@ version: "3.7"
 
 services:
 
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    command: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-    volumes:
-      - letsencrypt_certs:/etc/letsencrypt
-      - letsencrypt_www:/var/www/letsencrypt
-    networks:
-      - front_network
-
-  reverse-proxy:
+  traefik:
     build:
       context: ./
-      dockerfile: ./build/Dockerfile-reverse-proxy
-    image: reverse-proxy:custom
-    container_name: proxy
+      dockerfile: ./build/Dockerfile-traefik
+    image: traefik:custom
+    container_name: traefik
     restart: unless-stopped
-    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
-    depends_on:
-      - passbolt
-      - standardnotes
-      - cozy
-      - davis
-      - syncthing
-      - xbs
-      - wekan
     volumes:
-      - letsencrypt_certs:/etc/letsencrypt
-      - letsencrypt_www:/var/www/letsencrypt
-      - davis_www:/var/www/davis
+      - certificates:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - front_network
       - passwords_network
       - notes_network
       - cloud_network
@@ -42,8 +21,7 @@ services:
       - sync_network
       - tasks_network
     ports:
-      - 80:80
-      - 443:443
+      - "443:443"
 
   mysql:
     build:
@@ -99,6 +77,13 @@ services:
       - /run
     networks:
       - passwords_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.passbolt.entrypoints=websecure"
+      - "traefik.http.routers.passbolt.rule=Host(`${PASSWORDS_DOMAIN}`)"
+      - "traefik.http.routers.passbolt.tls=true"
+      - "traefik.http.routers.passbolt.tls.certresolver=default"
+      - "traefik.http.routers.passbolt.middlewares=security@file"
 
   standardnotes:
     build:
@@ -124,6 +109,13 @@ services:
       - mysql
     networks:
       - notes_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.standardnotes.entrypoints=websecure"
+      - "traefik.http.routers.standardnotes.rule=Host(`${NOTES_DOMAIN}`)"
+      - "traefik.http.routers.standardnotes.tls=true"
+      - "traefik.http.routers.standardnotes.tls.certresolver=default"
+      - "traefik.http.routers.standardnotes.middlewares=security@file"
 
   # Cozy Database
   couchdb:
@@ -168,8 +160,41 @@ services:
       - files_cozy_volume:/var/lib/cozy/data
     networks:
       - cloud_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cozy.entrypoints=websecure"
+      - "traefik.http.routers.cozy.rule=Host(`${CLOUD_DOMAIN}`) || Host(`drive.${CLOUD_DOMAIN}`) || Host(`settings.${CLOUD_DOMAIN}`)"
+      - "traefik.http.routers.cozy.tls=true"
+      - "traefik.http.routers.cozy.tls.certresolver=default"
+      - "traefik.http.services.cozy.loadbalancer.server.port=8080"
+      - "traefik.http.middlewares.home-redirectregex.redirectregex.regex=^https://(home.)?${CLOUD_DOMAIN}/?$$"
+      - "traefik.http.middlewares.home-redirectregex.redirectregex.replacement=https://drive.${CLOUD_DOMAIN}"
+      - "traefik.http.middlewares.home-redirectregex.redirectregex.permanent=true"
+      - "traefik.http.routers.cozy.middlewares=home-redirectregex@docker"
+      - "traefik.http.routers.cozy.middlewares=security@file"
 
   # Caldav / Carddav server
+  davis-proxy:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-davis-proxy
+    image: davis-proxy:custom
+    container_name: davis-proxy
+    restart: unless-stopped
+    depends_on:
+      - davis
+    volumes:
+      - davis_www:/var/www/davis
+    networks:
+      - calendar_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.davis.entrypoints=websecure"
+      - "traefik.http.routers.davis.rule=Host(`${CALENDAR_DOMAIN}`)"
+      - "traefik.http.routers.davis.tls=true"
+      - "traefik.http.routers.davis.tls.certresolver=default"
+      - "traefik.http.routers.davis.middlewares=security@file"
+
   davis:
     build:
       context: ./
@@ -215,6 +240,13 @@ services:
       - mongo
     networks:
       - bookmarks_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.xbs.entrypoints=websecure"
+      - "traefik.http.routers.xbs.rule=Host(`${BOOKMARKS_DOMAIN}`)"
+      - "traefik.http.routers.xbs.tls=true"
+      - "traefik.http.routers.xbs.tls.certresolver=default"
+      - "traefik.http.routers.xbs.middlewares=security@file"
 
   # XBS + Wekan database
   mongo:
@@ -258,6 +290,14 @@ services:
       - sync_network
     ports:
       - 22000:22000 # We must expose this port for Syncthing to work
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.syncthing.entrypoints=websecure"
+      - "traefik.http.routers.syncthing.rule=Host(`${SYNC_DOMAIN}`)"
+      - "traefik.http.routers.syncthing.tls=true"
+      - "traefik.http.routers.syncthing.tls.certresolver=default"
+      - "traefik.http.routers.syncthing.middlewares=security@file"
+      - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
 
   # Wekan (tasks)
   wekan:
@@ -273,6 +313,13 @@ services:
       - mongo
     networks:
       - tasks_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wekan.entrypoints=websecure"
+      - "traefik.http.routers.wekan.rule=Host(`${TASKS_DOMAIN}`)"
+      - "traefik.http.routers.wekan.tls=true"
+      - "traefik.http.routers.wekan.tls.certresolver=default"
+      - "traefik.http.routers.wekan.middlewares=security@file"
 
   # Mails (bound on a specific IP for th reverse to be unique)
   dovecot:
@@ -328,10 +375,8 @@ networks:
   mail_network: ~
 
 volumes:
-  letsencrypt_certs:
-    name: letsencrypt_certs
-  letsencrypt_www:
-    name: letsencrypt_www
+  certificates:
+    name: certificates
   gpg_volume:
     name: gpg_volume
   davis_www:

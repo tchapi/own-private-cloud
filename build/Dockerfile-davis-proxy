@@ -1,0 +1,6 @@
+FROM nginx:1.17.6-alpine
+
+LABEL maintainer="tchap@tchap.me"
+
+WORKDIR /etc/nginx/
+COPY configurations/davis/nginx.conf nginx.conf

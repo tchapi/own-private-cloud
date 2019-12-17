@@ -1,5 +1,13 @@
 <configuration version="29">
-    <gui enabled="true" tls="true" debugging="false">
+    <device id="$SYNC_ID" name="$SYNC_DOMAIN" compression="metadata" introducer="false" skipIntroductionRemovals="false" introducedBy="">
+        <address>dynamic</address>
+        <paused>false</paused>
+        <autoAcceptFolders>false</autoAcceptFolders>
+        <maxSendKbps>0</maxSendKbps>
+        <maxRecvKbps>0</maxRecvKbps>
+        <maxRequestKiB>0</maxRequestKiB>
+    </device>
+    <gui enabled="true" tls="false" debugging="false">
         <address>0.0.0.0:8384</address>
         <user>$USER</user>
         <password>$SYNC_UI_PASSWORD</password>
@@ -39,7 +47,7 @@
         <limitBandwidthInLan>false</limitBandwidthInLan>
         <minHomeDiskFree unit="%">1</minHomeDiskFree>
         <releasesURL>https://upgrades.syncthing.net/meta.json</releasesURL>
-        <overwriteRemoteDeviceNamesOnConnect>false</overwriteRemoteDeviceNamesOnConnect>
+        <overwriteRemoteDeviceNamesOnConnect>true</overwriteRemoteDeviceNamesOnConnect>
         <tempIndexMinBlocks>10</tempIndexMinBlocks>
         <trafficClass>0</trafficClass>
         <defaultFolderPath>~/data</defaultFolderPath>
