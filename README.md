@@ -12,7 +12,7 @@ Services :
   - Wekan — A MIT Kanban board manager, comparable to Trello
   - Syncthing — A continuous file synchronization program under the Mozilla Public License 2.0 license
 
-> All services are served through an HTTPS proxy based on Nginx, certificates are provided by Let's Encrypt. See below for more details.
+> All services are served through the Træfik reverse-proxy, certificates are provided by Let's Encrypt, and renewed automatically via Træfik.
 
 # Installation
 
@@ -72,20 +72,15 @@ And then build the images :
 
     docker-compose build
 
-## Set the dummy SSL certificates, then launch nginx and retrieve the real certificates
-
-    ./scripts/certbot/init-letsencrypt.sh
-
 ## Set the Cozy instance
 
     ./scripts/cozy/init-cozycloud.sh
 
 ## Provision the whole thing in daemon mode
 
-> Some containers have already been started by the init-letsencrypt script
-> This should only start certbot
-
     docker-compose up -d
+
+🎉
 
 ## Create the Passbolt admin user
 
@@ -97,7 +92,7 @@ And then build the images :
 
 # SSL
 
-The given Nginx configuration (_SSL params, etc_), along with a proper DNS configuration (including a correct CAA entry — see [here](https://blog.qualys.com/ssllabs/2017/03/13/caa-mandated-by-cabrowser-forum)), will result in a **A+** rating in [SSLLabs](https://www.ssllabs.com) :
+The given Traefik V2.0 configuration (_SSL params, etc_), along with a proper DNS configuration (including a correct CAA entry — see [here](https://blog.qualys.com/ssllabs/2017/03/13/caa-mandated-by-cabrowser-forum)), will result in a **A+** rating in [SSLLabs](https://www.ssllabs.com) :
 
 ![A+ Rating page](https://raw.githubusercontent.com/tchapi/own-private-cloud/master/_screenshots/ssl_rating.png)
 

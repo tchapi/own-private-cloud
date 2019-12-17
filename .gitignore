@@ -7,10 +7,7 @@ openrc.sh
 .env
 
 # Built configuration files
-configurations/reverse-proxy/cloud.conf
-configurations/reverse-proxy/nginx.conf
-configurations/reverse-proxy/chain.pem
-configurations/reverse-proxy/ssl-dhparams.pem
+configurations/traefik/traefik.toml
 configurations/standardnotes/extensions/*.json
 configurations/syncthing/config.xml
 configurations/xbs/settings.json
