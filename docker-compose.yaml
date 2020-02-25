@@ -167,11 +167,11 @@ services:
       - "traefik.http.routers.cozy.tls=true"
       - "traefik.http.routers.cozy.tls.certresolver=default"
       - "traefik.http.services.cozy.loadbalancer.server.port=8080"
-      - "traefik.http.middlewares.home-redirectregex.redirectregex.regex=^https://(home.)?${CLOUD_DOMAIN}/?$$"
+      - "traefik.http.middlewares.home-redirectregex.redirectregex.regex=^https://home.${CLOUD_DOMAIN}/?$$"
       - "traefik.http.middlewares.home-redirectregex.redirectregex.replacement=https://drive.${CLOUD_DOMAIN}"
       - "traefik.http.middlewares.home-redirectregex.redirectregex.permanent=true"
-      - "traefik.http.routers.cozy.middlewares=home-redirectregex@docker"
-      - "traefik.http.routers.cozy.middlewares=security@file"
+      - "traefik.http.middlewares.cozy-chain.chain.middlewares=home-redirectregex@docker,security@file"
+      - "traefik.http.routers.cozy.middlewares=cozy-chain"
 
   # Caldav / Carddav server
   davis-proxy:
