@@ -322,7 +322,6 @@ services:
       - "traefik.http.routers.wekan.middlewares=security@file"
 
 networks:
-  front_network: ~
   passwords_network: ~
   notes_network: ~
   cloud_network: ~
