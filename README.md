@@ -11,6 +11,7 @@ Services :
   - Davis — A MIT Cal and CardDAV server, based on sabre/dav
   - Wekan — A MIT Kanban board manager, comparable to Trello
   - Syncthing — A continuous file synchronization program under the Mozilla Public License 2.0 license
+  - kvtiles — An open-source map tiles server in Go, Apache 2.0 License
 
 > All services are served through the Træfik reverse-proxy, certificates are provided by Let's Encrypt, and renewed automatically via Træfik.
 
@@ -126,6 +127,12 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
 
 > If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (`mongo`, or `couch` too if needed) on the host for the entrypoint script to be replayed entirely
 
+### The map tiles server
+
+You can change the region, just grab a tag at https://hub.docker.com/r/akhenakh/kvtiles/tags, such as `france-13-latest` for instance.
+
+The tiles server is available directly at https://{MAPS_DOMAIN}/. You can see a handy map at https://{MAPS_DOMAIN}/static/?key={MAPS_API_KEY}.
+
 ### How-to rename a docker volume
 
     echo "Creating destination volume ..."
@@ -169,4 +176,8 @@ See https://github.com/Kickball/awesome-selfhosted for more awesome self-hosted 
   - Radicale : https://radicale.org/
   - Calendar Server:  https://www.calendarserver.org/ (Apple)
   - An android client app for CalDav / CardDav : https://gitlab.com/bitfireAT/davx5-ose - https://f-droid.org/packages/at.bitfire.davdroid/
-  
+
+### About the tiles server
+
+  - The blog post : https://blog.nobugware.com/post/2020/free-maps-for-all/
+  - The repository : https://github.com/akhenakh/kvtiles

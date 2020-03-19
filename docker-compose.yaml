@@ -20,6 +20,7 @@ services:
       - bookmarks_network
       - sync_network
       - tasks_network
+      - maps_network
     ports:
       - "443:443"
 
@@ -321,6 +322,24 @@ services:
       - "traefik.http.routers.wekan.tls.certresolver=default"
       - "traefik.http.routers.wekan.middlewares=security@file"
 
+  # kvtiles (Maps)
+  maps:
+    # See https://hub.docker.com/r/akhenakh/kvtiles/tags for available tags / zooms
+    image: akhenakh/kvtiles:planet-10-latest
+    container_name: maps
+    restart: unless-stopped
+    entrypoint: ["./kvtilesd", "-tilesKey=${MAPS_API_KEY}"]
+    networks:
+      - maps_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.maps.entrypoints=websecure"
+      - "traefik.http.routers.maps.rule=Host(`${MAPS_DOMAIN}`)"
+      - "traefik.http.routers.maps.tls=true"
+      - "traefik.http.routers.maps.tls.certresolver=default"
+      - "traefik.http.routers.maps.middlewares=security@file"
+      - "traefik.http.services.maps.loadbalancer.server.port=8080"
+
 networks:
   passwords_network: ~
   notes_network: ~
@@ -329,6 +348,7 @@ networks:
   bookmarks_network: ~
   sync_network: ~
   tasks_network: ~
+  maps_network: ~
 
 volumes:
   certificates:
