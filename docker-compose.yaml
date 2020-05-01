@@ -101,11 +101,12 @@ services:
       - DB_DATABASE=${NOTES_DATABASE}
       - DB_USERNAME=${NOTES_DB_USERNAME}
       - DB_PASSWORD=${NOTES_DB_PASSWORD}
+      - DISABLE_USER_REGISTRATION=true
     restart: unless-stopped
     command: >
         sh -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
-               /data/src/docker/entrypoint bootstrap &&
-               /data/src/docker/entrypoint start'
+               bundle exec rails db:migrate &&
+               bundle exec rails server -b 0.0.0.0'
     depends_on:
       - mysql
     networks:
@@ -137,7 +138,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cozy
       args:
-        version: "1.4.6"
+        version: "1.4.10"
     image: cozy:custom
     container_name: cozy
     environment:
@@ -201,7 +202,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-davis
       args:
-        version: "1.4.5"
+        version: "1.4.7"
     image: davis:custom
     container_name: davis
     environment:

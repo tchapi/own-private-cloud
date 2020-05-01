@@ -1,4 +1,4 @@
-FROM xbrowsersync/api:1.1.11
+FROM xbrowsersync/api:1.1.12
 
 LABEL maintainer="tchap@tchap.me"
 
