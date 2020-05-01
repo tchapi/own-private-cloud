@@ -86,7 +86,7 @@ services:
       - "traefik.http.routers.passbolt.tls.certresolver=default"
       - "traefik.http.routers.passbolt.middlewares=security@file"
 
-  standardnotes:
+  notes:
     build:
       context: ./
       dockerfile: ./build/Dockerfile-standardnotes
