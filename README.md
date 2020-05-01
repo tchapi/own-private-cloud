@@ -91,6 +91,17 @@ And then build the images :
 
     ./scripts/davis/init-mysql-tables.sh
 
+# Updating
+
+Update Dockerfiles or the `docker-compose.yml` file, then rebuild the images with `docker-compose build`. You can then recreate each container with the newly built images with `docker-compose up -d {container}`.
+
+For some containers using a shared volume such as Davis (`/var/www/davis`), you need to scrap the underlying volume before updating so that the code is really updated.
+
+For instance:
+
+    docker rm -f davis davis-proxy && docker volume rm davis_www
+    docker-compose up -d --force-recreate davis-proxy
+
 # SSL
 
 The given Traefik V2.0 configuration (_SSL params, etc_), along with a proper DNS configuration (including a correct CAA entry — see [here](https://blog.qualys.com/ssllabs/2017/03/13/caa-mandated-by-cabrowser-forum)), will result in a **A+** rating in [SSLLabs](https://www.ssllabs.com) :
