@@ -329,7 +329,7 @@ services:
     image: akhenakh/kvtiles:planet-10-latest
     container_name: maps
     restart: unless-stopped
-    entrypoint: ["./kvtilesd", "-tilesKey=${MAPS_API_KEY}"]
+    command: ["-tilesKey=${MAPS_API_KEY}"] # entrypoint is ["./kvtilesd"]
     networks:
       - maps_network
     labels:
