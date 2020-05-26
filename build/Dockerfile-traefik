@@ -1,4 +1,4 @@
-FROM traefik:v2.0
+FROM traefik:v2.2
 
 LABEL maintainer="tchap@tchap.me"
 

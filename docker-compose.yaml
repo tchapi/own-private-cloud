@@ -20,6 +20,7 @@ services:
       - bookmarks_network
       - sync_network
       - tasks_network
+      - maps_network
     ports:
       - "443:443"
 
@@ -85,7 +86,7 @@ services:
       - "traefik.http.routers.passbolt.tls.certresolver=default"
       - "traefik.http.routers.passbolt.middlewares=security@file"
 
-  standardnotes:
+  notes:
     build:
       context: ./
       dockerfile: ./build/Dockerfile-standardnotes
@@ -100,11 +101,12 @@ services:
       - DB_DATABASE=${NOTES_DATABASE}
       - DB_USERNAME=${NOTES_DB_USERNAME}
       - DB_PASSWORD=${NOTES_DB_PASSWORD}
+      - DISABLE_USER_REGISTRATION=true
     restart: unless-stopped
     command: >
         sh -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
-               /data/src/docker/entrypoint bootstrap &&
-               /data/src/docker/entrypoint start'
+               bundle exec rails db:migrate &&
+               bundle exec rails server -b 0.0.0.0'
     depends_on:
       - mysql
     networks:
@@ -136,7 +138,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cozy
       args:
-        version: "1.4.1"
+        version: "1.4.10"
     image: cozy:custom
     container_name: cozy
     environment:
@@ -163,15 +165,15 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.cozy.entrypoints=websecure"
-      - "traefik.http.routers.cozy.rule=Host(`${CLOUD_DOMAIN}`) || Host(`drive.${CLOUD_DOMAIN}`) || Host(`settings.${CLOUD_DOMAIN}`)"
+      - "traefik.http.routers.cozy.rule=Host(`${CLOUD_DOMAIN}`) || Host(`drive.${CLOUD_DOMAIN}`) || Host(`settings.${CLOUD_DOMAIN}`) || Host(`home.${CLOUD_DOMAIN}`)"
       - "traefik.http.routers.cozy.tls=true"
       - "traefik.http.routers.cozy.tls.certresolver=default"
       - "traefik.http.services.cozy.loadbalancer.server.port=8080"
-      - "traefik.http.middlewares.home-redirectregex.redirectregex.regex=^https://(home.)?${CLOUD_DOMAIN}/?$$"
+      - "traefik.http.middlewares.home-redirectregex.redirectregex.regex=^https://home.${CLOUD_DOMAIN}/?$$"
       - "traefik.http.middlewares.home-redirectregex.redirectregex.replacement=https://drive.${CLOUD_DOMAIN}"
       - "traefik.http.middlewares.home-redirectregex.redirectregex.permanent=true"
-      - "traefik.http.routers.cozy.middlewares=home-redirectregex@docker"
-      - "traefik.http.routers.cozy.middlewares=security@file"
+      - "traefik.http.middlewares.cozy-chain.chain.middlewares=home-redirectregex@docker,security@file"
+      - "traefik.http.routers.cozy.middlewares=cozy-chain"
 
   # Caldav / Carddav server
   davis-proxy:
@@ -200,7 +202,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-davis
       args:
-        version: "1.4.5"
+        version: "1.4.8"
     image: davis:custom
     container_name: davis
     environment:
@@ -289,7 +291,7 @@ services:
     networks:
       - sync_network
     ports:
-      - 22000:22000 # We must expose this port for Syncthing to work
+      - "22000:22000" # We must expose this port for Syncthing to work
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.syncthing.entrypoints=websecure"
@@ -363,8 +365,25 @@ services:
       - "${MAIL_HOST_IP}:465:465"
       - "${MAIL_HOST_IP}:587:587"
 
+  # kvtiles (Maps)
+  maps:
+    # See https://hub.docker.com/r/akhenakh/kvtiles/tags for available tags / zooms
+    image: akhenakh/kvtiles:planet-10-latest
+    container_name: maps
+    restart: unless-stopped
+    command: ["-tilesKey=${MAPS_API_KEY}"] # entrypoint is ["./kvtilesd"]
+    networks:
+      - maps_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.maps.entrypoints=websecure"
+      - "traefik.http.routers.maps.rule=Host(`${MAPS_DOMAIN}`)"
+      - "traefik.http.routers.maps.tls=true"
+      - "traefik.http.routers.maps.tls.certresolver=default"
+      - "traefik.http.routers.maps.middlewares=security@file"
+      - "traefik.http.services.maps.loadbalancer.server.port=8080"
+
 networks:
-  front_network: ~
   passwords_network: ~
   notes_network: ~
   cloud_network: ~
@@ -373,6 +392,7 @@ networks:
   sync_network: ~
   tasks_network: ~
   mail_network: ~
+  maps_network: ~
 
 volumes:
   certificates:
