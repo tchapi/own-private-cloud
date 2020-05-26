@@ -100,7 +100,9 @@ For some containers using a shared volume such as Davis (`/var/www/davis`), you 
 For instance:
 
     docker rm -f davis davis-proxy && docker volume rm davis_www
-    docker-compose up -d --force-recreate davis-proxy
+    docker container prune && docker image prune
+    docker-compose build davis
+    docker-compose up -d --force-recreate davis-proxy davis
 
 # SSL
 
