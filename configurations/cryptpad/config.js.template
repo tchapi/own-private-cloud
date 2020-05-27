@@ -108,11 +108,11 @@ module.exports = {
      *  which can be found on the settings page for registered users.
      *  Entries should be strings separated by a comma.
      */
-/*
+
     adminKeys: [
-        //"https://my.awesome.website/user/#/1/cryptpad-user1/YZgXQxKR0Rcb6r6CmxHPdAGLVludrAF2lEnkbx1vVOo=",
+        "$CRYPTPAD_ADMIN_KEY",
     ],
-*/
+
 
     /*  CryptPad's administration panel includes a "support" tab
      *  wherein administrators with a secret key can view messages
@@ -160,8 +160,7 @@ module.exports = {
      *
      *  hint: 50MB is 50 * 1024 * 1024
      */
-    defaultStorageLimit: 1000 * 1024 * 1024,
-
+    defaultStorageLimit: 100 * 1024,
 
     /* =====================
      *        STORAGE
@@ -207,20 +206,15 @@ module.exports = {
      *
      *  hint: 1GB is 1024 * 1024 * 1024 bytes
      */
-/*
+
     customLimits: {
-        "https://my.awesome.website/user/#/1/cryptpad-user1/YZgXQxKR0Rcb6r6CmxHPdAGLVludrAF2lEnkbx1vVOo=": {
-            limit: 20 * 1024 * 1024 * 1024,
+        "$CRYPTPAD_ADMIN_KEY": {
+            limit: 1024 * 1024 * 1024,
             plan: 'insider',
-            note: 'storage space donated by my.awesome.website'
-        },
-        "https://my.awesome.website/user/#/1/cryptpad-user2/GdflkgdlkjeworijfkldfsdflkjeEAsdlEnkbx1vVOo=": {
-            limit: 10 * 1024 * 1024 * 1024,
-            plan: 'insider',
-            note: 'storage space donated by my.awesome.website'
+            note: '1GB total available space'
         }
     },
-*/
+
 
     /*  Users with premium accounts (those with a plan included in their customLimit)
      *  can benefit from an increased upload size limit. By default they are restricted to the same

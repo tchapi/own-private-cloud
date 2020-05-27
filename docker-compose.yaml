@@ -359,19 +359,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.cryptpad.entrypoints=websecure"
-      - "traefik.http.routers.cryptpad.rule=Host(`${CRYPTPAD_DOMAIN}`)"
+      - "traefik.http.routers.cryptpad.rule=Host(`${CRYPTPAD_DOMAIN}`) || Host(`${CRYPTPAD_SANDBOX_DOMAIN}`)"
       - "traefik.http.routers.cryptpad.tls=true"
       - "traefik.http.routers.cryptpad.tls.certresolver=default"
       - "traefik.http.routers.cryptpad.middlewares=security@file"
-      - "traefik.http.routers.cryptpad.service=cryptpad"
       - "traefik.http.services.cryptpad.loadbalancer.server.port=3000"
-      - "traefik.http.routers.cryptpad-sandbox.entrypoints=websecure"
-      - "traefik.http.routers.cryptpad-sandbox.rule=Host(`${CRYPTPAD_SANDBOX_DOMAIN}`)"
-      - "traefik.http.routers.cryptpad-sandbox.tls=true"
-      - "traefik.http.routers.cryptpad-sandbox.tls.certresolver=default"
-      - "traefik.http.routers.cryptpad-sandbox.middlewares=security@file"
-      - "traefik.http.routers.cryptpad-sandbox.service=cryptpad-sandbox"
-      - "traefik.http.services.cryptpad-sandbox.loadbalancer.server.port=3001"
 
 networks:
   passwords_network: ~
