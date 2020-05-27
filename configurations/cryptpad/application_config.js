@@ -7,8 +7,8 @@
 */
 define(['/common/application_config_internal.js'], function (AppConfig) {
     AppConfig.surveyURL = "";
-    AppConfig.availablePadTypes = ['drive', 'pad', 'sheet', 'code', 'file'];
-    AppConfig.registeredOnlyTypes = ['drive', 'pad', 'sheet', 'code', 'file'];
+    AppConfig.availablePadTypes = ['drive', 'pad', 'sheet', 'code'];
+    AppConfig.registeredOnlyTypes = ['drive', 'pad', 'sheet', 'code'];
     AppConfig.hideLoadingScreenTips = true;
     AppConfig.availableLanguages = ['en'];
     AppConfig.disableAnonymousStore = true;
