@@ -21,6 +21,7 @@ services:
       - sync_network
       - tasks_network
       - maps_network
+      - cryptpad_network
     ports:
       - "443:443"
 
@@ -341,6 +342,29 @@ services:
       - "traefik.http.routers.maps.middlewares=security@file"
       - "traefik.http.services.maps.loadbalancer.server.port=8080"
 
+  # Cryptpad (Documents)
+  cryptpad:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-cryptpad
+      args:
+        version: "3.17.1"
+    image: cryptpad:custom
+    container_name: cryptpad
+    restart: unless-stopped
+    volumes:
+      - files_cryptpad_volume:/cryptpad/data
+    networks:
+      - cryptpad_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.cryptpad.entrypoints=websecure"
+      - "traefik.http.routers.cryptpad.rule=Host(`${CRYPTPAD_DOMAIN}`) || Host(`${CRYPTPAD_SANDBOX_DOMAIN}`)"
+      - "traefik.http.routers.cryptpad.tls=true"
+      - "traefik.http.routers.cryptpad.tls.certresolver=default"
+      - "traefik.http.routers.cryptpad.middlewares=security@file"
+      - "traefik.http.services.cryptpad.loadbalancer.server.port=3000"
+
 networks:
   passwords_network: ~
   notes_network: ~
@@ -350,6 +374,7 @@ networks:
   sync_network: ~
   tasks_network: ~
   maps_network: ~
+  cryptpad_network: ~
 
 volumes:
   certificates:
@@ -388,3 +413,9 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/sync
+  files_cryptpad_volume: # This volume is actually an attached OpenStack Block storage. It stores the cryptpad data
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/cryptpad

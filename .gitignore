@@ -13,3 +13,4 @@ configurations/syncthing/config.xml
 configurations/syncthing/cert.pem
 configurations/syncthing/key.pem
 configurations/xbs/settings.json
+configurations/cryptpad/config.js
