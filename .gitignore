@@ -2,6 +2,7 @@
 
 # OpenStack configuration file
 openrc.sh
+openrc-v3.sh
 
 # Environment vars
 .env
@@ -13,6 +14,7 @@ configurations/syncthing/config.xml
 configurations/syncthing/cert.pem
 configurations/syncthing/key.pem
 configurations/xbs/settings.json
+configurations/cryptpad/config.js
 configurations/mails/smtpd.conf
 configurations/mails/dkim_signing.conf
 configurations/mails/10-ssl.conf

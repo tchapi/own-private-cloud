@@ -30,6 +30,9 @@ expandVars ./configurations/standardnotes/templates/simple-task-editor.json.temp
 # XBS configuration
 expandVars ./configurations/xbs/settings.json.template ./configurations/xbs/settings.json
 
+# Cryptpad configuration
+expandVars ./configurations/cryptpad/config.js.template ./configurations/cryptpad/config.js
+
 # Syncthing configuration
 # See https://docs.syncthing.net/dev/device-ids.html and https://github.com/syncthing/syncthing/issues/4217#issuecomment-309116907
 # If the certificate and key have not been created yet, create them. They will persist locally, in case you need to rebuild the container
