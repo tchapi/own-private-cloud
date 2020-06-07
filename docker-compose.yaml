@@ -22,6 +22,7 @@ services:
       - tasks_network
       - maps_network
       - cryptpad_network
+      - mail_network
     ports:
       - "443:443"
 
@@ -324,7 +325,7 @@ services:
       - "traefik.http.routers.wekan.tls.certresolver=default"
       - "traefik.http.routers.wekan.middlewares=security@file"
 
-  # Mails (bound on a specific IP for th reverse to be unique)
+  # Mails (bound on a specific IP for the reverse to be unique)
   dovecot:
     build:
       context: ./
@@ -333,12 +334,12 @@ services:
         top_domain: ${TOP_DOMAIN}
         mail_domain: ${MAIL_DOMAIN}
     image: dovecot:custom
-    container_name: dovecot
+    container_name: mail-dovecot
     env_file: .env
     restart: unless-stopped
     volumes:
       - mails_volume:/var/mail
-      - letsencrypt_certs:/etc/letsencrypt
+      - certificates:/etc/letsencrypt
     networks:
       - mail_network
     ports:
@@ -353,12 +354,12 @@ services:
         top_domain: ${TOP_DOMAIN}
         mail_domain: ${MAIL_DOMAIN}
     image: opensmtpd:custom
-    container_name: smtpd
+    container_name: mail-smtpd
     env_file: .env
     restart: unless-stopped
     volumes:
       - mails_volume:/var/mail
-      - letsencrypt_certs:/etc/letsencrypt
+      - certificates:/etc/letsencrypt
     networks:
       - mail_network
     ports:

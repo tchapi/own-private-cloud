@@ -1,5 +1,5 @@
 # Build filter-rspamd and filter-senderscore from sources
-FROM golang:1.7.3 AS builder
+FROM golang:1.14 AS builder
 
 WORKDIR /go
 RUN git clone https://github.com/poolpOrg/filter-rspamd.git filter-rspamd
@@ -12,7 +12,7 @@ WORKDIR /go/filter-senderscore
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o filter-senderscore .
 
 # Main image
-FROM alpine:3.10
+FROM alpine:3.12
 
 LABEL maintainer="tchap@tchap.me"
 
@@ -57,7 +57,7 @@ RUN mkdir -p /var/lib/opensmtpd/empty \
   && mkdir -p /etc/mail \
   && chmod 711 /var/spool/smtpd
 
-RUN git clone -b portable git://github.com/OpenSMTPD/OpenSMTPD.git opensmtpd
+RUN git clone git://github.com/OpenSMTPD/OpenSMTPD.git opensmtpd
 WORKDIR /opensmtpd
 
 # Build opensmtpd
