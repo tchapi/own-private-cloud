@@ -201,14 +201,14 @@ The tiles server is available directly at https://{MAPS_DOMAIN}/. You can see a 
   - Shell command  / Entrypoint in Docker : https://stackoverflow.com/questions/41512237/how-to-execute-a-shell-command-before-the-entrypoint-via-the-dockerfile
   - Ignore files for Cozy drive : https://github.com/cozy-labs/cozy-desktop/blob/master/doc/usage/ignore_files.md
   - Deploy your own SAAS : https://github.com/Atarity/deploy-your-own-saas/blob/master/README.md
-  - How to run your own mail server : https://www.c0ffee.net/blog/mail-server-guide/
-  - Mail servers are not hard : https://poolp.org/posts/2019-08-30/you-should-not-run-your-mail-server-because-mail-is-hard/
-  - NSA-proof your e-mail in 2 hours : https://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/
-  - Mail-in-a-Box : https://mailinabox.email/
   - A set of Ansible playbooks to build and maintain your own private cloud : https://github.com/sovereign/sovereign/blob/master/README.md
 
 ## Mails
 
+  - How to run your own mail server : https://www.c0ffee.net/blog/mail-server-guide/
+  - Mail servers are not hard : https://poolp.org/posts/2019-08-30/you-should-not-run-your-mail-server-because-mail-is-hard/
+  - NSA-proof your e-mail in 2 hours : https://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/
+  - Mail-in-a-Box : https://mailinabox.email/
   - Setting up a mailserver with OpenSMTPD and Dovecot : https://poolp.org/posts/2019-09-14/setting-up-a-mail-server-with-opensmtpd-dovecot-and-rspamd/
   - OpenSMTPD: Setting up a mailserver : http://z5t1.com:8080/cucumber_releases/cucumber-1.1/source/net-extra/opensmtpd/doc/example1.html
   - Test a SMTP server : https://www.stevenrombauts.be/2018/12/test-smtp-with-telnet-or-openssl/
