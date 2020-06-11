@@ -13,9 +13,9 @@ filter rspamd proc-exec "filter-rspamd"
 
 table aliases file:/etc/mail/aliases
 
-listen on eth0 tls pki $MAIL_DOMAIN filter { check_dyndns, check_rdns, check_fcrdns, senderscore, rspamd }
+listen on eth0 tls pki $MAIL_DOMAIN filter { check_dyndns, check_rdns, check_fcrdns, senderscore, rspamd } hostname $MAIL_DOMAIN
 
-listen on eth0 port submission tls-require pki $MAIL_DOMAIN auth filter rspamd
+listen on eth0 port submission tls-require pki $MAIL_DOMAIN auth filter rspamd hostname $MAIL_DOMAIN
 
 action "local_mail" maildir "/var/mail/%{rcpt.user}/Maildir" junk alias <aliases>
 action "outbound" relay helo $MAIL_DOMAIN

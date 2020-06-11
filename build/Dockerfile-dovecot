@@ -2,8 +2,9 @@ FROM alpine:3.12
 
 LABEL maintainer="tchap@tchap.me"
 
-ARG top_domain
-ARG mail_domain
+ARG mail_principal_user
+ARG mail_principal_password
+ARG mail_group_id
 
 EXPOSE 143
 EXPOSE 993
@@ -11,8 +12,16 @@ EXPOSE 993
 # Install necessary packages
 RUN apk add --no-cache \
     dovecot \
-    dovecot-pigeonhole-plugin
+    dovecot-pigeonhole-plugin \
+    dovecot-submissiond
 
+# Set logging to STDOUT/STDERR
+RUN sed -i -e 's,#log_path = syslog,log_path = /dev/stderr,' \
+           -e 's,#info_log_path =,info_log_path = /dev/stdout,' \
+           -e 's,#debug_log_path =,debug_log_path = /dev/stdout,' \
+  /etc/dovecot/conf.d/10-logging.conf
+
+COPY configurations/mails/auth-passwdfile.conf.ext /etc/dovecot/conf.d/auth-passwdfile.conf.ext
 COPY configurations/mails/10-ssl.conf /etc/dovecot/conf.d/10-ssl.conf
 COPY configurations/mails/10-mail.conf /etc/dovecot/conf.d/10-mail.conf
 COPY configurations/mails/20-imap.conf /etc/dovecot/conf.d/20-imap.conf
@@ -25,9 +34,22 @@ COPY configurations/mails/sa-learn-spam.sh /usr/local/lib/dovecot/sieve/sa-learn
 
 WORKDIR /usr/local/lib/dovecot/sieve/
 
+# Create a single system user named vmail used for all virtual users
+RUN addgroup -g ${mail_group_id} vmail && adduser vmail -G vmail -u ${mail_group_id} -g "Mail account UID" -D -h /var/mail -H -s /sbin/nologin
+
+# Create mail principal user and set password
+RUN echo "${mail_principal_user}:"$(doveadm pw -p ${mail_principal_password})"::" > /etc/dovecot/users
+
 RUN sievec report-ham.sieve \
     && sievec report-spam.sieve \
     && chmod 755 sa-learn-ham.sh \
     && chmod 755 sa-learn-spam.sh
+
+# Remove left-over temporary files
+RUN find /var/cache/apk /tmp -mindepth 1 -delete
+
+# Volumes for data persistence
+RUN mkdir -p /var/mail && chown :vmail /var/mail && chmod g+ws /var/mail
+VOLUME /var/mail
 
 CMD ["dovecot", "-F"]

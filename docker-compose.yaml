@@ -331,8 +331,9 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-dovecot
       args:
-        top_domain: ${TOP_DOMAIN}
-        mail_domain: ${MAIL_DOMAIN}
+        mail_principal_user: ${MAIL_PRINCIPAL_USER}
+        mail_principal_password: ${MAIL_PRINCIPAL_PASSWORD}
+        mail_group_id: ${MAIL_VOLUME_GROUP}
     image: dovecot:custom
     container_name: mail-dovecot
     env_file: .env
@@ -352,7 +353,9 @@ services:
       dockerfile: ./build/Dockerfile-opensmtpd
       args:
         top_domain: ${TOP_DOMAIN}
-        mail_domain: ${MAIL_DOMAIN}
+        mail_principal_user: ${MAIL_PRINCIPAL_USER}
+        mail_principal_password: ${MAIL_PRINCIPAL_PASSWORD}
+        mail_group_id: ${MAIL_VOLUME_GROUP}
     image: opensmtpd:custom
     container_name: mail-smtpd
     env_file: .env
@@ -366,6 +369,39 @@ services:
       - "${MAIL_HOST_IP}:25:25"
       - "${MAIL_HOST_IP}:465:465"
       - "${MAIL_HOST_IP}:587:587"
+
+
+  # This container :
+  #  - exposes a traefik endpoint so that certificates for MAIL_DOMAIN are created and renewed by Traefik via labels
+  # NB: Could be replaced by a webmail client
+  mail-certificates-endpoint:
+    image: httpd:alpine
+    container_name: mail-certificates-endpoint
+    networks:
+      - mail_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mail.entrypoints=websecure"
+      - "traefik.http.routers.mail.rule=Host(`${MAIL_DOMAIN}`)"
+      - "traefik.http.routers.mail.tls=true"
+      - "traefik.http.routers.mail.tls.certresolver=default"
+      - "traefik.http.routers.mail.middlewares=security@file"
+
+  # This container :
+  #  - periodically exports these certificates to .pem files, in a shared volume
+  #    so that dovecot and opensmtpd containers can consume them
+  mail-certificates-dumper:
+    image: ldez/traefik-certs-dumper:v2.7.0
+    container_name: mail-certificates-dumper
+    entrypoint: sh -c '
+      traefik-certs-dumper file --version v2
+        --crt-name=fullchain --crt-ext=.pem
+        --key-name=privkey --key-ext=.pem
+        --domain-subdir
+        --source /letsencrypt/acme.json --dest /letsencrypt/live/.
+        --watch'
+    volumes:
+      - certificates:/letsencrypt
 
   # kvtiles (Maps)
   maps:

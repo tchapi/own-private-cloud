@@ -56,6 +56,12 @@ Services :
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
     docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/sync /mnt/files/cryptpad /mnt/files/mails'
 
+##### For mails, ensure that the permissions are correct
+
+    docker-machine ssh default 'sudo chown :$MAIL_VOLUME_GROUP /mnt/files/mails'
+    docker-machine ssh default 'sudo chmod 775 /mnt/files/mails' # Full access to members of the group
+    docker-machine ssh default 'sudo chmod g+s /mnt/files/mails' # Ensure all future content in the folder will inherit group ownership
+
 ## Get environment variables to target the remote docker instance
 
     eval $(docker-machine env default)
@@ -148,6 +154,23 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
 # Tips
 
 > If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (`mongo`, or `couch` too if needed) on the host for the entrypoint script to be replayed entirely
+
+### Add a failover IP on Debian 9
+
+Supposing an alias of `1`, and an interface of `ens3` :
+
+Disable auto configuration on boot by adding :
+
+    network: {config: disabled}
+
+in `/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg`
+
+Edit `/etc/network/interfaces.d/50-cloud-init.cfg` and add :
+
+    auto ens3:1
+    iface ens3:1 inet static
+    address YOUR.FAILOVER.IP
+    netmask 255.255.255.255
 
 ### The map tiles server
 

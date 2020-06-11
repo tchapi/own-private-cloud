@@ -18,3 +18,5 @@ configurations/cryptpad/config.js
 configurations/mails/smtpd.conf
 configurations/mails/dkim_signing.conf
 configurations/mails/10-ssl.conf
+configurations/mails/aliases
+configurations/mails/dkim-*

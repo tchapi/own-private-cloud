@@ -17,7 +17,9 @@ FROM alpine:3.12
 LABEL maintainer="tchap@tchap.me"
 
 ARG top_domain
-ARG mail_domain
+ARG mail_principal_user
+ARG mail_principal_password
+ARG mail_group_id
 
 EXPOSE 25
 EXPOSE 465
@@ -53,7 +55,6 @@ RUN mkdir -p /var/lib/opensmtpd/empty \
   && adduser _smtpd -h /var/lib/opensmtpd/empty/ -D -H -s /bin/false \
   && adduser _smtpq -h /var/lib/opensmtpd/empty/ -D -H -s /bin/false \
   && mkdir -p /var/spool/smtpd \
-  && mkdir -p /var/mail \
   && mkdir -p /etc/mail \
   && chmod 711 /var/spool/smtpd
 
@@ -70,11 +71,6 @@ RUN ./bootstrap \
   && make install \
   && cp etc/aliases /etc/mail/aliases
 
-# Configure DKIM
-RUN mkdir /etc/mail/dkim \
-    && openssl genrsa -out /etc/mail/dkim/${top_domain}.key 1024 \
-    && openssl rsa -in /etc/mail/dkim/${top_domain}.key -pubout -out /etc/mail/dkim/${top_domain}.pub
-
 # Filters (Rspamd and Senderscore)
 WORKDIR /usr/local/libexec/opensmtpd/
 COPY --from=builder /go/filter-rspamd/filter-rspamd .
@@ -83,10 +79,24 @@ COPY --from=builder /go/filter-senderscore/filter-senderscore .
 RUN mkdir -p /etc/rspamd/local.d
 COPY configurations/mails/dkim_signing.conf /etc/rspamd/local.d/dkim_signing.conf
 
+# Create mail principal user and set password
+RUN addgroup -g ${mail_group_id} vmail && adduser -G vmail -u ${mail_group_id} ${mail_principal_user} -g "Mail account: ${mail_principal_user}@${top_domain}" -D -H -s /sbin/nologin \
+    && echo "${mail_principal_user}:${mail_principal_password}" | /usr/sbin/chpasswd
+
+# Copy keys for DKIM
+RUN mkdir /etc/mail/dkim
+COPY configurations/mails/dkim-${top_domain}.key /etc/mail/dkim/${top_domain}.key
+COPY configurations/mails/dkim-${top_domain}.pub /etc/mail/dkim/${top_domain}.pub
+
 # Configuration files for OpenSMTPd
+COPY configurations/mails/aliases /etc/mail/aliases
 COPY configurations/mails/smtpd.conf /etc/mail/smtpd.conf
 
 COPY configurations/mails/start-smtpd-and-rspamd.sh /usr/local/bin/start-smtpd-and-rspamd.sh
 RUN chmod +x /usr/local/bin/start-smtpd-and-rspamd.sh
+
+# Volumes for data persistence
+RUN mkdir -p /var/mail && chown :vmail /var/mail && chmod g+ws /var/mail
+VOLUME /var/mail
 
 CMD start-smtpd-and-rspamd.sh
