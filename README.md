@@ -119,7 +119,7 @@ The given Traefik V2.0 configuration (_SSL params, etc_), along with a proper DN
 
 ## To get the DKIM key (for the mails)
 
-    . .env && DKIM_KEY_VALUE=$(docker run -it opensmtpd:custom "/bin/cat" "/etc/mail/dkim/${TOP_DOMAIN}.pub" | sed '$d' | sed 1d)
+    . .env && DKIM_KEY_VALUE=$(cat ./configurations/mails/dkim-${TOP_DOMAIN}.pub | sed '$d' | sed 1d)
 
 You can then create a DKIM DNS entry with something along those lines :
 
@@ -206,6 +206,13 @@ The tiles server is available directly at https://{MAPS_DOMAIN}/. You can see a 
   - NSA-proof your e-mail in 2 hours : https://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/
   - Mail-in-a-Box : https://mailinabox.email/
   - A set of Ansible playbooks to build and maintain your own private cloud : https://github.com/sovereign/sovereign/blob/master/README.md
+
+## Mails
+
+  - Setting up a mailserver with OpenSMTPD and Dovecot : https://poolp.org/posts/2019-09-14/setting-up-a-mail-server-with-opensmtpd-dovecot-and-rspamd/
+  - OpenSMTPD: Setting up a mailserver : http://z5t1.com:8080/cucumber_releases/cucumber-1.1/source/net-extra/opensmtpd/doc/example1.html
+  - Test a SMTP server : https://www.stevenrombauts.be/2018/12/test-smtp-with-telnet-or-openssl/
+  - A simple mailserver with Docker : https://tvi.al/simple-mail-server-with-docker/
 
 ## Dockerfiles :
 
