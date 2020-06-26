@@ -375,7 +375,9 @@ services:
   #  - exposes a traefik endpoint so that certificates for MAIL_DOMAIN are created and renewed by Traefik via labels
   # NB: Could be replaced by a webmail client
   mail-certificates-endpoint:
-    image: httpd:alpine
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-mailendpoint
     container_name: mail-certificates-endpoint
     networks:
       - mail_network

@@ -1,0 +1,5 @@
+FROM httpd:alpine
+
+LABEL maintainer="tchap@tchap.me"
+
+COPY configurations/mails/mail.html /usr/local/apache2/htdocs/index.html
