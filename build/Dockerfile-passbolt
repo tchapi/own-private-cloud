@@ -1,4 +1,4 @@
-FROM passbolt/passbolt:2.12.2-debian
+FROM passbolt/passbolt:2.13.0-debian
 
 LABEL maintainer="tchap@tchap.me"
 
