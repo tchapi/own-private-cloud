@@ -213,6 +213,8 @@ The tiles server is available directly at https://{MAPS_DOMAIN}/. You can see a 
   - OpenSMTPD: Setting up a mailserver : http://z5t1.com:8080/cucumber_releases/cucumber-1.1/source/net-extra/opensmtpd/doc/example1.html
   - Test a SMTP server : https://www.stevenrombauts.be/2018/12/test-smtp-with-telnet-or-openssl/
   - A simple mailserver with Docker : https://tvi.al/simple-mail-server-with-docker/
+  - A set of Ansible playbooks to build and maintain your own private cloud : https://github.com/sovereign/sovereign/blob/master/README.md
+  - How to self-host your email server : https://www.garron.blog/posts/host-your-email-server.html
 
 ## Dockerfiles :
 
