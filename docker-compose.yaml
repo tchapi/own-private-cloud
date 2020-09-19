@@ -378,6 +378,8 @@ services:
     build:
       context: ./
       dockerfile: ./build/Dockerfile-mailendpoint
+      args:
+        mail_domain: ${MAIL_DOMAIN}
     image: httpd:custom
     container_name: mail-certificates-endpoint
     networks:
