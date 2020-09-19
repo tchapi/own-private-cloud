@@ -1,4 +1,4 @@
-FROM syncthing/syncthing:1.4.2
+FROM syncthing/syncthing:1.9.0
 
 LABEL maintainer="tchap@tchap.me"
 
