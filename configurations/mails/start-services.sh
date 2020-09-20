@@ -28,7 +28,7 @@ while sleep 60; do
   # If the greps above find anything, they exit with 0 status
   # If they are not both 0, then something is wrong
   if [ $RSPAMD_STATUS -ne 0 -o $SMTPD_STATUS -ne 0 ]; then
-    echo "One of the processes has already exited."
+    echo "Either SMTPd or rSpamd has exited, stop the container; docker should restart it automatically."
     exit 1
   fi
 done

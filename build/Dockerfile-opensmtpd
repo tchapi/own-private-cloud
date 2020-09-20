@@ -92,8 +92,8 @@ COPY configurations/mails/dkim-${top_domain}.pub /etc/mail/dkim/${top_domain}.pu
 COPY configurations/mails/aliases /etc/mail/aliases
 COPY configurations/mails/smtpd.conf /etc/mail/smtpd.conf
 
-COPY configurations/mails/start-smtpd-and-rspamd.sh /usr/local/bin/start-smtpd-and-rspamd.sh
-RUN chmod +x /usr/local/bin/start-smtpd-and-rspamd.sh
+COPY configurations/mails/start-services.sh /usr/local/bin/start-services.sh
+RUN chmod +x /usr/local/bin/start-services.sh
 
 # Remove left-over temporary files
 RUN find /var/cache/apk /tmp -mindepth 1 -delete
@@ -102,4 +102,4 @@ RUN find /var/cache/apk /tmp -mindepth 1 -delete
 RUN mkdir -p /var/mail && chown :vmail /var/mail && chmod g+ws /var/mail
 VOLUME /var/mail
 
-CMD start-smtpd-and-rspamd.sh
+CMD start-services.sh
