@@ -2,7 +2,7 @@
 
 # OpenStack configuration file
 openrc.sh
-openrc-v3.sh
+openrc-*.sh
 
 # Environment vars
 .env
