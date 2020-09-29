@@ -98,6 +98,10 @@ And then build the images :
 
     ./scripts/davis/init-mysql-tables.sh
 
+## And finally, create a rule so that all the traffic of mail containers (SMTPD mainly) goes out by the `MAIL_HOST_IP` defined in your `.env` file
+
+    ./scripts/mail/create-iptables-rule.sh
+
 # Updating
 
 Update Dockerfiles or the `docker-compose.yml` file, then rebuild the images with `docker-compose build`. You can then recreate each container with the newly built images with `docker-compose up -d {container}`.
@@ -215,6 +219,7 @@ The tiles server is available directly at https://{MAPS_DOMAIN}/. You can see a 
   - A simple mailserver with Docker : https://tvi.al/simple-mail-server-with-docker/
   - A set of Ansible playbooks to build and maintain your own private cloud : https://github.com/sovereign/sovereign/blob/master/README.md
   - How to self-host your email server : https://www.garron.blog/posts/host-your-email-server.html
+  - About changing the outgoing address for a network of containers : https://medium.com/@havloujian.joachim/advanced-docker-networking-outgoing-ip-921fc3090b09
 
 ## Dockerfiles :
 

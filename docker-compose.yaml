@@ -476,7 +476,14 @@ networks:
   bookmarks_network: ~
   sync_network: ~
   tasks_network: ~
-  mail_network: ~
+  # We force the subnet here, so we can use it in
+  # the iptables routing command afterwards to make
+  # the outgoing packets go through a specific IP.
+  # See https://stackoverflow.com/a/46493740/1741150
+  mail_network:
+    ipam:
+      config:
+        - subnet: "172.100.0.0/16"
   maps_network: ~
   cryptpad_network: ~
 
