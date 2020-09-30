@@ -211,7 +211,7 @@ services:
       - APP_ENV=prod
       - APP_SECRET=${DAVIS_APP_SECRET}
       - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}
-      - MAILER_URL=smtp://${MAIL_HOST}:${MAIL_PORT}?username=${MAIL_USERNAME}&password=${MAIL_PASSWORD}
+      - MAILER_URL=smtp://${MAIL_HOST}:${MAIL_PORT}?encryption=tls&username=${MAIL_USERNAME}&password=${MAIL_PASSWORD}
       - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
       - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
       - AUTH_REALM=${DAVIS_AUTH_REALM}
