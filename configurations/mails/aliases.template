@@ -83,9 +83,9 @@ _slaacd: /dev/null
 sshd:   /dev/null
 
 # Well-known aliases -- these should be filled in!
-root: $MAIL_PRINCIPAL_USER
-manager: $MAIL_PRINCIPAL_USER
-dumper: $MAIL_PRINCIPAL_USER
+root:     $MAIL_PRINCIPAL_USER@$TOP_DOMAIN
+manager:  $MAIL_PRINCIPAL_USER@$TOP_DOMAIN
+dumper:   $MAIL_PRINCIPAL_USER@$TOP_DOMAIN
 
 # RFC 2142: NETWORK OPERATIONS MAILBOX NAMES
 abuse:    root

@@ -17,7 +17,7 @@ listen on eth0 tls pki $MAIL_DOMAIN filter { check_dyndns, check_rdns, check_fcr
 
 listen on eth0 port submission tls-require pki $MAIL_DOMAIN auth filter rspamd hostname $MAIL_DOMAIN
 
-action "local_mail" maildir "/var/mail/%{rcpt.user}/Maildir" junk alias <aliases>
+action "local_mail" maildir "/var/mail/%{dest.user}/Maildir" junk alias <aliases>
 action "outbound" relay helo $MAIL_DOMAIN
 
 match from any for domain "$TOP_DOMAIN" action "local_mail"
