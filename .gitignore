@@ -17,6 +17,6 @@ configurations/xbs/settings.json
 configurations/cryptpad/config.js
 configurations/mails/smtpd.conf
 configurations/mails/dkim_signing.conf
-configurations/mails/10-ssl.conf
+configurations/mails/dovecot.conf
 configurations/mails/aliases
 configurations/mails/dkim-*

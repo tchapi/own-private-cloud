@@ -15,17 +15,9 @@ RUN apk add --no-cache \
     dovecot-pigeonhole-plugin \
     dovecot-submissiond
 
-# Set logging to STDOUT/STDERR
-RUN sed -i -e 's,#log_path = syslog,log_path = /dev/stderr,' \
-           -e 's,#info_log_path =,info_log_path = /dev/stdout,' \
-           -e 's,#debug_log_path =,debug_log_path = /dev/stdout,' \
-  /etc/dovecot/conf.d/10-logging.conf
+RUN rm -rf /etc/dovecot/*
 
-COPY configurations/mails/auth-passwdfile.conf.ext /etc/dovecot/conf.d/auth-passwdfile.conf.ext
-COPY configurations/mails/10-ssl.conf /etc/dovecot/conf.d/10-ssl.conf
-COPY configurations/mails/10-mail.conf /etc/dovecot/conf.d/10-mail.conf
-COPY configurations/mails/20-imap.conf /etc/dovecot/conf.d/20-imap.conf
-COPY configurations/mails/90-plugin.conf /etc/dovecot/conf.d/90-plugin.conf
+COPY configurations/mails/dovecot.conf /etc/dovecot/dovecot.conf
 
 COPY configurations/mails/report-ham.sieve /usr/local/lib/dovecot/sieve/report-ham.sieve
 COPY configurations/mails/report-spam.sieve /usr/local/lib/dovecot/sieve/report-spam.sieve
@@ -38,7 +30,7 @@ WORKDIR /usr/local/lib/dovecot/sieve/
 RUN addgroup -g ${mail_group_id} vmail && adduser vmail -G vmail -u ${mail_group_id} -g "Mail account UID" -D -h /var/mail -H -s /sbin/nologin
 
 # Create mail principal user and set password
-RUN echo "${mail_principal_user}:"$(doveadm pw -p ${mail_principal_password})"::" > /etc/dovecot/users
+RUN echo "${mail_principal_user}:"$(doveadm pw -s ARGON2ID -p ${mail_principal_password})"::" > /etc/dovecot/users
 
 RUN sievec report-ham.sieve \
     && sievec report-spam.sieve \

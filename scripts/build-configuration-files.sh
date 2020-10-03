@@ -53,7 +53,7 @@ expandVars ./configurations/syncthing/config.xml.template ./configurations/synct
 # Mail configuration
 expandVars ./configurations/mails/smtpd.conf.template ./configurations/mails/smtpd.conf
 expandVars ./configurations/mails/dkim_signing.conf.template ./configurations/mails/dkim_signing.conf
-expandVars ./configurations/mails/10-ssl.conf.template ./configurations/mails/10-ssl.conf
+expandVars ./configurations/mails/dovecot.conf.template ./configurations/mails/dovecot.conf
 expandVars ./configurations/mails/aliases.template ./configurations/mails/aliases
 # Create DKIM key
 if [ ! -f ./configurations/mails/dkim-${TOP_DOMAIN}.key ]; then
