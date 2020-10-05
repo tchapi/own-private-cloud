@@ -218,8 +218,10 @@ The tiles server is available directly at https://{MAPS_DOMAIN}/. You can see a 
   - Test a SMTP server : https://www.stevenrombauts.be/2018/12/test-smtp-with-telnet-or-openssl/
   - A simple mailserver with Docker : https://tvi.al/simple-mail-server-with-docker/
   - A set of Ansible playbooks to build and maintain your own private cloud : https://github.com/sovereign/sovereign/blob/master/README.md
+  - Setting up an email server in 2020 with OpenSMTPD and Dovecot https://prefetch.eu/blog/2020/email-server/
   - How to self-host your email server : https://www.garron.blog/posts/host-your-email-server.html
   - About changing the outgoing address for a network of containers : https://medium.com/@havloujian.joachim/advanced-docker-networking-outgoing-ip-921fc3090b09
+  - An OpenBSD E-Mail Server Using OpenSMTPD, Dovecot, Rspamd, and RainLoop https://www.vultr.com/docs/an-openbsd-e-mail-server-using-opensmtpd-dovecot-rspamd-and-rainloop
 
 ## Dockerfiles :
 
