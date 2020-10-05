@@ -121,13 +121,11 @@ The given Traefik V2.0 configuration (_SSL params, etc_), along with a proper DN
 
 ![A+ Rating page](https://raw.githubusercontent.com/tchapi/own-private-cloud/master/_screenshots/ssl_rating.png)
 
-## To get the DKIM key (for the mails)
+# DNS entries for mail
 
-    . .env && DKIM_KEY_VALUE=$(cat ./configurations/mails/dkim-${TOP_DOMAIN}.pub | sed '$d' | sed 1d)
+You have to add some DNS entries to make your setup work. Run the following scripts to have them listed according to your environment values:
 
-You can then create a DKIM DNS entry with something along those lines :
-
-    . .env && echo ${DKIM_SELECTOR}._domainkey.${TOP_DOMAIN}. IN TXT "v=DKIM1;k=rsa;p=${DKIM_KEY_VALUE//[$'\t\r\n ']};"
+    ./scripts/mail/show-dns-entries.sh
 
 # Run & Maintenance
 
