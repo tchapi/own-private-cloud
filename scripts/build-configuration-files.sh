@@ -54,7 +54,7 @@ expandVars ./configurations/syncthing/config.xml.template ./configurations/synct
 expandVars ./configurations/mails/smtpd.conf.template ./configurations/mails/smtpd.conf
 expandVars ./configurations/mails/dkim_signing.conf.template ./configurations/mails/dkim_signing.conf
 expandVars ./configurations/mails/dovecot.conf.template ./configurations/mails/dovecot.conf
-expandVars ./configurations/mails/aliases.template ./configurations/mails/aliases
+expandVars ./configurations/mails/virtuals.template ./configurations/mails/virtuals
 # Create DKIM key
 if [ ! -f ./configurations/mails/dkim-${TOP_DOMAIN}.key ]; then
   echo "### Generating DKIM keys"

@@ -19,4 +19,5 @@ configurations/mails/smtpd.conf
 configurations/mails/dkim_signing.conf
 configurations/mails/dovecot.conf
 configurations/mails/aliases
+configurations/mails/virtuals
 configurations/mails/dkim-*
