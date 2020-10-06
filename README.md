@@ -12,7 +12,9 @@ Services :
   - Wekan — A MIT Kanban board manager, comparable to Trello
   - Syncthing — A continuous file synchronization program under the Mozilla Public License 2.0 license
   - kvtiles — An open-source map tiles server in Go, Apache 2.0 License
-  - Cryptpad - An AGPLv3 encrypted collaboration suite
+  - Cryptpad — An AGPLv3 encrypted collaboration suite
+  - OpenSMTPd — an ISC implementation of the SMTP protocol
+  - Dovecot — a LGPLv2.1 / MIT robust IMAP server
 
 > All services are served through the Træfik reverse-proxy, certificates are provided by Let's Encrypt, and renewed automatically via Træfik.
 
