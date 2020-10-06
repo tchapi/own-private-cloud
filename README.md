@@ -127,6 +127,26 @@ You have to add some DNS entries to make your setup work. Run the following scri
 
     ./scripts/mail/show-dns-entries.sh
 
+## Test your email server
+
+Test that your SMTP endpoint works as expected:
+
+    openssl s_client -starttls smtp -connect yourmaildomain.org:587
+
+and:
+
+    openssl s_client -connect yourmaildomain.org:465
+
+Both should yield a prompt, and say that the certificate is ok (`Verify return code: 0 (ok)`)
+
+Test your IMAP endpoint (Dovecot) with:
+
+    openssl s_client -connect yourmaildomain.org:993
+
+You can try to login with `A LOGIN {user} {password}` by replacing `{user}` and `{password}` with the real strings, which should yield something along those lines:
+
+    A OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE SNIPPET=FUZZY PREVIEW=FUZZY STATUS=SIZE LITERAL+ NOTIFY] Logged in
+
 # Run & Maintenance
 
 To prevent user registration in the notes container :
