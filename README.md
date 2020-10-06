@@ -70,6 +70,8 @@ Services :
 
     git submodule update --init
 
+> When rebuilding, don't forget to update submodules with `git submodule update --recursive --remote`
+
 ## Build all custom images
 
 Build configuration files first (_so that environment variables are replaced correctly_):
