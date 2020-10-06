@@ -131,17 +131,17 @@ You have to add some DNS entries to make your setup work. Run the following scri
 
 Test that your SMTP endpoint works as expected:
 
-    openssl s_client -starttls smtp -connect yourmaildomain.org:587
+    openssl s_client -starttls smtp -connect mail.mydomain.com:587
 
 and:
 
-    openssl s_client -connect yourmaildomain.org:465
+    openssl s_client -connect mail.mydomain.com:465
 
 Both should yield a prompt, and say that the certificate is ok (`Verify return code: 0 (ok)`)
 
 Test your IMAP endpoint (Dovecot) with:
 
-    openssl s_client -connect yourmaildomain.org:993
+    openssl s_client -connect mail.mydomain.com:993
 
 You can try to login with `A LOGIN {user} {password}` by replacing `{user}` and `{password}` with the real strings, which should yield something along those lines:
 
