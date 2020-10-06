@@ -3,7 +3,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 source $DIR/../../.env
 
-DKIM_KEY=$(tail -n +2 configurations/mails/dkim-tchap.me.pub | tail -r | tail -n +2 | tail -r  | tr -d '\n')
+DKIM_KEY=$(tail -n +2 configurations/mails/dkim-${TOP_DOMAIN}.pub | tail -r | tail -n +2 | tail -r  | tr -d '\n')
 
 echo "### In order for your setup to work correctly, you need to add / modify DNS entries for the domain ${TOP_DOMAIN}."
 echo "### "
