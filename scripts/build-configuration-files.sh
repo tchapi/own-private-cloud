@@ -50,4 +50,15 @@ SYNC_ID=$(openssl x509 -in ./configurations/syncthing/cert.pem -outform der \
   | tr -d =)
 expandVars ./configurations/syncthing/config.xml.template ./configurations/syncthing/config.xml
 
+# Mail configuration
+expandVars ./configurations/mails/smtpd.conf.template ./configurations/mails/smtpd.conf
+expandVars ./configurations/mails/dkim_signing.conf.template ./configurations/mails/dkim_signing.conf
+expandVars ./configurations/mails/dovecot.conf.template ./configurations/mails/dovecot.conf
+expandVars ./configurations/mails/virtuals.template ./configurations/mails/virtuals
+# Create DKIM key
+if [ ! -f ./configurations/mails/dkim-${TOP_DOMAIN}.key ]; then
+  echo "### Generating DKIM keys"
+  openssl genrsa -out ./configurations/mails/dkim-${TOP_DOMAIN}.key 1024 && openssl rsa -in ./configurations/mails/dkim-${TOP_DOMAIN}.key -pubout -out ./configurations/mails/dkim-${TOP_DOMAIN}.pub
+fi
+
 echo "### Done."

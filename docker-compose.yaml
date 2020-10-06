@@ -22,6 +22,7 @@ services:
       - tasks_network
       - maps_network
       - cryptpad_network
+      - mail_network
     ports:
       - "443:443"
 
@@ -210,7 +211,7 @@ services:
       - APP_ENV=prod
       - APP_SECRET=${DAVIS_APP_SECRET}
       - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}
-      - MAILER_URL=smtp://${MAIL_HOST}:${MAIL_PORT}?username=${MAIL_USERNAME}&password=${MAIL_PASSWORD}
+      - MAILER_URL=smtp://${MAIL_HOST}:${MAIL_PORT}?encryption=tls&username=${MAIL_USERNAME}&password=${MAIL_PASSWORD}
       - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
       - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
       - AUTH_REALM=${DAVIS_AUTH_REALM}
@@ -324,6 +325,108 @@ services:
       - "traefik.http.routers.wekan.tls.certresolver=default"
       - "traefik.http.routers.wekan.middlewares=security@file"
 
+  # Mails (bound on a specific IP for the reverse to be unique)
+  dovecot:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-dovecot
+      args:
+        mail_principal_user: ${MAIL_PRINCIPAL_USER}
+        mail_principal_password: ${MAIL_PRINCIPAL_PASSWORD}
+        mail_group_id: ${MAIL_VOLUME_GROUP}
+    image: dovecot:custom
+    container_name: mail-dovecot
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - mails_volume:/var/mail
+      - certificates:/etc/letsencrypt
+    networks:
+      - mail_network
+    ports:
+      - "${MAIL_HOST_IP}:143:143"
+      - "${MAIL_HOST_IP}:993:993"
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.reload_dovecot_for_certificates.schedule: "@weekly"
+      ofelia.job-exec.reload_dovecot_for_certificates.command: "dovecot reload"
+
+  smtpd:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-opensmtpd
+      args:
+        top_domain: ${TOP_DOMAIN}
+        mail_principal_user: ${MAIL_PRINCIPAL_USER}
+        mail_principal_password: ${MAIL_PRINCIPAL_PASSWORD}
+        mail_group_id: ${MAIL_VOLUME_GROUP}
+    image: opensmtpd:custom
+    container_name: mail-smtpd
+    env_file: .env
+    restart: unless-stopped
+    volumes:
+      - mails_volume:/var/mail
+      - certificates:/etc/letsencrypt
+    networks:
+      - mail_network
+    ports:
+      - "${MAIL_HOST_IP}:25:25"
+      - "${MAIL_HOST_IP}:465:465"
+      - "${MAIL_HOST_IP}:587:587"
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.reload_smtpd_for_certificates.schedule: "@weekly"
+      ofelia.job-exec.reload_smtpd_for_certificates.command: 'killall smtpd' # wait 60s max and then the container stops and restarts
+
+  # This container :
+  #  - exposes a traefik endpoint so that certificates for MAIL_DOMAIN are created and renewed by Traefik via labels
+  # NB: Could be replaced by a webmail client
+  mail-certificates-endpoint:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-mailendpoint
+      args:
+        mail_domain: ${MAIL_DOMAIN}
+    image: httpd:custom
+    container_name: mail-certificates-endpoint
+    networks:
+      - mail_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mail.entrypoints=websecure"
+      - "traefik.http.routers.mail.rule=Host(`${MAIL_DOMAIN}`)"
+      - "traefik.http.routers.mail.tls=true"
+      - "traefik.http.routers.mail.tls.certresolver=default"
+      - "traefik.http.routers.mail.middlewares=security@file"
+
+  # This container :
+  #  - periodically exports the Traefik certificates to .pem files, in a shared volume
+  #    so that dovecot and opensmtpd containers can consume them
+  mail-certificates-dumper:
+    image: ldez/traefik-certs-dumper:v2.7.0
+    container_name: mail-certificates-dumper
+    entrypoint: sh -c '
+      traefik-certs-dumper file --version v2
+        --crt-name=fullchain --crt-ext=.pem
+        --key-name=privkey --key-ext=.pem
+        --domain-subdir
+        --source /letsencrypt/acme.json --dest /letsencrypt/live/.
+        --watch'
+    volumes:
+      - certificates:/letsencrypt
+
+  # Cron scheduler - restarts dovecot and smtpd periodically so that new certificates are picked up correctly
+  ofelia:
+    image: mcuadros/ofelia:latest
+    container_name: mail-ofelia
+    restart: unless-stopped
+    depends_on:
+      - smtpd
+      - dovecot
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
   # kvtiles (Maps)
   maps:
     # See https://hub.docker.com/r/akhenakh/kvtiles/tags for available tags / zooms
@@ -373,6 +476,14 @@ networks:
   bookmarks_network: ~
   sync_network: ~
   tasks_network: ~
+  # We force the subnet here, so we can use it in
+  # the iptables routing command afterwards to make
+  # the outgoing packets go through a specific IP.
+  # See https://stackoverflow.com/a/46493740/1741150
+  mail_network:
+    ipam:
+      config:
+        - subnet: "172.100.0.0/16"
   maps_network: ~
   cryptpad_network: ~
 
@@ -419,3 +530,9 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/cryptpad
+  mails_volume: # This volume is actually an attached OpenStack Block storage. It stores the mail data
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/mails

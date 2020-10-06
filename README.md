@@ -54,7 +54,13 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/sync /mnt/files/cryptpad'
+    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/sync /mnt/files/cryptpad /mnt/files/mails'
+
+##### For mails, ensure that the permissions are correct
+
+    docker-machine ssh default 'sudo chown :$MAIL_VOLUME_GROUP /mnt/files/mails'
+    docker-machine ssh default 'sudo chmod 775 /mnt/files/mails' # Full access to members of the group
+    docker-machine ssh default 'sudo chmod g+s /mnt/files/mails' # Ensure all future content in the folder will inherit group ownership
 
 ## Get environment variables to target the remote docker instance
 
@@ -92,6 +98,10 @@ And then build the images :
 
     ./scripts/davis/init-mysql-tables.sh
 
+## And finally, create a rule so that all the traffic of mail containers (SMTPD mainly) goes out by the `MAIL_HOST_IP` defined in your `.env` file
+
+    ./scripts/mail/create-iptables-rule.sh
+
 # Updating
 
 Update Dockerfiles or the `docker-compose.yml` file, then rebuild the images with `docker-compose build`. You can then recreate each container with the newly built images with `docker-compose up -d {container}`.
@@ -110,6 +120,32 @@ For instance:
 The given Traefik V2.0 configuration (_SSL params, etc_), along with a proper DNS configuration (including a correct CAA entry — see [here](https://blog.qualys.com/ssllabs/2017/03/13/caa-mandated-by-cabrowser-forum)), will result in a **A+** rating in [SSLLabs](https://www.ssllabs.com) :
 
 ![A+ Rating page](https://raw.githubusercontent.com/tchapi/own-private-cloud/master/_screenshots/ssl_rating.png)
+
+# DNS entries for mail
+
+You have to add some DNS entries to make your setup work. Run the following scripts to have them listed according to your environment values:
+
+    ./scripts/mail/show-dns-entries.sh
+
+## Test your email server
+
+Test that your SMTP endpoint works as expected:
+
+    openssl s_client -starttls smtp -connect mail.mydomain.com:587
+
+and:
+
+    openssl s_client -connect mail.mydomain.com:465
+
+Both should yield a prompt, and say that the certificate is ok (`Verify return code: 0 (ok)`)
+
+Test your IMAP endpoint (Dovecot) with:
+
+    openssl s_client -connect mail.mydomain.com:993
+
+You can try to login with `A LOGIN {user} {password}` by replacing `{user}` and `{password}` with the real strings, which should yield something along those lines:
+
+    A OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE SNIPPET=FUZZY PREVIEW=FUZZY STATUS=SIZE LITERAL+ NOTIFY] Logged in
 
 # Run & Maintenance
 
@@ -141,6 +177,23 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
 
 > If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (`mongo`, or `couch` too if needed) on the host for the entrypoint script to be replayed entirely
 
+### Add a failover IP on Debian 9
+
+Supposing an alias of `1`, and an interface of `ens3` :
+
+Disable auto configuration on boot by adding :
+
+    network: {config: disabled}
+
+in `/etc/cloud/cloud.cfg.d/99-disable-network-config.cfg`
+
+Edit `/etc/network/interfaces.d/50-cloud-init.cfg` and add :
+
+    auto ens3:1
+    iface ens3:1 inet static
+    address YOUR.FAILOVER.IP
+    netmask 255.255.255.255
+
 ### The map tiles server
 
 You can change the region, just grab a tag at https://hub.docker.com/r/akhenakh/kvtiles/tags, such as `france-13-latest` for instance.
@@ -170,6 +223,23 @@ The tiles server is available directly at https://{MAPS_DOMAIN}/. You can see a 
   - Shell command  / Entrypoint in Docker : https://stackoverflow.com/questions/41512237/how-to-execute-a-shell-command-before-the-entrypoint-via-the-dockerfile
   - Ignore files for Cozy drive : https://github.com/cozy-labs/cozy-desktop/blob/master/doc/usage/ignore_files.md
   - Deploy your own SAAS : https://github.com/Atarity/deploy-your-own-saas/blob/master/README.md
+  - A set of Ansible playbooks to build and maintain your own private cloud : https://github.com/sovereign/sovereign/blob/master/README.md
+
+## Mails
+
+  - How to run your own mail server : https://www.c0ffee.net/blog/mail-server-guide/
+  - Mail servers are not hard : https://poolp.org/posts/2019-08-30/you-should-not-run-your-mail-server-because-mail-is-hard/
+  - NSA-proof your e-mail in 2 hours : https://sealedabstract.com/code/nsa-proof-your-e-mail-in-2-hours/
+  - Mail-in-a-Box : https://mailinabox.email/
+  - Setting up a mailserver with OpenSMTPD and Dovecot : https://poolp.org/posts/2019-09-14/setting-up-a-mail-server-with-opensmtpd-dovecot-and-rspamd/
+  - OpenSMTPD: Setting up a mailserver : http://z5t1.com:8080/cucumber_releases/cucumber-1.1/source/net-extra/opensmtpd/doc/example1.html
+  - Test a SMTP server : https://www.stevenrombauts.be/2018/12/test-smtp-with-telnet-or-openssl/
+  - A simple mailserver with Docker : https://tvi.al/simple-mail-server-with-docker/
+  - A set of Ansible playbooks to build and maintain your own private cloud : https://github.com/sovereign/sovereign/blob/master/README.md
+  - Setting up an email server in 2020 with OpenSMTPD and Dovecot https://prefetch.eu/blog/2020/email-server/
+  - How to self-host your email server : https://www.garron.blog/posts/host-your-email-server.html
+  - About changing the outgoing address for a network of containers : https://medium.com/@havloujian.joachim/advanced-docker-networking-outgoing-ip-921fc3090b09
+  - An OpenBSD E-Mail Server Using OpenSMTPD, Dovecot, Rspamd, and RainLoop https://www.vultr.com/docs/an-openbsd-e-mail-server-using-opensmtpd-dovecot-rspamd-and-rainloop
 
 ## Dockerfiles :
 

@@ -1,0 +1,9 @@
+FROM httpd:alpine
+
+ARG mail_domain
+
+LABEL maintainer="tchap@tchap.me"
+
+COPY configurations/mails/mail.html /usr/local/apache2/htdocs/index.html
+
+RUN echo "ServerName ${mail_domain}" >> /usr/local/apache2/conf/httpd.conf

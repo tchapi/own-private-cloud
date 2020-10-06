@@ -1,0 +1,33 @@
+pki $MAIL_DOMAIN cert "/etc/letsencrypt/live/$MAIL_DOMAIN/fullchain.pem"
+pki $MAIL_DOMAIN key "/etc/letsencrypt/live/$MAIL_DOMAIN/privkey.pem"
+
+srs key "$SRS_KEY"
+
+# Filters
+filter check_dyndns phase connect match rdns regex { '.*\.dyn\..*', '.*\.dsl\..*' } disconnect "550 no residential connections"
+filter check_rdns phase connect match !rdns disconnect "550 no rDNS is so 80s"
+filter check_fcrdns phase connect match !fcrdns disconnect "550 no FCrDNS is so 80s"
+filter senderscore proc-exec "filter-senderscore -blockBelow 10 -junkBelow 70 -slowFactor 5000"
+filter rspamd proc-exec "filter-rspamd"
+
+# Virtual users and auth
+# table aliases file:/etc/mail/aliases
+table passwds file:/etc/mail/passwds
+table virtuals file:/etc/mail/virtuals
+
+# Local - not implemented
+# action "LOCAL" mbox alias <aliases>
+# match from local for local action "LOCAL"
+
+# Inbound 
+listen on eth0 port 25 tls pki "$MAIL_DOMAIN" filter { "check_dyndns", "check_rdns", "check_fcrdns", "senderscore", "rspamd" }
+
+action "RECV" maildir "/var/mail/%{dest.user:lowercase|strip}/Maildir" junk virtual <virtuals>
+match from any for domain "$TOP_DOMAIN" action "RECV"
+
+# Outbound
+listen on eth0 port 465 smtps       pki "$MAIL_DOMAIN" auth <passwds> filter "rspamd"
+listen on eth0 port 587 tls-require pki "$MAIL_DOMAIN" auth <passwds> filter "rspamd"
+
+action "SEND" relay srs
+match from any auth for any action "SEND"
