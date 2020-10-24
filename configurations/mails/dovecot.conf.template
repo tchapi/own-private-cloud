@@ -43,6 +43,35 @@ userdb {
 # Ensure that /var/mail is owned by vmail:vmail, so that Dovecot has write access.
 mail_location = maildir:/var/mail/%n/Maildir
 
+namespace inbox {
+  inbox = yes
+
+  # See https://doc.dovecot.org/configuration_manual/namespace/#hierarchy-separators:
+  # Changing the separator doesn’t change the on-disk “layout separator”.
+  separator = /
+
+  mailbox "Drafts" {
+    auto = subscribe
+    special_use = \Drafts
+  }
+  mailbox "Sent" {
+    auto = subscribe
+    special_use = \Sent
+  }
+  mailbox "Trash" {
+    auto = subscribe
+    special_use = \Trash
+  }
+  mailbox "Junk" {
+    auto = subscribe
+    special_use = \Junk
+  }
+  mailbox "Archive" {
+    auto = subscribe
+    special_use = \Archive
+  }
+}
+
 # Plugins
 protocol imap {
   # Space separated list of plugins to load (default is global mail_plugins).
