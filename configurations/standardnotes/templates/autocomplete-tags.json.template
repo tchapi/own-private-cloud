@@ -3,9 +3,9 @@
   "name": "Autocomplete Tags",
   "content_type": "SN|Component",
   "area": "note-tags",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "description": "Autocomplete tags in the action bar",
   "url": "https://$NOTES_DOMAIN/extensions/autocomplete-tags/index.html",
-  "download_url": "https://github.com/sn-extensions/autocomplete-tags/archive/1.3.1.zip",
+  "download_url": "https://github.com/sn-extensions/autocomplete-tags/archive/1.3.2.zip",
   "latest_url": "https://$NOTES_DOMAIN/extensions/autocomplete-tags.json"
 }

@@ -3,9 +3,9 @@
   "name": "Secure Spreadsheets Component",
   "content_type": "SN|Component",
   "area": "editor-editor",
-  "version": "1.3.2",
+  "version": "1.3.4",
   "description": "Secure spreadsheets",
   "url": "https://$NOTES_DOMAIN/extensions/secure-spreadsheets/dist/index.html",
-  "download_url": "https://github.com/sn-extensions/secure-spreadsheets/archive/1.3.2.zip",
+  "download_url": "https://github.com/sn-extensions/secure-spreadsheets/archive/1.3.4.zip",
   "latest_url": "https://$NOTES_DOMAIN/extensions/secure-spreadsheets.json"
 }
