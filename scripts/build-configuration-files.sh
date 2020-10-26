@@ -34,7 +34,6 @@ cp ./configurations/standardnotes/templates/index.json.template ./configurations
 # Quite convoluted, but works ok 🤷‍
 for f in "${extensions[@]}"; do
   i=$(( i + 1 ))
-  echo "`(($i==$total))`"
   awk -v ext="%`basename $f`%" -v f="$f" -v fi="$i" -v t="$total" 'NR==FNR { a[n++]=$0; next }
     $0 ~ ext { for (i=0;i<n -1;++i) print "    "a[i]; if (fi!=t) print "    },"; else print "    }"; next }
     1' $f ./configurations/standardnotes/extensions/index.json > ./configurations/standardnotes/extensions/index.json.done
