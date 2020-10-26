@@ -3,9 +3,9 @@
   "name": "Plus Editor",
   "content_type": "SN|Component",
   "area": "editor-editor",
-  "version": "1.3.2",
+  "version": "1.4.3",
   "description": "A full-fledged editor",
   "url": "https://$NOTES_DOMAIN/extensions/plus-editor/index.html",
-  "download_url": "https://github.com/sn-extensions/plus-editor/archive/1.3.2.zip",
+  "download_url": "https://github.com/standardnotes/plus-editor/archive/1.4.3.zip",
   "latest_url": "https://$NOTES_DOMAIN/extensions/plus-editor.json"
 }

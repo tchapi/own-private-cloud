@@ -21,8 +21,8 @@ echo "### Building configuration files"
 expandVars ./configurations/traefik/traefik.toml.template ./configurations/traefik/traefik.toml
 
 # Notes extensions
-expandVars ./configurations/standardnotes/templates/advanced-markdown-editor.json.template ./configurations/standardnotes/extensions/advanced-markdown-editor.json
-expandVars ./configurations/standardnotes/templates/autocomplete-tags.json.template ./configurations/standardnotes/extensions/autocomplete-tags.json
+expandVars ./configurations/standardnotes/templates/markdown-pro.json.template ./configurations/standardnotes/extensions/markdown-pro.json
+expandVars ./configurations/standardnotes/templates/quick-tags.json.template ./configurations/standardnotes/extensions/quick-tags.json
 expandVars ./configurations/standardnotes/templates/plus-editor.json.template ./configurations/standardnotes/extensions/plus-editor.json
 expandVars ./configurations/standardnotes/templates/secure-spreadsheets.json.template ./configurations/standardnotes/extensions/secure-spreadsheets.json
 expandVars ./configurations/standardnotes/templates/simple-task-editor.json.template ./configurations/standardnotes/extensions/simple-task-editor.json

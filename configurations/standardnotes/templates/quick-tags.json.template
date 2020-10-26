@@ -1,0 +1,11 @@
+{
+  "identifier": "org.standardnotes.extension.quick-tags",
+  "name": "Autocomplete Tags",
+  "content_type": "SN|Component",
+  "area": "note-tags",
+  "version": "1.3.2",
+  "description": "Autocomplete tags in the action bar",
+  "url": "https://$NOTES_DOMAIN/extensions/quick-tags/index.html",
+  "download_url": "https://github.com/standardnotes/quick-tags/archive/1.3.2.zip",
+  "latest_url": "https://$NOTES_DOMAIN/extensions/quick-tags.json"
+}

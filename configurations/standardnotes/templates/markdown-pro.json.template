@@ -1,0 +1,11 @@
+{
+  "identifier": "org.standardnotes.extension.markdown-pro",
+  "name": "Markdown Pro Editor",
+  "content_type": "SN|Component",
+  "area": "editor-editor",
+  "version": "1.3.9",
+  "description": "A full-fledged markdown editor",
+  "url": "https://$NOTES_DOMAIN/extensions/markdown-pro/index.html",
+  "download_url": "https://github.com/standardnotes/markdown-pro/archive/1.3.9.zip",
+  "latest_url": "https://$NOTES_DOMAIN/extensions/markdown-pro.json"
+}
