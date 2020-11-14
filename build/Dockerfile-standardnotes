@@ -1,8 +1,9 @@
-FROM arugifa/standardnotes-server:0.0.0-rc.2020.04.14
+FROM standardnotes/syncing-server:stable
 
 LABEL maintainer="tchap@tchap.me"
 
 # Copy extensions in public folder
-WORKDIR $PROJECT_DIR
-COPY configurations/standardnotes/extensions public/extensions
-COPY configurations/standardnotes/index.html public/index.html
+COPY configurations/standardnotes/extensions /syncing-server/public/extensions
+COPY configurations/standardnotes/index.html /syncing-server/public/index.html
+
+EXPOSE 3000

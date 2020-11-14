@@ -98,17 +98,12 @@ services:
       - RAILS_ENV=production
       - RAILS_SERVE_STATIC_FILES=true
       - SECRET_KEY_BASE=${NOTES_SECRET_KEY_BASE}
-      - DB_CONNECTION=mysql
       - DB_HOST=mysql
       - DB_DATABASE=${NOTES_DATABASE}
       - DB_USERNAME=${NOTES_DB_USERNAME}
       - DB_PASSWORD=${NOTES_DB_PASSWORD}
       - DISABLE_USER_REGISTRATION=true
     restart: unless-stopped
-    command: >
-        sh -c 'while ! nc -vz mysql 3306 ; do sleep 10 ; done &&
-               bundle exec rails db:migrate &&
-               bundle exec rails server -b 0.0.0.0'
     depends_on:
       - mysql
     networks:
