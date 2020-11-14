@@ -135,7 +135,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cozy
       args:
-        version: "1.4.17"
+        version: "1.4.21"
     image: cozy:custom
     container_name: cozy
     environment:
@@ -446,7 +446,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cryptpad
       args:
-        version: "3.21.0"
+        version: "3.24.0"
     image: cryptpad:custom
     container_name: cryptpad
     restart: unless-stopped
