@@ -238,6 +238,48 @@ services:
     networks:
       - bookmarks_network
 
+  # Planka (tasks)
+  planka:
+    image: meltyshev/planka:latest
+    container_name: tasks
+    command: >
+      bash -c
+        "for i in `seq 1 30`; do
+          ./start.sh &&
+          s=$$? && break || s=$$?;
+          echo \"Tried $$i times. Waiting 5 seconds...\";
+          sleep 5;
+        done; (exit $$s)"
+    environment:
+      - BASE_URL=https://${TASKS_DOMAIN}
+      - DATABASE_URL=postgresql://postgres@postgres/${PLANKA_DATABASE_NAME}
+      - SECRET_KEY=${PLANKA_SECRET}
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - tasks_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.planka.entrypoints=websecure"
+      - "traefik.http.routers.planka.rule=Host(`${TASKS_DOMAIN}`)"
+      - "traefik.http.routers.planka.tls=true"
+      - "traefik.http.routers.planka.tls.certresolver=default"
+      - "traefik.http.routers.planka.middlewares=security@file"
+    volumes:
+      - files_planka_volume:/app/public/attachments
+
+  postgres:
+    image: postgres:13.0-alpine
+    restart: unless-stopped
+    volumes:
+      - database_postgres_volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=${PLANKA_DATABASE_NAME}
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    networks:
+      - tasks_network
+
   # Mails (bound on a specific IP for the reverse to be unique)
   dovecot:
     build:
@@ -502,6 +544,12 @@ volumes:
       o: bind
       type: none
       device: /mnt/databases/mysql
+  database_postgres_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/databases/postgres
   database_couch_volume:
     driver: local
     driver_opts:
@@ -532,6 +580,12 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/mails
+  files_planka_volume: # It stores the planka attachments
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/tasks
   files_webdav_volume: # It stores the webdav data
     driver: local
     driver_opts:

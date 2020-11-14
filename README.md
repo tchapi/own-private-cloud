@@ -53,14 +53,14 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdb # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdb1'
     docker-machine ssh default 'sudo mkdir /mnt/databases && sudo mount /dev/sdb1 /mnt/databases'
-    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch /mnt/databases/mongo'
+    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch /mnt/databases/mongo /mnt/databases/postgres'
 
 #### The files volume :
 
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/cryptpad /mnt/files/mails /mnt/files/gitea'
+    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/cryptpad /mnt/files/mails /mnt/files/gitea /mnt/files/tasks'
 
 ##### For mails, ensure that the permissions are correct
 
