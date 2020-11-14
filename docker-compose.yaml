@@ -199,7 +199,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-davis
       args:
-        version: "1.4.9"
+        version: "1.5.0"
     image: davis:custom
     container_name: davis
     environment:
