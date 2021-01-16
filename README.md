@@ -116,8 +116,7 @@ For instance:
 
     docker rm -f davis davis-proxy && docker volume rm davis_www
     docker container prune && docker image prune
-    docker-compose build davis
-    docker-compose up -d --force-recreate davis-proxy davis
+    docker-compose up -d --force-recreate --build davis-proxy davis
 
 # SSL
 
