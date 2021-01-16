@@ -16,6 +16,13 @@ RUN apk add --no-cache \
     dovecot-pigeonhole-plugin \
     dovecot-submissiond
 
+# Before changing the configuration, create mail principal user and set password.
+# We do it here before copying the final configuration since `doveadm` could fail
+# because the configuration references a file that is in a volume (`letsencrypt`,
+# not attached during build).
+RUN echo "${mail_principal_user}:"$(doveadm pw -s ARGON2ID -p ${mail_principal_password})"::" > /tmp/dovecot-users
+
+# Now, remove all configuration and start fresh
 RUN rm -rf /etc/dovecot/*
 
 COPY configurations/mails/dovecot.conf /etc/dovecot/dovecot.conf
@@ -30,8 +37,8 @@ WORKDIR /usr/local/lib/dovecot/sieve/
 # Create a single system user named vmail used for all virtual users
 RUN addgroup -g ${mail_group_id} vmail && adduser vmail -G vmail -u ${mail_group_id} -g "Mail account UID" -D -h /var/mail -H -s /sbin/nologin
 
-# Create mail principal user and set password
-RUN echo "${mail_principal_user}:"$(doveadm pw -s ARGON2ID -p ${mail_principal_password})"::" > /etc/dovecot/users
+# Move the passwords file back in place
+RUN mv /tmp/dovecot-users /etc/dovecot/users
 
 RUN sievec report-ham.sieve \
     && sievec report-spam.sieve \
