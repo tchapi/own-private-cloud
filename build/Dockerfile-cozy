@@ -1,4 +1,4 @@
-FROM golang:1.13 AS builder
+FROM golang:1.15 AS builder
 
 ARG version
 
@@ -9,7 +9,7 @@ RUN CGO_ENABLED=0 GOOS=linux set -eux && \
     bash -ex ./scripts/build.sh release && \
     rm ./cozy-stack*.sha256
 
-FROM node:8-stretch-slim
+FROM node:12-stretch-slim
 
 COPY --from=builder /go/cozy-stack/cozy-stack* /usr/local/bin/cozy-stack
 COPY ./configurations/cozy/docker-entrypoint-production.sh /usr/local/bin/docker-entrypoint.sh
