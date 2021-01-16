@@ -1,5 +1,5 @@
 # Build filter-rspamd and filter-senderscore from sources
-FROM golang:1.14 AS builder
+FROM golang:1.15 AS builder
 
 WORKDIR /go
 RUN git clone https://github.com/poolpOrg/filter-rspamd.git filter-rspamd
@@ -12,7 +12,7 @@ WORKDIR /go/filter-senderscore
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o filter-senderscore .
 
 # Main image
-FROM alpine:3.12
+FROM alpine:3.13
 # From https://hub.docker.com/_/alpine
 
 LABEL maintainer="tchap@tchap.me"
