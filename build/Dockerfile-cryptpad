@@ -1,5 +1,6 @@
 # Multistage build to reduce image size and increase security
 FROM node:12-buster-slim AS build
+# From https://hub.docker.com/_/node
 
 LABEL maintainer="tchap@tchap.me"
 
