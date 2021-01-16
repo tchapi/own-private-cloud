@@ -1,4 +1,5 @@
 FROM mongo:4.0.13
+# From https://hub.docker.com/_/mongo
 
 LABEL maintainer="tchap@tchap.me"
 
