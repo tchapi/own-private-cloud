@@ -199,7 +199,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-davis
       args:
-        version: "1.5.0"
+        version: "1.6.0"
     image: davis:custom
     container_name: davis
     environment:
@@ -211,6 +211,7 @@ services:
       - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
       - AUTH_REALM=${DAVIS_AUTH_REALM}
       - AUTH_METHOD=Digest
+      - IMAP_AUTH_URL=null
       - CALDAV_ENABLED=true
       - CARDDAV_ENABLED=true
       - WEBDAV_ENABLED=false
