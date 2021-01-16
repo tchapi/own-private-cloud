@@ -1,4 +1,5 @@
-FROM nginx:1.17.6-alpine
+FROM nginx:1.19.6-alpine
+# From https://hub.docker.com/_/nginx
 
 LABEL maintainer="tchap@tchap.me"
 
