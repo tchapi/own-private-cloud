@@ -92,7 +92,7 @@ COPY configurations/mails/dkim-${top_domain}.pub /etc/mail/dkim/${top_domain}.pu
 RUN echo "${mail_principal_user}  "$(echo -n "${mail_principal_password}" | /usr/local/libexec/opensmtpd/encrypt) > /etc/mail/passwds
 # ... as well as a "no-reply" SMTP account to send mails.
 # /!\ Sending a mail to this account will result in a 550 error
-RUN echo "no-reply  "$(echo -n "${mail_no_reply_password}" | /usr/local/libexec/opensmtpd/encrypt) > /etc/mail/passwds
+RUN echo "no-reply  "$(echo -n "${mail_no_reply_password}" | /usr/local/libexec/opensmtpd/encrypt) >> /etc/mail/passwds
 
 # Configuration files for OpenSMTPd
 COPY configurations/mails/virtuals /etc/mail/virtuals
