@@ -20,6 +20,7 @@ LABEL maintainer="tchap@tchap.me"
 ARG top_domain
 ARG mail_principal_user
 ARG mail_principal_password
+ARG mail_no_reply_password
 ARG mail_group_id
 
 EXPOSE 25
@@ -89,6 +90,9 @@ COPY configurations/mails/dkim-${top_domain}.pub /etc/mail/dkim/${top_domain}.pu
 
 # Create mail principal user and set password
 RUN echo "${mail_principal_user}  "$(echo -n "${mail_principal_password}" | /usr/local/libexec/opensmtpd/encrypt) > /etc/mail/passwds
+# ... as well as a "no-reply" SMTP account to send mails.
+# /!\ Sending a mail to this account will result in a 550 error
+RUN echo "no-reply  "$(echo -n "${mail_no_reply_password}" | /usr/local/libexec/opensmtpd/encrypt) >> /etc/mail/passwds
 
 # Configuration files for OpenSMTPd
 COPY configurations/mails/virtuals /etc/mail/virtuals
