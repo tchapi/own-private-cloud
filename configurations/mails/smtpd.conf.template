@@ -20,7 +20,7 @@ table virtuals file:/etc/mail/virtuals
 # match from local for local action "LOCAL"
 
 # Inbound 
-listen on eth0 port 25 tls pki "$MAIL_DOMAIN" filter { "check_dyndns", "check_rdns", "check_fcrdns", "senderscore", "rspamd" }
+listen on eth0 hostname "$MAIL_DOMAIN" port 25 tls pki "$MAIL_DOMAIN" filter { "check_dyndns", "check_rdns", "check_fcrdns", "senderscore", "rspamd" }
 
 action "RECV" maildir "/var/mail/%{dest.user:lowercase|strip}/Maildir" junk virtual <virtuals>
 match from any for domain "$TOP_DOMAIN" action "RECV"
