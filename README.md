@@ -1,6 +1,6 @@
 # Personal Infrastructure As A Service
 
-✅ See [this blogpost](https://www.foobarflies.io/your-own-public-cloud-why-not/) for a complete (and technical) explanation.
+✅ See [this blogpost](https://www.foobarflies.io/your-own-public-cloud-why-not/) and [this follow-up](https://www.foobarflies.io/a-year-with-my-own-public-cloud/) for a complete (and technical) explanation.
 
 Services :
 
