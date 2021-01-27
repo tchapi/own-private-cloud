@@ -18,6 +18,7 @@ FROM alpine:3.13
 LABEL maintainer="tchap@tchap.me"
 
 ARG top_domain
+ARG mail_domain
 ARG mail_principal_user
 ARG mail_principal_password
 ARG mail_no_reply_password
@@ -102,6 +103,7 @@ RUN echo "no-reply  "$(echo -n "${mail_no_reply_password}" | /usr/local/libexec/
 # Configuration files for OpenSMTPd
 COPY configurations/mails/virtuals /etc/mail/virtuals
 COPY configurations/mails/smtpd.conf /etc/mail/smtpd.conf
+RUN echo "${mail_domain}" > /etc/mail/mailname
 
 COPY configurations/mails/start-services.sh /usr/local/bin/start-services.sh
 RUN chmod +x /usr/local/bin/start-services.sh

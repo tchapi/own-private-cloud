@@ -353,6 +353,7 @@ services:
       dockerfile: ./build/Dockerfile-opensmtpd
       args:
         top_domain: ${TOP_DOMAIN}
+        mail_domain: ${MAIL_DOMAIN}
         mail_principal_user: ${MAIL_PRINCIPAL_USER}
         mail_principal_password: ${MAIL_PRINCIPAL_PASSWORD}
         mail_no_reply_password: ${MAIL_NO_REPLY_PASSWORD}
