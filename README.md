@@ -204,7 +204,7 @@ When making a block storage bigger :
   2. Unmount the `/dev/sd*1` volume
   3. Change the size in the Public Cloud interface
   4. WARNING The volume name will likely change
-  4. Delete (`d`,`w`) / recreate the partition (`n`,`p`,`w`) / `sudo e2fsck -f /dev/sd*1` / `sudo resize2fs /dev/sd*1`
+  4. `sudo fdisk /dev/sd*` (_no number here_): Delete (`d`,`w`) / recreate the partition (`n`,`p`,`w`) / `sudo e2fsck -f /dev/sd*1` / `sudo resize2fs /dev/sd*1`
   5. Remount it
   6. Restart the container
   7. :tada:
