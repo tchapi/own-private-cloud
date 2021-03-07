@@ -387,6 +387,7 @@ services:
         mail_domain: ${MAIL_DOMAIN}
     image: httpd:custom
     container_name: mail-certificates-endpoint
+    restart: unless-stopped
     networks:
       - mail_network
     labels:
@@ -401,8 +402,9 @@ services:
   #  - periodically exports the Traefik certificates to .pem files, in a shared volume
   #    so that dovecot and opensmtpd containers can consume them
   mail-certificates-dumper:
-    image: ldez/traefik-certs-dumper:v2.7.0
+    image: ldez/traefik-certs-dumper:v2.7.4
     container_name: mail-certificates-dumper
+    restart: unless-stopped
     entrypoint: sh -c '
       traefik-certs-dumper file --version v2
         --crt-name=fullchain --crt-ext=.pem
