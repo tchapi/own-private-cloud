@@ -135,7 +135,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cozy
       args:
-        version: "1.4.21"
+        version: "1.4.29"
     image: cozy:custom
     container_name: cozy
     environment:
