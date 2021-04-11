@@ -75,9 +75,7 @@ services:
     depends_on:
       - mysql
     volumes:
-      - gpg_volume:/var/www/passbolt/config/gpg
-    tmpfs:
-      - /run
+      - gpg_volume:/etc/passbolt/gpg
     networks:
       - passwords_network
     labels:
