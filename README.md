@@ -145,6 +145,86 @@ And then build the images :
 
     ./scripts/mail/create-iptables-rule.sh
 
+> ⚠️ WARNING ⚠️ : On Debian Buster (10), `iptables` now uses `nft` under the hood, and it just **doesn't work** in this case. You need to select the legacy iptables via `update-alternatives --config iptables` first, restart the Docker engine, and recreate the networks (_so that the rules are re-applied_) before playing the script above. See for instance https://github.com/docker-mailserver/docker-mailserver/issues/1356.
+
+# Automatic backups
+
+In the event of a burning datacenter, you might want to backup all your data to some other provider / server so that you can recover (most of) your data.
+
+We're going to _incrementally_ backup `/mnt/database` and `/mnt/files` — that should be sufficient to help us recover from a disaster.
+
+We use [**duplicity**](http://duplicity.nongnu.org/index.html) for this, and a S3-compatible backend to store the backups remotely (but with duplicity, you can use pretty much whatever service you want).
+
+> See https://www.scaleway.com/en/docs/store-object-with-duplicity/#-Installing-Software-Requirements for more info on their Object Storage solutions and the way it works with duplicity
+
+## Install Python 3.9.2 and the latest duplicity version
+
+On the Docker host:
+
+#### Install Python 3.9.2
+
+    sudo apt install --no-install-recommends wget build-essential libreadline-gplv2-dev libncursesw5-dev \
+     libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
+
+    wget https://www.python.org/ftp/python/3.9.2/Python-3.9.2.tgz
+    tar xzf Python-3.9.2.tgz
+    cd Python-3.9.2
+    ./configure --enable-optimizations
+    sudo make install # with 'sudo', we replace the original Python provided with the distro
+
+#### Install Duplicity requirements
+
+    sudo apt update && sudo apt install -y -f gettext librsync-dev
+
+#### Compile and install Duplicity with latest Python3.9 (_that we previously installed_)
+
+    wget https://launchpad.net/duplicity/0.8-series/0.8.18/+download/duplicity-0.8.18.tar.gz
+    tar xaf duplicity-0.8.18.tar.gz
+    cd duplicity-0.8.18
+    sudo pip3.9 install -r requirements.txt
+    sudo pip3.9 install boto # for S3 remote target
+    sudo python3.9 setup.py install
+
+> You must create a `/root/.aws/credentials` file with your S3 credentials:
+>
+>     [default]
+>     aws_access_key_id=EXAMPLE_KEY
+>     aws_secret_access_key=EXAMPLE_SECRET
+>
+> The user in which "home" you set these credentials will need to be the one running the cron task obviously. A simple solution would be to use `root`, since duplicity must be able to read all the files that you want to backup
+
+## Add a crontab for the backup
+
+Create `/etc/cron.d/backup_daily` with :
+
+    PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    42 01 * * * root duplicity incr --full-if-older-than 365D --volsize 1024 --asynchronous-upload --no-encryption --include /mnt/databases --include /mnt/files --exclude '**' /mnt/ s3://<S3_HOST>/<S3_BUCKET_NAME> >> /var/log/duplicity.log 2>&1
+
+> This will run every day, at 01:42 AM, as the `root` user.
+
+Options (see http://duplicity.nongnu.org/vers8/duplicity.1.html):
+
+  - `--volsize 1024` : Use chunks of 1Go
+  - `--asynchronous-upload` : Try to speed up uploads using CPU and bandwidth more efficiently
+  - `--no-encryption` : Do not encrypt remote backups
+  - `--include /mnt/databases --include /mnt/files --exclude '**'` : Only backup `/mnt/files` and `/mnt/databases`
+
+## Bonus: additional cli commands to work on backups
+
+#### List all backed-up files
+
+    duplicity list-current-files s3://<S3_HOST>/<S3_BUCKET_NAME>
+
+#### Verify data (_in depth_) and its recoverability
+
+    duplicity verify \
+        --no-encryption \
+        --include /mnt/databases \
+        --include /mnt/files \
+        --exclude '**' \
+        --compare-data \
+        s3://<S3_HOST>/<S3_BUCKET_NAME> /mnt/
+
 # Updating
 
 Update Dockerfiles or the `docker-compose.yml` file, then rebuild the images with `docker-compose build`. You can then recreate each container with the newly built images with `docker-compose up -d {container}`.
