@@ -36,9 +36,13 @@ Services :
     --openstack-private-key-file="/path/to/.ssh/id_rsa" \
     default
 
-## Install necessary packages on the host (for passbolt - to generate entropy)
+## Install necessary packages on the host 
 
-    docker-machine ssh default 'sudo apt update && sudo apt install -y -f haveged'
+    docker-machine ssh default 'sudo apt update && sudo apt install -y -f software-properties-common fail2ban haveged'
+
+  - `software-properties-common` is a common package providing standard libs
+  - `fail2ban` is to prevent unwanted access
+  - `haveged` is for Passbolt - to generate entropy
 
 ## Mount external attached block storage volume
 
