@@ -111,11 +111,11 @@ And then build the images :
 
 > If you want to extend the Docker Compose services definitions, you can create an addendum `docker-compose.supplementary.yaml` file for instance, and run `docker-compose` using both files to merge the configurations:
 > 
->     docker-compose -f docker-compose.yaml -f docker-compose.supplementary.yml ps
+>     docker-compose -f docker-compose.yaml -f docker-compose.supplementary.yaml ps
 >
 > You can check that your configuration is merged correctly with:
 > 
->     docker-compose -f docker-compose.yaml -f docker-compose.supplementary.yml config
+>     docker-compose -f docker-compose.yaml -f docker-compose.supplementary.yaml config
 >   
 > See [this Medium post](https://pscheit.medium.com/docker-compose-advanced-configuration-541356d121de) for more details
 
