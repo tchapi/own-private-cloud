@@ -197,7 +197,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-davis
       args:
-        version: "1.6.0"
+        version: "1.7.2"
     image: davis:custom
     container_name: davis
     environment:
