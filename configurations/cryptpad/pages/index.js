@@ -31,7 +31,7 @@ define([
                 [ 'code', Msg.type.code],
                 [ 'slide', Msg.type.slide],
                 [ 'sheet', Msg.type.sheet],
-                [ 'poll', Msg.type.poll],
+                [ 'form', Msg.type.form],
                 [ 'kanban', Msg.type.kanban],
                 [ 'whiteboard', Msg.type.whiteboard],
                 [ 'drive', Msg.type.drive]
@@ -80,6 +80,12 @@ define([
             });
         }
 
+        var supportText = Pages.setHTML(h('span'), Msg.home_support);
+        Pages.documentationLink(supportText.querySelector('a'), "https://docs.cryptpad.fr/en/how_to_contribute.html");
+
+        var opensource = Pages.setHTML(h('p'), Msg.home_opensource);
+        Pages.externalLink(opensource.querySelector('a'), "https://github.com/xwiki-labs/cryptpad");
+
         var blocks = [
             // h('div.row.cp-page-section', [
             //     h('div.col-sm-6',
@@ -103,7 +109,7 @@ define([
             // h('div.row.cp-page-section', [
             //     h('div.col-sm-6', [
             //         h('h2', Msg.home_opensource_title),
-            //         Pages.setHTML(h('p'), Msg.home_opensource),
+            //         opensource,
             //         h('img.small-logo.cp-img-invert', {
             //             src: '/customize/images/logo_AGPLv3.svg',
             //             alt: 'APGL3 License Logo'
@@ -111,7 +117,7 @@ define([
             //     ]),
             //     h('div.col-sm-6', [
             //         h('h2', Msg.home_support_title),
-            //         Pages.setHTML(h('span'), Msg.home_support),
+            //         supportText,
             //         subscribeButton,
             //         Pages.crowdfundingButton(function () {
             //             Feedback.send('HOME_SUPPORT_CRYPTPAD');
@@ -143,8 +149,7 @@ define([
                                 alt: ''
                             }),
                             h('h1', 'CryptPad'),
-                            // UI.setHTML(h('span.tag-line'), Msg.main_catch_phrase)
-                            UI.setHTML(h('span.tag-line'), Config.httpUnsafeOrigin)
+                            UI.setHTML(h('span.tag-line'), Msg.main_catch_phrase)
                         ]),
                         h('div.col-md-5.cp-app-grid', [
                             icons,

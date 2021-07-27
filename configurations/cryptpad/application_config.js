@@ -12,6 +12,7 @@ define(['/common/application_config_internal.js'], function (AppConfig) {
     AppConfig.hideLoadingScreenTips = true;
     AppConfig.availableLanguages = ['en'];
     AppConfig.disableAnonymousStore = true;
+    AppConfig.disableAnonymousPadCreation = true
     AppConfig.disableCrowdfundingMessages = true;
     AppConfig.logFeedback = false;
 
