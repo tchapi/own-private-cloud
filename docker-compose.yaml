@@ -444,12 +444,13 @@ services:
       - "traefik.http.services.maps.loadbalancer.server.port=8080"
 
   # Cryptpad (Documents)
+  # See https://github.com/xwiki-labs/cryptpad
   cryptpad:
     build:
       context: ./
       dockerfile: ./build/Dockerfile-cryptpad
       args:
-        version: "4.8.0"
+        version: "4.11.0"
     image: cryptpad:custom
     container_name: cryptpad
     restart: unless-stopped
