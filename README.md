@@ -127,6 +127,9 @@ And then build the images :
 
     ./scripts/cozy/init-cozycloud.sh
 
+> NB: To add an app later on (e.g. the Notes app), you can: `docker exec -it cozy bash`
+> and then `cozy-stack apps install --domain ${CLOUD_DOMAIN} notes registry://notes/stable`
+
 ## Provision the whole thing in daemon mode
 
     docker-compose up -d

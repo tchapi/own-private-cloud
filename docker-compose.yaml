@@ -133,7 +133,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cozy
       args:
-        version: "1.4.36"
+        version: "1.4.38"
     image: cozy:custom
     container_name: cozy
     environment:
@@ -160,7 +160,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.cozy.entrypoints=websecure"
-      - "traefik.http.routers.cozy.rule=Host(`${CLOUD_DOMAIN}`) || Host(`drive.${CLOUD_DOMAIN}`) || Host(`settings.${CLOUD_DOMAIN}`) || Host(`home.${CLOUD_DOMAIN}`)"
+      - "traefik.http.routers.cozy.rule=Host(`${CLOUD_DOMAIN}`) || Host(`drive.${CLOUD_DOMAIN}`) || Host(`notes.${CLOUD_DOMAIN}`) || Host(`settings.${CLOUD_DOMAIN}`) || Host(`home.${CLOUD_DOMAIN}`)"
       - "traefik.http.routers.cozy.tls=true"
       - "traefik.http.routers.cozy.tls.certresolver=default"
       - "traefik.http.services.cozy.loadbalancer.server.port=8080"
