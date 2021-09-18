@@ -214,6 +214,7 @@ services:
       - CARDDAV_ENABLED=true
       - WEBDAV_ENABLED=false
       - INVITE_FROM_ADDRESS=${EMAIL}
+      - MAPBOX_API_KEY=${MAPBOX_API_KEY}
     restart: unless-stopped
     depends_on:
       - mysql
