@@ -337,6 +337,14 @@ The tiles server is available directly at https://{MAPS_DOMAIN}/. You can see a 
                -v new_volume_name:/to \
                alpine ash -c "cd /from ; cp -av . /to"
 
+### How to disable ipv6 on Debian
+
+You might need this if Traefik does not manage to get certificates with a tls challenge (and if you don't have any ipv6 dns created)
+
+    sysctl -w net.ipv6.conf.all.disable_ipv6=1
+    sysctl -w net.ipv6.conf.default.disable_ipv6=1
+    sysctl -w net.ipv6.conf.lo.disable_ipv6=1
+
 # Literature
 
   - Docker best practices : https://blog.docker.com/2019/07/intro-guide-to-dockerfile-best-practices/
