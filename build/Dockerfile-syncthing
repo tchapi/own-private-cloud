@@ -1,4 +1,4 @@
-FROM syncthing/syncthing:1.15
+FROM syncthing/syncthing:1.18
 # From https://hub.docker.com/r/syncthing/syncthing
 
 LABEL maintainer="tchap@tchap.me"
