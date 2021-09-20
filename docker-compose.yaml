@@ -208,7 +208,7 @@ services:
       - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
       - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
       - AUTH_REALM=${DAVIS_AUTH_REALM}
-      - AUTH_METHOD=Digest
+      - AUTH_METHOD=Basic
       - IMAP_AUTH_URL=null
       - CALDAV_ENABLED=true
       - CARDDAV_ENABLED=true
