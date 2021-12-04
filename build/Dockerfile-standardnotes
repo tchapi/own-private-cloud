@@ -1,4 +1,4 @@
-FROM standardnotes/syncing-server:stable
+FROM standardnotes/syncing-server:latest
 # From https://hub.docker.com/r/standardnotes/syncing-server
 
 LABEL maintainer="tchap@tchap.me"
