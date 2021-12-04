@@ -1,5 +1,8 @@
 # Build filter-rspamd and filter-senderscore from sources
-FROM golang:1.15 AS builder
+FROM golang:1.17 AS builder
+
+# See https://go.dev/blog/go116-module-changes
+RUN go env -w GO111MODULE=auto
 
 WORKDIR /go
 RUN git clone https://github.com/poolpOrg/filter-rspamd.git filter-rspamd
