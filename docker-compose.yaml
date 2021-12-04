@@ -69,13 +69,16 @@ services:
       - EMAIL_TRANSPORT_DEFAULT_TLS=true
       - EMAIL_TRANSPORT_DEFAULT_USERNAME=${MAIL_USERNAME}
       - EMAIL_TRANSPORT_DEFAULT_PASSWORD=${MAIL_PASSWORD}
+      - PASSBOLT_PLUGINS_JWT_AUTHENTICATION_ENABLED=TRUE
+      - PASSBOLT_PLUGINS_MOBILE_ENABLED=TRUE
     restart: unless-stopped
     command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
     tty: true
     depends_on:
       - mysql
     volumes:
-      - gpg_volume:/etc/passbolt/gpg
+      - passbolt_gpg_volume:/etc/passbolt/gpg
+      - passbolt_jwt_volume:/etc/passbolt/jwt
     networks:
       - passwords_network
     labels:
@@ -490,8 +493,18 @@ networks:
 volumes:
   certificates:
     name: certificates
-  gpg_volume:
-    name: gpg_volume
+  passbolt_gpg_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/passbolt/gpg
+  passbolt_jwt_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/passbolt/jwt
   davis_www:
     name: davis_www
   database_mysql_volume: # This volume is actually an attached OpenStack Block storage
