@@ -349,6 +349,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-opensmtpd
       args:
+        version: "v6.8.0p2"
         top_domain: ${TOP_DOMAIN}
         mail_domain: ${MAIL_DOMAIN}
         mail_principal_user: ${MAIL_PRINCIPAL_USER}
