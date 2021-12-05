@@ -45,7 +45,6 @@ RUN apk add --no-cache \
     libasr-dev \
     libevent-dev \
     libtool \
-    libtool \
     linux-pam-dev \
     make \
     musl-dev \
