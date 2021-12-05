@@ -196,12 +196,7 @@ services:
       - "traefik.http.routers.davis.middlewares=security@file"
 
   davis:
-    build:
-      context: ./
-      dockerfile: ./build/Dockerfile-davis
-      args:
-        version: "1.7.3"
-    image: davis:custom
+    image: ghcr.io/tchapi/davis:v1.8.0
     container_name: davis
     environment:
       - APP_ENV=prod
