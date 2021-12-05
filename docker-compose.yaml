@@ -488,6 +488,9 @@ networks:
 volumes:
   certificates:
     name: certificates
+  davis_www:
+    name: davis_www 
+  # These volumes are actually attached OpenStack Block storage
   passbolt_gpg_volume:
     driver: local
     driver_opts:
@@ -500,45 +503,43 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/passbolt/jwt
-  davis_www:
-    name: davis_www
-  database_mysql_volume: # This volume is actually an attached OpenStack Block storage
+  database_mysql_volume:
     driver: local
     driver_opts:
       o: bind
       type: none
       device: /mnt/databases/mysql
-  database_couch_volume: # This volume is actually an attached OpenStack Block storage
+  database_couch_volume:
     driver: local
     driver_opts:
       o: bind
       type: none
       device: /mnt/databases/couch
-  database_mongo_volume: # This volume is actually an attached OpenStack Block storage
+  database_mongo_volume:
     driver: local
     driver_opts:
       o: bind
       type: none
       device: /mnt/databases/mongo
-  files_cozy_volume: # This volume is actually an attached OpenStack Block storage. It stores the cozy files
+  files_cozy_volume: # It stores the cozy files
     driver: local
     driver_opts:
       o: bind
       type: none
       device: /mnt/files/cozy
-  files_sync_volume: # This volume is actually an attached OpenStack Block storage. It stores the syncthing data
+  files_sync_volume: # It stores the syncthing data
     driver: local
     driver_opts:
       o: bind
       type: none
       device: /mnt/files/sync
-  files_cryptpad_volume: # This volume is actually an attached OpenStack Block storage. It stores the cryptpad data
+  files_cryptpad_volume: # It stores the cryptpad data
     driver: local
     driver_opts:
       o: bind
       type: none
       device: /mnt/files/cryptpad
-  mails_volume: # This volume is actually an attached OpenStack Block storage. It stores the mail data
+  mails_volume: # It stores the mail data
     driver: local
     driver_opts:
       o: bind
