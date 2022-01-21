@@ -173,7 +173,7 @@ services:
       - "traefik.http.middlewares.cozy-chain.chain.middlewares=home-redirectregex@docker,security@file"
       - "traefik.http.routers.cozy.middlewares=cozy-chain"
 
-  # Caldav / Carddav server
+  # Caldav / Carddav / Webdav server
   davis-proxy:
     build:
       context: ./
@@ -210,14 +210,16 @@ services:
       - IMAP_AUTH_URL=null
       - CALDAV_ENABLED=true
       - CARDDAV_ENABLED=true
-      - WEBDAV_ENABLED=false
+      - WEBDAV_ENABLED=true
       - INVITE_FROM_ADDRESS=${EMAIL}
       - MAPBOX_API_KEY=${MAPBOX_API_KEY}
+      - PUBLIC_DIR=/webdav
     restart: unless-stopped
     depends_on:
       - mysql
     volumes:
       - davis_www:/var/www/davis
+      - files_webdav_volume:/webdav
     networks:
       - calendar_network
 
@@ -546,3 +548,9 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/mails
+  files_webdav_volume: # It stores the webdav data
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/webdav
