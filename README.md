@@ -267,7 +267,7 @@ Test your IMAP endpoint (Dovecot) with:
 
     openssl s_client -connect mail.mydomain.com:993
 
-You can try to login with `A LOGIN {user} {password}` by replacing `{user}` and `{password}` with the real strings, which should yield something along those lines:
+You can try to login with `A LOGIN {user} {password}` by replacing `{user}` and `{password}` with the real strings, which should yield something along those lines:
 
     A OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE SNIPPET=FUZZY PREVIEW=FUZZY STATUS=SIZE LITERAL+ NOTIFY] Logged in
 
