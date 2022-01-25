@@ -18,7 +18,6 @@ services:
       - cloud_network
       - calendar_network
       - bookmarks_network
-      - sync_network
       - tasks_network
       - maps_network
       - cryptpad_network
@@ -270,34 +269,6 @@ services:
       - bookmarks_network
       - tasks_network
 
-  # Syncthing
-  syncthing:
-    build:
-      context: ./
-      dockerfile: ./build/Dockerfile-syncthing
-    image: syncthing:custom
-    container_name: syncthing
-    environment:
-      - PUID=${SYNC_PUID}
-      - PGID=${SYNC_PGID}
-      - SYNC_UI_PASSWORD=${SYNC_UI_PASSWORD}
-      - SYNC_API_KEY=${SYNC_API_KEY}
-    restart: unless-stopped
-    volumes:
-      - files_sync_volume:/var/syncthing/data
-    networks:
-      - sync_network
-    ports:
-      - "22000:22000" # We must expose this port for Syncthing to work
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.syncthing.entrypoints=websecure"
-      - "traefik.http.routers.syncthing.rule=Host(`${SYNC_DOMAIN}`)"
-      - "traefik.http.routers.syncthing.tls=true"
-      - "traefik.http.routers.syncthing.tls.certresolver=default"
-      - "traefik.http.routers.syncthing.middlewares=security@file"
-      - "traefik.http.services.syncthing.loadbalancer.server.port=8384"
-
   # Wekan (tasks)
   wekan:
     image: wekanteam/wekan
@@ -475,7 +446,6 @@ networks:
   cloud_network: ~
   calendar_network: ~
   bookmarks_network: ~
-  sync_network: ~
   tasks_network: ~
   # We force the subnet here, so we can use it in
   # the iptables routing command afterwards to make
@@ -530,12 +500,6 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/cozy
-  files_sync_volume: # It stores the syncthing data
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/files/sync
   files_cryptpad_volume: # It stores the cryptpad data
     driver: local
     driver_opts:

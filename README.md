@@ -8,9 +8,8 @@ Services :
   - Cozy Cloud (_Drive and settings only_) — A smart personal cloud to gather all your data
   - Passbolt — A free, open-source, extensible, OpenPGP-based password manager
   - X-browser Sync — A free and open-source browser syncing tool
-  - Davis — A MIT Cal and CardDAV server, based on sabre/dav
+  - Davis — A MIT WebDAV, CalDAV and CardDAV server, based on sabre/dav
   - Wekan — A MIT Kanban board manager, comparable to Trello
-  - Syncthing — A continuous file synchronization program under the Mozilla Public License 2.0 license
   - kvtiles — An open-source map tiles server in Go, Apache 2.0 License
   - Cryptpad — An AGPLv3 encrypted collaboration suite
   - OpenSMTPd — an ISC implementation of the SMTP protocol
@@ -60,7 +59,7 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/sync /mnt/files/cryptpad /mnt/files/mails'
+    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/cryptpad /mnt/files/mails'
 
 ##### For mails, ensure that the permissions are correct
 
@@ -287,7 +286,7 @@ To see the disk usage :
 
 When making a block storage bigger :
 
-  1. First **stop** the container using it (cozy + syncthing for instance, or many more if it's the databases)
+  1. First **stop** the container using it (cozy for instance, or many more if it's the databases)
   2. Unmount the `/dev/sd*1` volume
   3. Change the size in the Public Cloud interface
   4. WARNING The volume name will likely change
@@ -381,7 +380,6 @@ You might need this if Traefik does not manage to get certificates with a tls ch
   - Standard Notes : https://github.com/arugifa/standardnotes-server-docker/blob/master/Dockerfile
   - MariaDB : https://github.com/docker-library/mariadb/blob/master/10.4/docker-entrypoint.sh
   - x-browser-sync : https://github.com/xbrowsersync/api-docker
-  - syncthing : https://github.com/syncthing/syncthing/blob/master/Dockerfile
 
 ## Other alternatives
 
