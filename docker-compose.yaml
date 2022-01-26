@@ -14,7 +14,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - passwords_network
-      - notes_network
       - cloud_network
       - calendar_network
       - bookmarks_network
@@ -33,9 +32,6 @@ services:
     container_name: mysql
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - NOTES_DATABASE=${NOTES_DATABASE}
-      - NOTES_DB_USERNAME=${NOTES_DB_USERNAME}
-      - NOTES_DB_PASSWORD=${NOTES_DB_PASSWORD}
       - PASSBOLT_DATABASE=${PASSBOLT_DATABASE}
       - PASSBOLT_DB_USERNAME=${PASSBOLT_DB_USERNAME}
       - PASSBOLT_DB_PASSWORD=${PASSBOLT_DB_PASSWORD}
@@ -87,34 +83,6 @@ services:
       - "traefik.http.routers.passbolt.tls=true"
       - "traefik.http.routers.passbolt.tls.certresolver=default"
       - "traefik.http.routers.passbolt.middlewares=security@file"
-
-  notes:
-    build:
-      context: ./
-      dockerfile: ./build/Dockerfile-standardnotes
-    image: standardnotes:custom
-    container_name: notes
-    environment:
-      - RAILS_ENV=production
-      - RAILS_SERVE_STATIC_FILES=true
-      - SECRET_KEY_BASE=${NOTES_SECRET_KEY_BASE}
-      - DB_HOST=mysql
-      - DB_DATABASE=${NOTES_DATABASE}
-      - DB_USERNAME=${NOTES_DB_USERNAME}
-      - DB_PASSWORD=${NOTES_DB_PASSWORD}
-      - DISABLE_USER_REGISTRATION=true
-    restart: unless-stopped
-    depends_on:
-      - mysql
-    networks:
-      - notes_network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.standardnotes.entrypoints=websecure"
-      - "traefik.http.routers.standardnotes.rule=Host(`${NOTES_DOMAIN}`)"
-      - "traefik.http.routers.standardnotes.tls=true"
-      - "traefik.http.routers.standardnotes.tls.certresolver=default"
-      - "traefik.http.routers.standardnotes.middlewares=security@file"
 
   # Cozy Database
   couchdb:
@@ -442,7 +410,6 @@ services:
 
 networks:
   passwords_network: ~
-  notes_network: ~
   cloud_network: ~
   calendar_network: ~
   bookmarks_network: ~

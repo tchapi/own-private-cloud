@@ -4,7 +4,6 @@
 
 Services :
 
-  - Standard notes — A free, open-source, and completely encrypted notes app
   - Cozy Cloud (_Drive and settings only_) — A smart personal cloud to gather all your data
   - Passbolt — A free, open-source, extensible, OpenPGP-based password manager
   - X-browser Sync — A free and open-source browser syncing tool
@@ -272,11 +271,6 @@ You can try to login with `A LOGIN {user} {password}` by replacing `{user}` and 
     A OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE SNIPPET=FUZZY PREVIEW=FUZZY STATUS=SIZE LITERAL+ NOTIFY] Logged in
 
 # Run & Maintenance
-
-To prevent user registration in the notes container :
-
-    docker exec -it notes sed -i 's/\(post "auth" =>\)/# \1/' /data/src/config/routes.rb
-    docker-compose restart standardnotes
 
 To prevent user registration in wekan, just go in the settings page (https://{my_subdomain_for_wekan.mydomain.com}/setting) and deactivate it.
 

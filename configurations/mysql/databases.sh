@@ -1,11 +1,6 @@
 #!/bin/bash
 
 mysql -uroot -p"${MYSQL_ROOT_PASSWORD}" <<- EOSQL
-            
-      -- Standard notes
-      CREATE DATABASE IF NOT EXISTS \`${NOTES_DATABASE}\`;
-      CREATE USER '${NOTES_DB_USERNAME}'@'%' IDENTIFIED BY '${NOTES_DB_PASSWORD}';
-      GRANT ALL ON \`${NOTES_DATABASE}\`.* TO '${NOTES_DB_USERNAME}'@'%';
 
       -- Passbolt
       CREATE DATABASE IF NOT EXISTS \`${PASSBOLT_DATABASE}\`;
