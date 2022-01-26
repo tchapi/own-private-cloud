@@ -43,7 +43,6 @@ services:
       - database_mysql_volume:/var/lib/mysql
     networks:
       - passwords_network
-      - notes_network
       - calendar_network
 
   passbolt:
