@@ -162,7 +162,7 @@ We use [**duplicity**](http://duplicity.nongnu.org/index.html) for this, and a S
 
 On the Docker host:
 
-#### Install Python 3.9.2
+#### Install Python 3.9.2 (if needed)
 
     sudo apt install --no-install-recommends wget build-essential libreadline-gplv2-dev libncursesw5-dev \
      libssl-dev libsqlite3-dev tk-dev libgdbm-dev libc6-dev libbz2-dev libffi-dev zlib1g-dev
@@ -179,12 +179,12 @@ On the Docker host:
 
 #### Compile and install Duplicity with latest Python3.9 (_that we previously installed_)
 
-    wget https://launchpad.net/duplicity/0.8-series/0.8.18/+download/duplicity-0.8.18.tar.gz
-    tar xaf duplicity-0.8.18.tar.gz
-    cd duplicity-0.8.18
-    sudo pip3.9 install -r requirements.txt
-    sudo pip3.9 install boto # for S3 remote target
-    sudo python3.9 setup.py install
+    wget https://launchpad.net/duplicity/0.8-series/0.8.21/+download/duplicity-0.8.21.tar.gz
+    tar xaf duplicity-0.8.21.tar.gz
+    cd duplicity-0.8.21
+    pip3 install -r requirements.txt
+    pip3 install boto # for S3 remote target
+    sudo python3 setup.py install
 
 > You must create a `/root/.aws/credentials` file with your S3 credentials:
 >
@@ -225,6 +225,16 @@ Options (see http://duplicity.nongnu.org/vers8/duplicity.1.html):
         --exclude '**' \
         --compare-data \
         s3://<S3_HOST>/<S3_BUCKET_NAME> /mnt/
+
+#### Move another backup file to S3
+
+        s3cmd put file.zip s3://{bucket}/{path}/file.zip --storage-class=GLACIER --multipart-chunk-size-mb=100
+
+> It's important to set a multipart chunk size so that the original file size divided by the chunk size doesn't exceed 1000 (chunks) since an upload can have at most 1000 chunks.
+
+#### Move a file on a S3-compatible storage to a Glacier class
+
+        s3cmd cp s3://{bucket}/{path} s3://{bucket}/{path} --storage-class=GLACIER --add-header=x-amz-metadata-directive:REPLACE
 
 # Updating
 
