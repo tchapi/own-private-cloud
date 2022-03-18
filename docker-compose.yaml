@@ -162,7 +162,7 @@ services:
       - "traefik.http.routers.davis.middlewares=security@file"
 
   davis:
-    image: ghcr.io/tchapi/davis:v1.10.1
+    image: ghcr.io/tchapi/davis:v1.10.2
     container_name: davis
     environment:
       - APP_ENV=prod
