@@ -97,12 +97,13 @@ services:
       - cloud_network
 
   # Cozy Stack
+  # See https://github.com/cozy/cozy-stack/releases
   cozy:
     build:
       context: ./
       dockerfile: ./build/Dockerfile-cozy
       args:
-        version: "1.5.0"
+        version: "1.5.4"
     image: cozy:custom
     container_name: cozy
     environment:
