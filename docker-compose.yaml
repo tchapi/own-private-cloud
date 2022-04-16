@@ -390,7 +390,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cryptpad
       args:
-        version: "4.12.1"
+        version: "4.14.0"
     image: cryptpad:custom
     container_name: cryptpad
     restart: unless-stopped
@@ -400,13 +400,29 @@ services:
       - cryptpad_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cryptpad.entrypoints=websecure"
-      - "traefik.http.routers.cryptpad.rule=Host(`${CRYPTPAD_DOMAIN}`) || Host(`${CRYPTPAD_SANDBOX_DOMAIN}`)"
-      - "traefik.http.routers.cryptpad.tls=true"
-      - "traefik.http.routers.cryptpad.tls.certresolver=default"
-      - "traefik.http.middlewares.cryptpad-chain.chain.middlewares=cors@file,security@file"
-      - "traefik.http.routers.cryptpad.middlewares=cryptpad-chain"
-      - "traefik.http.services.cryptpad.loadbalancer.server.port=3000"
+      # See https://github.com/xwiki-labs/cryptpad/blob/main/docs/example.nginx.conf
+      # First case (secure)
+      - "traefik.http.routers.cryptpad-safe.entrypoints=websecure"
+      - "traefik.http.routers.cryptpad-safe.rule=(Host(`${CRYPTPAD_DOMAIN}`) && !PathPrefix(`/unsafeiframe/inner.html`)) || (Host(`${CRYPTPAD_SANDBOX_DOMAIN}`) && !Path(`/{t:(sheet|doc|presentation)}/inner.html{n:.*}`, `/common/onlyoffice/{n:.*}/{m:.*}.html{r:.*}`))"
+      - "traefik.http.routers.cryptpad-safe.tls=true"
+      - "traefik.http.routers.cryptpad-safe.tls.certresolver=default"
+      - "traefik.http.services.cryptpad-safe.loadbalancer.server.port=3000"
+      - "traefik.http.routers.cryptpad-safe.service=cryptpad-safe"
+      - "traefik.http.middlewares.custom.headers.accessControlAllowOriginList=${CRYPTPAD_SANDBOX_DOMAIN}"
+      - "traefik.http.middlewares.custom.headers.contentSecurityPolicy=default-src 'none'; child-src https://${CRYPTPAD_DOMAIN}; worker-src 'self'; media-src blob:; style-src 'unsafe-inline' 'self' https://${CRYPTPAD_DOMAIN}; script-src 'self' resource: https://${CRYPTPAD_DOMAIN}; connect-src 'self' https://${CRYPTPAD_DOMAIN} blob: wss://${CRYPTPAD_DOMAIN} https://${CRYPTPAD_SANDBOX_DOMAIN}; font-src 'self' data: https://${CRYPTPAD_DOMAIN}; img-src 'self' data: blob: https://${CRYPTPAD_DOMAIN}; frame-src 'self' https://${CRYPTPAD_SANDBOX_DOMAIN} blob:; frame-ancestors 'self' https://${CRYPTPAD_DOMAIN}"
+      - "traefik.http.middlewares.cryptpad-safe-chain.chain.middlewares=custom,cryptpad@file,security@file"
+      - "traefik.http.routers.cryptpad-safe.middlewares=cryptpad-safe-chain"
+      # Second case (unsafe)
+      - "traefik.http.routers.cryptpad-unsafe.entrypoints=websecure"
+      - "traefik.http.routers.cryptpad-unsafe.rule=(Host(`${CRYPTPAD_DOMAIN}`) && PathPrefix(`/unsafeiframe/inner.html`)) || (Host(`${CRYPTPAD_SANDBOX_DOMAIN}`) && Path(`/{t:(sheet|doc|presentation)}/inner.html{n:.*}`, `/common/onlyoffice/{n:.*}/{m:.*}.html{r:.*}`))"
+      - "traefik.http.routers.cryptpad-unsafe.tls=true"
+      - "traefik.http.routers.cryptpad-unsafe.tls.certresolver=default"
+      - "traefik.http.services.cryptpad-unsafe.loadbalancer.server.port=3000"
+      - "traefik.http.routers.cryptpad-unsafe.service=cryptpad-unsafe"
+      - "traefik.http.middlewares.custom2.headers.accessControlAllowOriginList=${CRYPTPAD_SANDBOX_DOMAIN}"
+      - "traefik.http.middlewares.custom2.headers.contentSecurityPolicy=default-src 'none'; child-src https://${CRYPTPAD_DOMAIN}; worker-src 'self'; media-src blob:; style-src 'unsafe-inline' 'self' https://${CRYPTPAD_DOMAIN}; script-src 'self' 'unsafe-eval' 'unsafe-inline' resource: https://${CRYPTPAD_DOMAIN}; connect-src 'self' https://${CRYPTPAD_DOMAIN} blob: wss://${CRYPTPAD_DOMAIN} https://${CRYPTPAD_SANDBOX_DOMAIN}; font-src 'self' data: https://${CRYPTPAD_DOMAIN}; img-src 'self' data: blob: https://${CRYPTPAD_DOMAIN}; frame-src 'self' https://${CRYPTPAD_SANDBOX_DOMAIN} blob:; frame-ancestors 'self' https://${CRYPTPAD_DOMAIN}"
+      - "traefik.http.middlewares.cryptpad-unsafe-chain.chain.middlewares=custom2,cryptpad@file,security@file"
+      - "traefik.http.routers.cryptpad-unsafe.middlewares=cryptpad-unsafe-chain"
 
 networks:
   passwords_network: ~

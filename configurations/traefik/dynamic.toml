@@ -2,10 +2,14 @@
   [http.middlewares.security.headers]
     stsSeconds = 31536000
     sslRedirect = true
-  [http.middlewares.cors.headers]
-    [http.middlewares.cors.headers.customResponseHeaders]
+  [http.middlewares.cryptpad.headers]
+    # See https://github.com/xwiki-labs/cryptpad/blob/main/docs/example.nginx.conf
+    browserXssFilter = true # X-XSS-Protection "1; mode=block"
+    contentTypeNosniff = true # X-Content-Type-Options nosniff;
+    [http.middlewares.cryptpad.headers.customResponseHeaders]
       Cross-Origin-Resource-Policy = "cross-origin"
       Cross-Origin-Embedder-Policy = "require-corp"
+      Permissions-Policy = "interest-cohort=()"
 
 [tls]
   [tls.options]
