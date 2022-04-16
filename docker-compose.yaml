@@ -404,7 +404,8 @@ services:
       - "traefik.http.routers.cryptpad.rule=Host(`${CRYPTPAD_DOMAIN}`) || Host(`${CRYPTPAD_SANDBOX_DOMAIN}`)"
       - "traefik.http.routers.cryptpad.tls=true"
       - "traefik.http.routers.cryptpad.tls.certresolver=default"
-      - "traefik.http.routers.cryptpad.middlewares=security@file"
+      - "traefik.http.middlewares.cryptpad-chain.chain.middlewares=cors@file,security@file"
+      - "traefik.http.routers.cryptpad.middlewares=cryptpad-chain"
       - "traefik.http.services.cryptpad.loadbalancer.server.port=3000"
 
 networks:

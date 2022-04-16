@@ -2,6 +2,10 @@
   [http.middlewares.security.headers]
     stsSeconds = 31536000
     sslRedirect = true
+  [http.middlewares.cors.headers]
+    [http.middlewares.cors.headers.customResponseHeaders]
+      Cross-Origin-Resource-Policy = "cross-origin"
+      Cross-Origin-Embedder-Policy = "require-corp"
 
 [tls]
   [tls.options]
