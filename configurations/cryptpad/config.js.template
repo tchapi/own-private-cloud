@@ -46,7 +46,7 @@ module.exports = {
  *  cryptpad/docs/example.nginx.conf (see the $main_domain variable)
  *
  */
-    httpUnsafeOrigin: '$CRYPTPAD_DOMAIN',
+    httpUnsafeOrigin: 'https://$CRYPTPAD_DOMAIN',
 
 /*  httpSafeOrigin is the URL that is used for the 'sandbox' described above.
  *  If you're testing or developing with CryptPad on your local machine then
@@ -142,7 +142,7 @@ module.exports = {
     /*  CryptPad will display a point of contact for your instance on its contact page
      *  (/contact.html) if you provide it below.
      */
-    //adminEmail: 'i.did.not.read.my.config@cryptpad.fr',
+    adminEmail: "$CRYPTPAD_ADMIN_EMAIL",
 
     /*
      *  By default, CryptPad contacts one of our servers once a day.
