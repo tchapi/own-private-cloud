@@ -10,7 +10,7 @@ admin:
   port: 6060
 
 mail:
-  noreply_address: noreply@{{.Env.DOMAIN}}
+  noreply_address: no-reply@{{.Env.TOP_DOMAIN}}
   noreply_name: Cozy at {{.Env.DOMAIN}}
   host: {{.Env.MAIL_HOST}}
   port: {{.Env.MAIL_PORT}}

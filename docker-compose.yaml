@@ -108,6 +108,7 @@ services:
     container_name: cozy
     environment:
       - DOMAIN=${CLOUD_DOMAIN}
+      - TOP_DOMAIN=${TOP_DOMAIN}
       - COUCHDB_PROTOCOL=http
       - COUCHDB_HOST=couchdb
       - COUCHDB_PORT=5984
@@ -116,8 +117,8 @@ services:
       - COZY_ADMIN_PASSPHRASE=${COZY_ADMIN_PASSPHRASE}
       - MAIL_HOST=${MAIL_HOST}
       - MAIL_PORT=${MAIL_PORT}
-      - MAIL_USERNAME=${MAIL_USERNAME}
-      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - MAIL_USERNAME="no-reply"
+      - MAIL_PASSWORD=${MAIL_NO_REPLY_PASSWORD}
       - MAIL_DISABLE_TLS=false
       - MAIL_SKIP_CERTIFICATE_VALIDATION=false
     restart: unless-stopped
