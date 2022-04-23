@@ -20,7 +20,7 @@ RUN apk add --no-cache \
 # We do it here before copying the final configuration since `doveadm` could fail
 # because the configuration references a file that is in a volume (`letsencrypt`,
 # not attached during build).
-RUN echo "${mail_principal_user}:"$(doveadm pw -s ARGON2ID -p ${mail_principal_password})"::" > /tmp/dovecot-users
+RUN echo "${mail_principal_user}:"$(doveadm pw -s ARGON2ID -p "${mail_principal_password}")"::" > /tmp/dovecot-users
 
 # Now, remove all configuration and start fresh
 RUN rm -rf /etc/dovecot/*
