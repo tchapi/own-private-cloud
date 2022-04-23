@@ -170,7 +170,7 @@ services:
       - APP_ENV=prod
       - APP_SECRET=${DAVIS_APP_SECRET}
       - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}
-      - MAILER_DSN=smtp://${MAIL_USERNAME}:${MAIL_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
+      - MAILER_DSN=smtp://no-reply:${MAIL_NO_REPLY_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
       - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
       - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
       - AUTH_REALM=${DAVIS_AUTH_REALM}
@@ -179,7 +179,7 @@ services:
       - CALDAV_ENABLED=true
       - CARDDAV_ENABLED=true
       - WEBDAV_ENABLED=true
-      - INVITE_FROM_ADDRESS=${EMAIL}
+      - INVITE_FROM_ADDRESS=no-reply@${TOP_DOMAIN}
       - MAPBOX_API_KEY=${MAPBOX_API_KEY}
       - PUBLIC_DIR=/webdav
     restart: unless-stopped
