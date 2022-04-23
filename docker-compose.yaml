@@ -157,7 +157,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.davis.entrypoints=websecure"
-      - "traefik.http.routers.davis.rule=Host(`${CALENDAR_DOMAIN}`)"
+      - "traefik.http.routers.davis.rule=Host(`${DAV_DOMAIN}`)"
       - "traefik.http.routers.davis.tls=true"
       - "traefik.http.routers.davis.tls.certresolver=default"
       - "traefik.http.routers.davis.middlewares=security@file"
