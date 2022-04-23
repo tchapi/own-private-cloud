@@ -15,7 +15,7 @@ services:
     networks:
       - passwords_network
       - cloud_network
-      - calendar_network
+      - dav_network
       - bookmarks_network
       - tasks_network
       - maps_network
@@ -43,7 +43,7 @@ services:
       - database_mysql_volume:/var/lib/mysql
     networks:
       - passwords_network
-      - calendar_network
+      - dav_network
 
   passbolt:
     build:
@@ -154,7 +154,7 @@ services:
     volumes:
       - davis_www:/var/www/davis
     networks:
-      - calendar_network
+      - dav_network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.davis.entrypoints=websecure"
@@ -189,7 +189,7 @@ services:
       - davis_www:/var/www/davis
       - files_webdav_volume:/webdav
     networks:
-      - calendar_network
+      - dav_network
 
   # XBS = X-browser sync
   xbs:
@@ -429,7 +429,7 @@ services:
 networks:
   passwords_network: ~
   cloud_network: ~
-  calendar_network: ~
+  dav_network: ~
   bookmarks_network: ~
   tasks_network: ~
   # We force the subnet here, so we can use it in
