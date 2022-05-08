@@ -42,6 +42,8 @@ Services :
   - `fail2ban` is to prevent unwanted access
   - `haveged` is for Passbolt - to generate entropy
 
+> Note: if you don't use `docker-machine`, you can just SSH to the host normally too
+
 ## Mount external attached block storage volume
 
 > The volumes must be attached beforehand in the OpenStack console
@@ -58,7 +60,7 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/cryptpad /mnt/files/mails'
+    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/cryptpad /mnt/files/mails /mnt/files/gitea'
 
 ##### For mails, ensure that the permissions are correct
 
@@ -137,6 +139,24 @@ And then build the images :
 ## Create the Passbolt admin user
 
     ./scripts/passbolt/init-admin-user.sh
+
+## Create the Gitea admin user
+
+    ./scripts/gitea/init-admin-user.sh
+
+## Copy the custom template files for Gitea
+
+These files resides in `configurations/gitea`; copy the `public` and `templates` folders to `/mnt/files/gitea/gitea/.` before provisionning the container, or restart it after doing it.
+
+> **How to enable SSH passthrough for Gitea**
+> 
+> If you want to be able to use the standard port 22 for git, you need to create a passthrough between your Docker host and the gitea container. In order to do so, you have many options as outlined in https://docs.gitea.io/en-us/install-with-docker/#ssh-container-passthrough.
+> 
+> The container is setup for the first option (the shim), and you need to run `./scripts/gitea/init-ssh-passthrough.sh` **on your host** if you want to set it up in full. Be wary that the UID and GID used are `2022` and if you want to change it, you need to do it both in the `docker-compose.yml` file and in this script.
+>
+> If all succeeds, you will be able to test the SSH connection with `ssh -T git@${GIT_DOMAIN}` and you will be granted a message like so:
+>    
+>    _Hi there, {your_username}! You've successfully authenticated with the key named {your_ssh_key_name}, but Gitea does not provide shell access._
 
 ## Init the davis instance if needed (_if the tables do not already exist_)
 

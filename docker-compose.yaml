@@ -21,6 +21,7 @@ services:
       - maps_network
       - cryptpad_network
       - mail_network
+      - git_network
     ports:
       - "443:443"
 
@@ -38,12 +39,16 @@ services:
       - DAVIS_DATABASE=${DAVIS_DATABASE}
       - DAVIS_DB_USERNAME=${DAVIS_DB_USERNAME}
       - DAVIS_DB_PASSWORD=${DAVIS_DB_PASSWORD}
+      - GITEA_DATABASE=${GITEA_DATABASE}
+      - GITEA_DB_USERNAME=${GITEA_DB_USERNAME}
+      - GITEA_DB_PASSWORD=${GITEA_DB_PASSWORD}
     restart: unless-stopped
     volumes:
       - database_mysql_volume:/var/lib/mysql
     networks:
       - passwords_network
       - dav_network
+      - git_network
 
   passbolt:
     build:
@@ -426,6 +431,62 @@ services:
       - "traefik.http.middlewares.cryptpad-unsafe-chain.chain.middlewares=custom2,cryptpad@file,security@file"
       - "traefik.http.routers.cryptpad-unsafe.middlewares=cryptpad-unsafe-chain"
 
+  # Gitea (git)
+  # See https://docs.gitea.io/en-us/install-with-docker/
+  gitea:
+    image: gitea/gitea:1.16.6
+    container_name: git
+    environment:
+      - USER_UID=2022
+      - USER_GID=2022
+      - GITEA__APP_NAME=${GIT_DOMAIN}
+      - GITEA__database__DB_TYPE=mysql
+      - GITEA__database__HOST=mysql:3306
+      - GITEA__database__NAME=${GITEA_DATABASE}
+      - GITEA__database__USER=${GITEA_DB_USERNAME}
+      - GITEA__database__PASSWD=${GITEA_DB_PASSWORD}
+      - GITEA__mailer__ENABLED=true
+      - GITEA__mailer__MAILER_TYPE=smtp
+      - GITEA__mailer__HOST=${MAIL_HOST}:${MAIL_PORT}
+      - GITEA__mailer__USER=no-reply
+      - GITEA__mailer__PASSWD=${MAIL_NO_REPLY_PASSWORD}
+      - GITEA__mailer__FROM=no-reply@${TOP_DOMAIN}
+      - GITEA__openid__ENABLE_OPENID_SIGNIN=false
+      - GITEA__openid__ENABLE_OPENID_SIGNUP=false
+      - GITEA__service__DISABLE_REGISTRATION=true
+      - GITEA__service__ENABLE_TIMETRACKING=false
+      - GITEA__service__NO_REPLY_ADDRESS=noreply.git
+      - GITEA__service.explore__REQUIRE_SIGNIN_VIEW=true
+      - GITEA__service.explore__DISABLE_USERS_PAGE=true
+      - GITEA__server__ROOT_URL=https://${GIT_DOMAIN}
+      - GITEA__admin__DISABLE_REGULAR_ORG_CREATION=true
+      - GITEA__security__INSTALL_LOCK=true
+      - GITEA__i18n__LANGS=en-US
+      - GITEA__i18n__NAMES=English
+      # You need to copy the custom files to files_gitea_volume for this to work
+      - GITEA__ui__THEMES=github,github-dark
+      - GITEA__ui__DEFAULT_THEME=github-dark
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    volumes:
+      - files_gitea_volume:/data
+      - /home/git/.ssh/:/data/git/.ssh
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    networks:
+      - git_network
+    ports:
+      - "127.0.0.1:2222:22"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.gitea.entrypoints=websecure"
+      - "traefik.http.routers.gitea.rule=Host(`${GIT_DOMAIN}`)"
+      - "traefik.http.routers.gitea.tls=true"
+      - "traefik.http.routers.gitea.tls.certresolver=default"
+      - "traefik.http.routers.gitea.middlewares=security@file"
+      - "traefik.http.services.gitea.loadbalancer.server.port=3000"
+
 networks:
   passwords_network: ~
   cloud_network: ~
@@ -442,6 +503,7 @@ networks:
         - subnet: "172.100.0.0/16"
   maps_network: ~
   cryptpad_network: ~
+  git_network: ~
 
 volumes:
   certificates:
@@ -503,3 +565,9 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/webdav
+  files_gitea_volume: # It stores the gitea data
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/gitea
