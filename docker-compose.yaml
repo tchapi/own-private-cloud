@@ -459,6 +459,7 @@ services:
       - GITEA__service.explore__REQUIRE_SIGNIN_VIEW=true
       - GITEA__service.explore__DISABLE_USERS_PAGE=true
       - GITEA__server__ROOT_URL=https://${GIT_DOMAIN}
+      - GITEA__server__SSH_DOMAIN=${GIT_DOMAIN}
       - GITEA__admin__DISABLE_REGULAR_ORG_CREATION=true
       - GITEA__security__INSTALL_LOCK=true
       - GITEA__i18n__LANGS=en-US
