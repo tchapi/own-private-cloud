@@ -8,11 +8,11 @@ Services :
   - Passbolt — A free, open-source, extensible, OpenPGP-based password manager
   - X-browser Sync — A free and open-source browser syncing tool
   - Davis — A MIT WebDAV, CalDAV and CardDAV server, based on sabre/dav
-  - Wekan — A MIT Kanban board manager, comparable to Trello
   - kvtiles — An open-source map tiles server in Go, Apache 2.0 License
   - Cryptpad — An AGPLv3 encrypted collaboration suite
   - OpenSMTPd — an ISC implementation of the SMTP protocol
   - Dovecot — a LGPLv2.1 / MIT robust IMAP server
+  - Gitea — a MIT self-hosted git service with a web UI
 
 > All services are served through the Træfik reverse-proxy, certificates are provided by Let's Encrypt, and renewed automatically via Træfik.
 
@@ -301,8 +301,6 @@ You can try to login with `A LOGIN {user} {password}` by replacing `{user}` and 
     A OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE SNIPPET=FUZZY PREVIEW=FUZZY STATUS=SIZE LITERAL+ NOTIFY] Logged in
 
 # Run & Maintenance
-
-To prevent user registration in wekan, just go in the settings page (https://{my_subdomain_for_wekan.mydomain.com}/setting) and deactivate it.
 
 To see the disk usage :
 

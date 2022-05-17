@@ -17,7 +17,6 @@ services:
       - cloud_network
       - dav_network
       - bookmarks_network
-      - tasks_network
       - maps_network
       - cryptpad_network
       - mail_network
@@ -220,7 +219,7 @@ services:
       - "traefik.http.routers.xbs.tls.certresolver=default"
       - "traefik.http.routers.xbs.middlewares=security@file"
 
-  # XBS + Wekan database
+  # XBS database
   mongo:
     build:
       context: ./
@@ -230,9 +229,6 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-      - WEKAN_DATABASE=${WEKAN_DATABASE}
-      - WEKAN_DB_USERNAME=${WEKAN_DB_USERNAME}
-      - WEKAN_DB_PASSWORD=${WEKAN_DB_PASSWORD}
       - XBS_DATABASE=${XBS_DATABASE}
       - XBS_DB_USERNAME=${XBS_DB_USERNAME}
       - XBS_DB_PASSWORD=${XBS_DB_PASSWORD}
@@ -241,29 +237,6 @@ services:
       - database_mongo_volume:/data/db
     networks:
       - bookmarks_network
-      - tasks_network
-
-  # Wekan (tasks)
-  wekan:
-    image: wekanteam/wekan
-    container_name: tasks
-    environment:
-      - MONGO_URL=mongodb://${WEKAN_DB_USERNAME}:${WEKAN_DB_PASSWORD}@mongo:27017/${WEKAN_DATABASE}?authSource=admin
-      - ROOT_URL=https://${TASKS_DOMAIN}
-      - MAIL_URL=smtps://${MAIL_USERNAME}:${MAIL_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
-      - MAIL_FROM=${WEKAN_MAIL_FROM}
-    restart: unless-stopped
-    depends_on:
-      - mongo
-    networks:
-      - tasks_network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.wekan.entrypoints=websecure"
-      - "traefik.http.routers.wekan.rule=Host(`${TASKS_DOMAIN}`)"
-      - "traefik.http.routers.wekan.tls=true"
-      - "traefik.http.routers.wekan.tls.certresolver=default"
-      - "traefik.http.routers.wekan.middlewares=security@file"
 
   # Mails (bound on a specific IP for the reverse to be unique)
   dovecot:
@@ -493,7 +466,6 @@ networks:
   cloud_network: ~
   dav_network: ~
   bookmarks_network: ~
-  tasks_network: ~
   # We force the subnet here, so we can use it in
   # the iptables routing command afterwards to make
   # the outgoing packets go through a specific IP.
