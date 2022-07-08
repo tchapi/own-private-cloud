@@ -168,7 +168,7 @@ services:
       - "traefik.http.routers.davis.middlewares=security@file"
 
   davis:
-    image: ghcr.io/tchapi/davis:v1.10.2
+    image: ghcr.io/tchapi/davis:v2.0.0
     container_name: davis
     environment:
       - APP_ENV=prod
@@ -184,7 +184,6 @@ services:
       - CARDDAV_ENABLED=true
       - WEBDAV_ENABLED=true
       - INVITE_FROM_ADDRESS=no-reply@${TOP_DOMAIN}
-      - MAPBOX_API_KEY=${MAPBOX_API_KEY}
       - PUBLIC_DIR=/webdav
     restart: unless-stopped
     depends_on:
