@@ -107,7 +107,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cozy
       args:
-        version: "1.5.4"
+        version: "1.5.7"
     image: cozy:custom
     container_name: cozy
     environment:
@@ -168,7 +168,7 @@ services:
       - "traefik.http.routers.davis.middlewares=security@file"
 
   davis:
-    image: ghcr.io/tchapi/davis:v2.0.0
+    image: ghcr.io/tchapi/davis:v2.0.2
     container_name: davis
     environment:
       - APP_ENV=prod
@@ -184,7 +184,7 @@ services:
       - CARDDAV_ENABLED=true
       - WEBDAV_ENABLED=true
       - INVITE_FROM_ADDRESS=no-reply@${TOP_DOMAIN}
-      - PUBLIC_DIR=/webdav
+      - WEBDAV_PUBLIC_DIR=/webdav
     restart: unless-stopped
     depends_on:
       - mysql
