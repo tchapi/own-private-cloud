@@ -14,7 +14,13 @@ define(['/common/application_config_internal.js'], function (AppConfig) {
     AppConfig.disableAnonymousStore = true;
     AppConfig.disableAnonymousPadCreation = true
     AppConfig.disableCrowdfundingMessages = true;
+    AppConfig.disableFeedback = true;
     AppConfig.logFeedback = false;
+
+    AppConfig.privacy = false;
+    AppConfig.terms = false;
+    AppConfig.imprint = false;
+    AppConfig.source = false;
 
     return AppConfig;
 });

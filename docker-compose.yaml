@@ -369,7 +369,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cryptpad
       args:
-        version: "4.14.0"
+        version: "5.0.0"
     image: cryptpad:custom
     container_name: cryptpad
     restart: unless-stopped

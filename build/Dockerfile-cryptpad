@@ -46,10 +46,6 @@ RUN mkdir -p customize data data/blob data/block data/datastore
 COPY configurations/cryptpad/application_config.js customize/application_config.js
 COPY configurations/cryptpad/config.js config/config.js
 
-# Pages customizations
-COPY configurations/cryptpad/pages.js customize/pages.js
-COPY configurations/cryptpad/pages/index.js customize/pages/index.js
-
 # Volumes for data persistence
 VOLUME /cryptpad/data
 
