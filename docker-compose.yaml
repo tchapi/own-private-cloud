@@ -168,11 +168,12 @@ services:
       - "traefik.http.routers.davis.middlewares=security@file"
 
   davis:
-    image: ghcr.io/tchapi/davis:v2.0.2
+    image: ghcr.io/tchapi/davis:v3.1.0
     container_name: davis
     environment:
       - APP_ENV=prod
       - APP_SECRET=${DAVIS_APP_SECRET}
+      - DATABASE_DRIVER=mysql
       - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}?charset=utf8mb4&serverVersion=mariadb-10.6.10
       - MAILER_DSN=smtp://no-reply:${MAIL_NO_REPLY_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
       - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
