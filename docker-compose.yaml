@@ -204,6 +204,22 @@ services:
     networks:
       - dav_network
 
+  linkding:
+    image: sissbruecker/linkding:latest
+    container_name: linkding
+    restart: unless-stopped
+    volumes:
+      - files_linkding_volume:/etc/linkding/data
+    networks:
+      - bookmarks_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.linkding.entrypoints=websecure"
+      - "traefik.http.routers.linkding.rule=Host(`${BOOKMARKS_DOMAIN}`)"
+      - "traefik.http.routers.linkding.tls=true"
+      - "traefik.http.routers.linkding.tls.certresolver=default"
+      - "traefik.http.routers.linkding.middlewares=security@file"
+
   # Mails (bound on a specific IP for the reverse to be unique)
   dovecot:
     build:
@@ -504,3 +520,9 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/gitea
+  files_linkding_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/linkding
