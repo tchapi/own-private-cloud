@@ -1,6 +1,0 @@
-FROM mongo:4.4.13
-# From https://hub.docker.com/_/mongo
-
-LABEL maintainer="tchap@tchap.me"
-
-COPY configurations/xbs/mongoconfig.sh /docker-entrypoint-initdb.d/mongoconfig-xbs.sh

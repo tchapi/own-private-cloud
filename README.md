@@ -53,7 +53,7 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdb # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdb1'
     docker-machine ssh default 'sudo mkdir /mnt/databases && sudo mount /dev/sdb1 /mnt/databases'
-    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch /mnt/databases/mongo'
+    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch'
 
 #### The files volume :
 
@@ -321,7 +321,7 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
 
 # Tips
 
-> If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (`mongo`, or `couch` too if needed) on the host for the entrypoint script to be replayed entirely
+> If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (and `couch` too if needed) on the host for the entrypoint script to be replayed entirely
 
 
 ### Redirect a domain to another one with Traefik
