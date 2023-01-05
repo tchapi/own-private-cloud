@@ -144,6 +144,10 @@ And then build the images :
 
     ./scripts/gitea/init-admin-user.sh
 
+## Create the Linkding single user
+
+    ./scripts/linkding/init-user.sh
+
 ## Copy the custom template files for Gitea
 
 These files resides in `configurations/gitea`; copy the `public` and `templates` folders to `/mnt/files/gitea/gitea/.` before provisionning the container, or restart it after doing it.
