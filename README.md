@@ -323,6 +323,21 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
 
 > If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (`mongo`, or `couch` too if needed) on the host for the entrypoint script to be replayed entirely
 
+
+### Redirect a domain to another one with Traefik
+
+It's easy as to add rules to the `traefik` container. Example if you want to redirect `calendar.mydomain.com` to `dav.mydomain.com`:
+
+```yaml
+- "traefik.http.routers.legacy_calendar_to_dav.rule=Host(`calendar.mydomain.com`)"
+- "traefik.http.routers.legacy_calendar_to_dav.service=noop@internal"
+- "traefik.http.routers.legacy_calendar_to_dav.middlewares=to_dav"
+- "traefik.http.routers.legacy_calendar_to_dav.tls=true"
+- "traefik.http.middlewares.to_dav.redirectregex.regex=^https://calendar.mydomain.com/(.*)"
+- "traefik.http.middlewares.to_dav.redirectregex.replacement=https://dav.mydomain.com/$${1}"
+- "traefik.http.middlewares.to_dav.redirectregex.permanent=true"
+```
+
 ### Add a failover IP on Debian 9
 
 Supposing an alias of `1`, and an interface of `ens3` :
