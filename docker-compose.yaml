@@ -23,6 +23,15 @@ services:
       - git_network
     ports:
       - "443:443"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.api.rule=Host(`${STATUS_DOMAIN}`)"
+      - "traefik.http.routers.api.service=api@internal"
+      - "traefik.http.routers.api.tls=true"
+      - "traefik.http.routers.api.tls.certresolver=default"
+      - "traefik.http.middlewares.auth.basicauth.users=${STATUS_CREDENTIALS}"
+      - "traefik.http.routers.api.middlewares=auth"
+      - "traefik.http.routers.api.middlewares=security@file"
 
   mysql:
     build:

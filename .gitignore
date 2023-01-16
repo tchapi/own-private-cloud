@@ -17,6 +17,3 @@ configurations/mails/dovecot.conf
 configurations/mails/aliases
 configurations/mails/virtuals
 configurations/mails/dkim-*
-
-# Supplementary config file
-docker-compose.supplementary.y*ml

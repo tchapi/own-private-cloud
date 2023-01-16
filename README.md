@@ -338,6 +338,15 @@ It's easy as to add rules to the `traefik` container. Example if you want to red
 - "traefik.http.middlewares.to_dav.redirectregex.permanent=true"
 ```
 
+### Username and password for the status page
+
+In order to create a password for the status page (Traefik's default status page that will reside at https://status.mydomain.com), you need to create a username/password combo with:
+
+```
+htpasswd -nB username
+> New password: ...
+```
+
 ### Add a failover IP on Debian 9
 
 Supposing an alias of `1`, and an interface of `ens3` :
