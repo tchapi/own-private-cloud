@@ -204,48 +204,21 @@ services:
     networks:
       - dav_network
 
-  # XBS = X-browser sync
-  xbs:
-    build:
-      context: ./
-      dockerfile: ./build/Dockerfile-xbs
-    image: xbs:custom
-    container_name: xbs
-    environment:
-      - XBS_API_HOSTNAME=${BOOKMARKS_DOMAIN}
-      - XBROWSERSYNC_DB_USER=${XBS_DB_USERNAME}
-      - XBROWSERSYNC_DB_PWD=${XBS_DB_PASSWORD}
+  linkding:
+    image: sissbruecker/linkding:latest
+    container_name: linkding
     restart: unless-stopped
-    depends_on:
-      - mongo
+    volumes:
+      - files_linkding_volume:/etc/linkding/data
     networks:
       - bookmarks_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.xbs.entrypoints=websecure"
-      - "traefik.http.routers.xbs.rule=Host(`${BOOKMARKS_DOMAIN}`)"
-      - "traefik.http.routers.xbs.tls=true"
-      - "traefik.http.routers.xbs.tls.certresolver=default"
-      - "traefik.http.routers.xbs.middlewares=security@file"
-
-  # XBS database
-  mongo:
-    build:
-      context: ./
-      dockerfile: ./build/Dockerfile-mongo
-    image: mongo:custom
-    container_name: mongo
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
-      - XBS_DATABASE=${XBS_DATABASE}
-      - XBS_DB_USERNAME=${XBS_DB_USERNAME}
-      - XBS_DB_PASSWORD=${XBS_DB_PASSWORD}
-    restart: unless-stopped
-    volumes:
-      - database_mongo_volume:/data/db
-    networks:
-      - bookmarks_network
+      - "traefik.http.routers.linkding.entrypoints=websecure"
+      - "traefik.http.routers.linkding.rule=Host(`${BOOKMARKS_DOMAIN}`)"
+      - "traefik.http.routers.linkding.tls=true"
+      - "traefik.http.routers.linkding.tls.certresolver=default"
+      - "traefik.http.routers.linkding.middlewares=security@file"
 
   # Mails (bound on a specific IP for the reverse to be unique)
   dovecot:
@@ -517,12 +490,6 @@ volumes:
       o: bind
       type: none
       device: /mnt/databases/couch
-  database_mongo_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/databases/mongo
   files_cozy_volume: # It stores the cozy files
     driver: local
     driver_opts:
@@ -553,3 +520,9 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/gitea
+  files_linkding_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/linkding

@@ -9,7 +9,6 @@ openrc-*.sh
 
 # Built configuration files
 configurations/traefik/traefik.toml
-configurations/xbs/settings.json
 configurations/cryptpad/config.js
 configurations/mails/smtpd.conf
 configurations/mails/dkim_signing.conf

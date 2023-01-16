@@ -20,9 +20,6 @@ echo "### Building configuration files"
 # Traefik configuration
 expandVars ./configurations/traefik/traefik.toml.template ./configurations/traefik/traefik.toml
 
-# XBS configuration
-expandVars ./configurations/xbs/settings.json.template ./configurations/xbs/settings.json
-
 # Cryptpad configuration
 expandVars ./configurations/cryptpad/config.js.template ./configurations/cryptpad/config.js
 

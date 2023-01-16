@@ -53,14 +53,14 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdb # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdb1'
     docker-machine ssh default 'sudo mkdir /mnt/databases && sudo mount /dev/sdb1 /mnt/databases'
-    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch /mnt/databases/mongo'
+    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch'
 
 #### The files volume :
 
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/cryptpad /mnt/files/mails /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav'
+    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/cryptpad /mnt/files/mails /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav /mnt/files/linkding'
 
 ##### For mails, ensure that the permissions are correct
 
@@ -143,6 +143,10 @@ And then build the images :
 ## Create the Gitea admin user
 
     ./scripts/gitea/init-admin-user.sh
+
+## Create the Linkding single user
+
+    ./scripts/linkding/init-user.sh
 
 ## Copy the custom template files for Gitea
 
@@ -321,7 +325,7 @@ See https://www.cloudberrylab.com/resources/blog/linux-resize-partition/ for mor
 
 # Tips
 
-> If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (`mongo`, or `couch` too if needed) on the host for the entrypoint script to be replayed entirely
+> If you change databases.sh, you need to clear the content of `/mnt/databases/mysql` (and `couch` too if needed) on the host for the entrypoint script to be replayed entirely
 
 
 ### Redirect a domain to another one with Traefik
