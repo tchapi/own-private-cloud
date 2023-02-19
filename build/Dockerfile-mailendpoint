@@ -1,4 +1,5 @@
 FROM httpd:alpine
+# From https://hub.docker.com/_/httpd/tags
 
 ARG mail_domain
 

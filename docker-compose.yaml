@@ -302,7 +302,7 @@ services:
   #  - periodically exports the Traefik certificates to .pem files, in a shared volume
   #    so that dovecot and opensmtpd containers can consume them
   mail-certificates-dumper:
-    image: ldez/traefik-certs-dumper:v2.7.4
+    image: ldez/traefik-certs-dumper:v2.8.1
     container_name: mail-certificates-dumper
     restart: unless-stopped
     entrypoint: sh -c '
@@ -352,7 +352,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cryptpad
       args:
-        version: "5.0.0"
+        version: "5.2.1"
     image: cryptpad:custom
     container_name: cryptpad
     restart: unless-stopped
@@ -389,7 +389,7 @@ services:
   # Gitea (git)
   # See https://docs.gitea.io/en-us/install-with-docker/
   gitea:
-    image: gitea/gitea:1.16.6
+    image: gitea/gitea:1.18.3
     container_name: git
     environment:
       - USER_UID=2022

@@ -1,5 +1,6 @@
 # Build filter-rspamd and filter-senderscore from sources
-FROM golang:1.17 AS builder
+FROM golang:1.20 AS builder
+# From https://hub.docker.com/_/golang/tags
 
 # See https://go.dev/blog/go116-module-changes
 RUN go env -w GO111MODULE=auto
@@ -14,7 +15,7 @@ RUN git clone https://github.com/poolpOrg/filter-senderscore.git filter-sendersc
 WORKDIR /go/filter-senderscore
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o filter-senderscore .
 
-# Main image
+# Main image /!\ Do no update
 FROM alpine:3.15
 # From https://hub.docker.com/_/alpine
 
@@ -40,9 +41,9 @@ RUN apk add --no-cache \
     automake \
     bison \
     ca-certificates \
+    fts \
     fts-dev \
     gcc \
-    fts \
     libasr-dev \
     libevent-dev \
     libtool \

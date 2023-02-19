@@ -1,4 +1,4 @@
-FROM alpine:3.15
+FROM alpine:3.17
 # From https://hub.docker.com/_/alpine
 
 LABEL maintainer="tchap@tchap.me"
