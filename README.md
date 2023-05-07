@@ -4,7 +4,7 @@
 
 Services :
 
-  - Cozy Cloud (_Drive and settings only_) — A smart personal cloud to gather all your data
+  - Filebrowser — An Apache 2.0 simple web files browser / uploader and sharing interface
   - Passbolt — A free, open-source, extensible, OpenPGP-based password manager
   - X-browser Sync — A free and open-source browser syncing tool
   - Davis — A MIT WebDAV, CalDAV and CardDAV server, based on sabre/dav
@@ -53,14 +53,14 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdb # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdb1'
     docker-machine ssh default 'sudo mkdir /mnt/databases && sudo mount /dev/sdb1 /mnt/databases'
-    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/couch'
+    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/filebrowser'
 
 #### The files volume :
 
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/cozy /mnt/files/cryptpad /mnt/files/mails /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav /mnt/files/linkding'
+    docker-machine ssh default 'sudo mkdir /mnt/files/filebrowser /mnt/files/cryptpad /mnt/files/mails /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav /mnt/files/linkding'
 
 ##### For mails, ensure that the permissions are correct
 
@@ -122,13 +122,6 @@ And then build the images :
 >     docker-compose -f docker-compose.yaml -f docker-compose.supplementary.yaml config
 >   
 > See [this Medium post](https://pscheit.medium.com/docker-compose-advanced-configuration-541356d121de) for more details
-
-## Set the Cozy instance
-
-    ./scripts/cozy/init-cozycloud.sh
-
-> NB: To add an app later on (e.g. the Notes app), you can: `docker exec -it cozy bash`
-> and then `cozy-stack apps install --domain ${CLOUD_DOMAIN} notes registry://notes/stable`
 
 ## Provision the whole thing in daemon mode
 
@@ -312,7 +305,7 @@ To see the disk usage :
 
 When making a block storage bigger :
 
-  1. First **stop** the container using it (cozy for instance, or many more if it's the databases)
+  1. First **stop** the container using it (filebrowser for instance, or many more if it's the databases)
   2. Unmount the `/dev/sd*1` volume
   3. Change the size in the Public Cloud interface
   4. WARNING The volume name will likely change

@@ -96,63 +96,27 @@ services:
       - "traefik.http.routers.passbolt.tls.certresolver=default"
       - "traefik.http.routers.passbolt.middlewares=security@file"
 
-  # Cozy Database
-  couchdb:
-    image: couchdb:2.3
-    container_name: couchdb
+  # Filebrowser (cloud files server)
+  filebrowser:
+    image: filebrowser/filebrowser:v2.23.0
+    container_name: filebrowser
     environment:
-      - COUCHDB_USER=${COUCHDB_USER}
-      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+      - FB_PASSWORD=${FILEBROWSER_PASSWORD_HASHED}
+      - FB_USERNAME=${FILEBROWSER_USERNAME}
+      - FB_DATABASE=/database/filebrowser.db
     restart: unless-stopped
     volumes:
-      - database_couch_volume:/opt/couchdb/data
-    networks:
-      - cloud_network
-
-  # Cozy Stack
-  # See https://github.com/cozy/cozy-stack/releases
-  cozy:
-    build:
-      context: ./
-      dockerfile: ./build/Dockerfile-cozy
-      args:
-        version: "1.5.7"
-    image: cozy:custom
-    container_name: cozy
-    environment:
-      - DOMAIN=${CLOUD_DOMAIN}
-      - TOP_DOMAIN=${TOP_DOMAIN}
-      - COUCHDB_PROTOCOL=http
-      - COUCHDB_HOST=couchdb
-      - COUCHDB_PORT=5984
-      - COUCHDB_USER=${COUCHDB_USER}
-      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
-      - COZY_ADMIN_PASSPHRASE=${COZY_ADMIN_PASSPHRASE}
-      - MAIL_HOST=${MAIL_HOST}
-      - MAIL_PORT=${MAIL_PORT}
-      - MAIL_USERNAME="no-reply"
-      - MAIL_PASSWORD=${MAIL_NO_REPLY_PASSWORD}
-      - MAIL_DISABLE_TLS=false
-      - MAIL_SKIP_CERTIFICATE_VALIDATION=false
-    restart: unless-stopped
-    depends_on:
-      - couchdb
-    volumes:
-      - files_cozy_volume:/var/lib/cozy/data
+      - files_filebrowser_volume:/srv
+      - database_filebrowser_volume:/database
     networks:
       - cloud_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.cozy.entrypoints=websecure"
-      - "traefik.http.routers.cozy.rule=Host(`${CLOUD_DOMAIN}`) || Host(`drive.${CLOUD_DOMAIN}`) || Host(`settings.${CLOUD_DOMAIN}`) || Host(`home.${CLOUD_DOMAIN}`)"
-      - "traefik.http.routers.cozy.tls=true"
-      - "traefik.http.routers.cozy.tls.certresolver=default"
-      - "traefik.http.services.cozy.loadbalancer.server.port=8080"
-      - "traefik.http.middlewares.home-redirectregex.redirectregex.regex=^https://home.${CLOUD_DOMAIN}/?$$"
-      - "traefik.http.middlewares.home-redirectregex.redirectregex.replacement=https://drive.${CLOUD_DOMAIN}"
-      - "traefik.http.middlewares.home-redirectregex.redirectregex.permanent=true"
-      - "traefik.http.middlewares.cozy-chain.chain.middlewares=home-redirectregex@docker,security@file"
-      - "traefik.http.routers.cozy.middlewares=cozy-chain"
+      - "traefik.http.routers.filebrowser.entrypoints=websecure"
+      - "traefik.http.routers.filebrowser.rule=Host(`${CLOUD_DOMAIN}`)"
+      - "traefik.http.routers.filebrowser.tls=true"
+      - "traefik.http.routers.filebrowser.tls.certresolver=default"
+      - "traefik.http.routers.filebrowser.middlewares=security@file"
 
   # Caldav / Carddav / Webdav server
   davis-proxy:
@@ -177,7 +141,7 @@ services:
       - "traefik.http.routers.davis.middlewares=security@file"
 
   davis:
-    image: ghcr.io/tchapi/davis:v3.1.0
+    image: ghcr.io/tchapi/davis:v3.3.0
     container_name: davis
     environment:
       - APP_ENV=prod
@@ -352,7 +316,7 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cryptpad
       args:
-        version: "5.2.1"
+        version: "5.3.0"
     image: cryptpad:custom
     container_name: cryptpad
     restart: unless-stopped
@@ -388,8 +352,9 @@ services:
 
   # Gitea (git)
   # See https://docs.gitea.io/en-us/install-with-docker/
+  # and https://github.com/go-gitea/gitea for the version
   gitea:
-    image: gitea/gitea:1.18.3
+    image: gitea/gitea:1.19.3
     container_name: git
     environment:
       - USER_UID=2022
@@ -484,18 +449,18 @@ volumes:
       o: bind
       type: none
       device: /mnt/databases/mysql
-  database_couch_volume:
+  database_filebrowser_volume:
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: /mnt/databases/couch
-  files_cozy_volume: # It stores the cozy files
+      device: /mnt/databases/filebrowser
+  files_filebrowser_volume: # It stores the filebrowser files
     driver: local
     driver_opts:
       o: bind
       type: none
-      device: /mnt/files/cozy
+      device: /mnt/files/filebrowser
   files_cryptpad_volume: # It stores the cryptpad data
     driver: local
     driver_opts:
