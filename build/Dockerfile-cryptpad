@@ -13,7 +13,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -yq \
     unzip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Download release
+# Download release, see https://github.com/xwiki-labs/cryptpad/releases
 WORKDIR /tmp
 RUN curl --silent -o cryptpad.tar.gz -L https://github.com/xwiki-labs/cryptpad/archive/${version}.tar.gz \
  && tar xvzf cryptpad.tar.gz \
