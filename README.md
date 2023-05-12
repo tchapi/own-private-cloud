@@ -60,13 +60,7 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/filebrowser /mnt/files/cryptpad /mnt/files/mails/data /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav /mnt/files/linkding'
-
-##### For mails, ensure that the permissions are correct
-
-    docker-machine ssh default 'sudo chown :$MAIL_VOLUME_GROUP /mnt/files/mails'
-    docker-machine ssh default 'sudo chmod 775 /mnt/files/mails' # Full access to members of the group
-    docker-machine ssh default 'sudo chmod g+s /mnt/files/mails' # Ensure all future content in the folder will inherit group ownership
+    docker-machine ssh default 'sudo mkdir /mnt/files/filebrowser /mnt/files/cryptpad /mnt/files/mails/data /mnt/files/mails/state /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav /mnt/files/linkding'
 
 ## Get environment variables to target the remote docker instance
 

@@ -1,0 +1,17 @@
+FROM ghcr.io/docker-mailserver/docker-mailserver:12.1.0
+# From https://github.com/docker-mailserver/docker-mailserver/pkgs/container/docker-mailserver
+
+LABEL maintainer="tchap@tchap.me"
+
+ARG top_domain
+ARG mail_principal_user
+ARG mail_principal_password
+
+RUN mkdir -p /tmp/docker-mailserver/rspamd/dkim
+RUN mkdir -p /tmp/docker-mailserver/rspamd/override.d
+
+COPY configurations/mails/config/rspamd/dkim/rsa-* /tmp/docker-mailserver/rspamd/dkim/.
+COPY configurations/mails/config/rspamd/override.d/dkim_signing.conf /tmp/docker-mailserver/rspamd/override.d/dkim_signing.conf
+COPY configurations/mails/config/postfix-virtual.cf /tmp/docker-mailserver/postfix-virtual.cf
+
+RUN echo "${mail_principal_user}@${top_domain}|"$(doveadm pw -s SHA512-CRYPT -u "${mail_principal_user}" -p "${mail_principal_password}") > /tmp/docker-mailserver/postfix-accounts.cf

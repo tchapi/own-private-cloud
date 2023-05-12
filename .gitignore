@@ -10,9 +10,8 @@ openrc-*.sh
 # Built configuration files
 configurations/traefik/traefik.toml
 configurations/cryptpad/config.js
-configurations/mails/smtpd.conf
-configurations/mails/dkim_signing.conf
-configurations/mails/dovecot.conf
-configurations/mails/aliases
-configurations/mails/virtuals
-configurations/mails/dkim-*
+
+configurations/mails/config/rspamd/dkim/rsa-*
+configurations/mails/config/rspamd/override.d/dkim_signing.conf
+configurations/mails/config/postfix-accounts.cf
+configurations/mails/config/postfix-virtual.cf
