@@ -6,7 +6,7 @@ Services :
 
   - Filebrowser — An Apache 2.0 simple web files browser / uploader and sharing interface
   - Passbolt — A free, open-source, extensible, OpenPGP-based password manager
-  - X-browser Sync — A free and open-source browser syncing tool
+  - Linkding — A MIT simple bookmarking service
   - Davis — A MIT WebDAV, CalDAV and CardDAV server, based on sabre/dav
   - kvtiles — An open-source map tiles server in Go, Apache 2.0 License
   - Cryptpad — An AGPLv3 encrypted collaboration suite
