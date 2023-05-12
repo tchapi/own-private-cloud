@@ -10,8 +10,7 @@ Services :
   - Davis — A MIT WebDAV, CalDAV and CardDAV server, based on sabre/dav
   - kvtiles — An open-source map tiles server in Go, Apache 2.0 License
   - Cryptpad — An AGPLv3 encrypted collaboration suite
-  - OpenSMTPd — an ISC implementation of the SMTP protocol
-  - Dovecot — a LGPLv2.1 / MIT robust IMAP server
+  - Docker Mailserver — a MIT fullstack mail server
   - Gitea — a MIT self-hosted git service with a web UI
 
 > All services are served through the Træfik reverse-proxy, certificates are provided by Let's Encrypt, and renewed automatically via Træfik.
