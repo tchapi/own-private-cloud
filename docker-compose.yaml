@@ -210,8 +210,6 @@ services:
       - mails_data_volume:/var/mail
       - certificates:/etc/letsencrypt:ro
       - mails_state_volume:/var/mail-state/
-      # - ./configurations/mails/mail-logs/:/var/log/mail/
-      # - ./configurations/mails/config/:/tmp/docker-mailserver/
     environment:
       - LOG_LEVEL=debug
       - OVERRIDE_HOSTNAME=${MAIL_DOMAIN}
