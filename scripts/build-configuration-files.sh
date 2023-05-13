@@ -24,8 +24,9 @@ expandVars ./configurations/traefik/traefik.toml.template ./configurations/traef
 expandVars ./configurations/cryptpad/config.js.template ./configurations/cryptpad/config.js
 
 # Mail configuration
-expandVars ./configurations/mails/config/rspamd/override.d/dkim_signing.conf.template ./configurations/mails/config/rspamd/override.d/dkim_signing.conf 
+expandVars ./configurations/mails/config/rspamd/override.d/dkim_signing.conf.template ./configurations/mails/config/rspamd/override.d/dkim_signing.conf
 expandVars ./configurations/mails/config/postfix-virtual.cf.template ./configurations/mails/config/postfix-virtual.cf
+expandVars ./configurations/mails/config/user-patches.sh.template ./configurations/mails/config/user-patches.sh
 
 # Create 1024 DKIM key
 if [ ! -f ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt ]; then
