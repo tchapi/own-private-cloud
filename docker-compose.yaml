@@ -198,7 +198,7 @@ services:
     env_file: .env
     restart: unless-stopped
     volumes:
-      - mails_volume:/var/mail
+      - mails_data_volume:/var/mail
       - certificates:/etc/letsencrypt
     networks:
       - mail_network
@@ -227,7 +227,7 @@ services:
     env_file: .env
     restart: unless-stopped
     volumes:
-      - mails_volume:/var/mail
+      - mails_data_volume:/var/mail
       - certificates:/etc/letsencrypt
     networks:
       - mail_network
@@ -467,7 +467,7 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/cryptpad
-  mails_volume: # It stores the mail data
+  mails_data_volume: # It stores the mail data
     driver: local
     driver_opts:
       o: bind
