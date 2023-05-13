@@ -472,7 +472,7 @@ volumes:
     driver_opts:
       o: bind
       type: none
-      device: /mnt/files/mails
+      device: /mnt/files/mails/data
   files_webdav_volume: # It stores the webdav data
     driver: local
     driver_opts:

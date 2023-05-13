@@ -60,7 +60,7 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/filebrowser /mnt/files/cryptpad /mnt/files/mails /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav /mnt/files/linkding'
+    docker-machine ssh default 'sudo mkdir /mnt/files/filebrowser /mnt/files/cryptpad /mnt/files/mails/data /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav /mnt/files/linkding'
 
 ##### For mails, ensure that the permissions are correct
 
