@@ -208,7 +208,7 @@ services:
       - "${MAIL_HOST_IP}:993:993"  # IMAP4 (implicit TLS)
     volumes:
       - mails_data_volume:/var/mail
-      - certificates:/etc/letsencrypt:ro
+      - certificates:/etc/letsencrypt
       - mails_state_volume:/var/mail-state/
     environment:
       - LOG_LEVEL=debug
