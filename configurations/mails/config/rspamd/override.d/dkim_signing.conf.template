@@ -12,7 +12,7 @@ use_esld = true;
 check_pubkey = true; # you wan't to use this in the beginning
 
 domain {
-    tchap.me {
+    $TOP_DOMAIN {
         path = "/tmp/docker-mailserver/rspamd/dkim/rsa-1024-$DKIM_SELECTOR-$TOP_DOMAIN.private.txt";
         selector = "$DKIM_SELECTOR";
     }
