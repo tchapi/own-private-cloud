@@ -32,9 +32,9 @@ expandVars ./configurations/mails/config/user-patches.sh.template ./configuratio
 if [ ! -f ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt ]; then
   echo "### Generating DKIM keys"
   openssl genrsa -out ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt 1024
-  openssl rsa -in ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt -pubout -out /tmp/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.public.txt
 fi
 
+openssl rsa -in ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt -pubout -out /tmp/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.public.txt
 DKIM_KEY=$(tail -n +2 /tmp/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.public.txt | tail -r | tail -n +2 | tail -r  | tr -d '\n')
 echo "v=DKIM1; k=rsa; p=${DKIM_KEY}" > ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.public.dns.txt
 echo -e "${DKIM_SELECTOR}._domainkey IN TXT ( \"v=DKIM1; k=rsa; \"\n	\"p=${DKIM_KEY}\" ) ;" > ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.public.txt
