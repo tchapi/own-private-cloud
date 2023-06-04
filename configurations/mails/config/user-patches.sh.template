@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# This user patches script runs right before starting the daemons.
+# That means, all the other configuration is in place, so the script
+# can make final adjustments.
+# If you modify any supervisord configuration, make sure to run
+# "supervisorctl update" or "supervisorctl reload" afterwards.
+
+# For more information, see
+# https://docker-mailserver.github.io/docker-mailserver/edge/config/advanced/override-defaults/user-patches/
+
+# Creates the mmap for the transport file (containing the discard rule for the no-reply address)
+echo 'user-patches.sh: Creating the postmap for the transport file'
+postmap /etc/postfix/transport
+
+echo 'user-patches.sh: Successfully executed'

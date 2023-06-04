@@ -24,14 +24,19 @@ expandVars ./configurations/traefik/traefik.toml.template ./configurations/traef
 expandVars ./configurations/cryptpad/config.js.template ./configurations/cryptpad/config.js
 
 # Mail configuration
-expandVars ./configurations/mails/smtpd.conf.template ./configurations/mails/smtpd.conf
-expandVars ./configurations/mails/dkim_signing.conf.template ./configurations/mails/dkim_signing.conf
-expandVars ./configurations/mails/dovecot.conf.template ./configurations/mails/dovecot.conf
-expandVars ./configurations/mails/virtuals.template ./configurations/mails/virtuals
-# Create DKIM key
-if [ ! -f ./configurations/mails/dkim-${TOP_DOMAIN}.key ]; then
+expandVars ./configurations/mails/config/rspamd/override.d/dkim_signing.conf.template ./configurations/mails/config/rspamd/override.d/dkim_signing.conf
+expandVars ./configurations/mails/config/postfix-virtual.cf.template ./configurations/mails/config/postfix-virtual.cf
+expandVars ./configurations/mails/config/user-patches.sh.template ./configurations/mails/config/user-patches.sh
+
+# Create 1024 DKIM key
+if [ ! -f ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt ]; then
   echo "### Generating DKIM keys"
-  openssl genrsa -out ./configurations/mails/dkim-${TOP_DOMAIN}.key 1024 && openssl rsa -in ./configurations/mails/dkim-${TOP_DOMAIN}.key -pubout -out ./configurations/mails/dkim-${TOP_DOMAIN}.pub
+  openssl genrsa -out ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt 1024
 fi
+
+openssl rsa -in ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt -pubout -out /tmp/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.public.txt
+DKIM_KEY=$(tail -n +2 /tmp/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.public.txt | tail -r | tail -n +2 | tail -r  | tr -d '\n')
+echo "v=DKIM1; k=rsa; p=${DKIM_KEY}" > ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.public.dns.txt
+echo -e "${DKIM_SELECTOR}._domainkey IN TXT ( \"v=DKIM1; k=rsa; \"\n	\"p=${DKIM_KEY}\" ) ;" > ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.public.txt
 
 echo "### Done."

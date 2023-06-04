@@ -1,9 +1,0 @@
-allow_username_mismatch = true;
-
-domain {
-    $TOP_DOMAIN {
-        path = "/etc/mail/dkim/$TOP_DOMAIN.key";
-        selector = "$DKIM_SELECTOR";
-    }
-}
-

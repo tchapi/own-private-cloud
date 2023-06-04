@@ -74,7 +74,7 @@ services:
       - EMAIL_TRANSPORT_DEFAULT_HOST=${MAIL_HOST}
       - EMAIL_TRANSPORT_DEFAULT_PORT=${MAIL_PORT}
       - EMAIL_TRANSPORT_DEFAULT_TLS=true
-      - EMAIL_TRANSPORT_DEFAULT_USERNAME=no-reply
+      - EMAIL_TRANSPORT_DEFAULT_USERNAME=no-reply@${TOP_DOMAIN}
       - EMAIL_TRANSPORT_DEFAULT_PASSWORD=${MAIL_NO_REPLY_PASSWORD}
       - PASSBOLT_PLUGINS_JWT_AUTHENTICATION_ENABLED=TRUE
       - PASSBOLT_PLUGINS_MOBILE_ENABLED=TRUE
@@ -148,7 +148,7 @@ services:
       - APP_SECRET=${DAVIS_APP_SECRET}
       - DATABASE_DRIVER=mysql
       - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}?charset=utf8mb4&serverVersion=mariadb-10.6.10
-      - MAILER_DSN=smtp://no-reply:${MAIL_NO_REPLY_PASSWORD}@${MAIL_HOST}:${MAIL_PORT}
+      - MAILER_DSN=smtp://no-reply%40${TOP_DOMAIN}:${MAIL_NO_REPLY_PASSWORD}@${MAIL_HOST}:${MAIL_PORT} # %40 = encoded @
       - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
       - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
       - AUTH_REALM=${DAVIS_AUTH_REALM}
@@ -185,60 +185,53 @@ services:
       - "traefik.http.routers.linkding.middlewares=security@file"
 
   # Mails (bound on a specific IP for the reverse to be unique)
-  dovecot:
+  mailserver:
     build:
       context: ./
-      dockerfile: ./build/Dockerfile-dovecot
+      dockerfile: ./build/Dockerfile-mailserver
       args:
-        mail_principal_user: ${MAIL_PRINCIPAL_USER}
-        mail_principal_password: ${MAIL_PRINCIPAL_PASSWORD}
-        mail_group_id: ${MAIL_VOLUME_GROUP}
-    image: dovecot:custom
-    container_name: mail-dovecot
-    env_file: .env
-    restart: unless-stopped
-    volumes:
-      - mails_data_volume:/var/mail
-      - certificates:/etc/letsencrypt
-    networks:
-      - mail_network
-    ports:
-      - "${MAIL_HOST_IP}:143:143"
-      - "${MAIL_HOST_IP}:993:993"
-    labels:
-      ofelia.enabled: "true"
-      ofelia.job-exec.reload_dovecot_for_certificates.schedule: "@weekly"
-      ofelia.job-exec.reload_dovecot_for_certificates.command: "dovecot reload"
-
-  smtpd:
-    build:
-      context: ./
-      dockerfile: ./build/Dockerfile-opensmtpd
-      args:
-        version: "v6.8.0p2"
-        top_domain: ${TOP_DOMAIN}
-        mail_domain: ${MAIL_DOMAIN}
         mail_principal_user: ${MAIL_PRINCIPAL_USER}
         mail_principal_password: ${MAIL_PRINCIPAL_PASSWORD}
         mail_no_reply_password: ${MAIL_NO_REPLY_PASSWORD}
-        mail_group_id: ${MAIL_VOLUME_GROUP}
-    image: opensmtpd:custom
-    container_name: mail-smtpd
-    env_file: .env
+        top_domain: ${TOP_DOMAIN}
+    image: mailserver:custom
+    container_name: mail
     restart: unless-stopped
+    networks:
+      - mail_network
+    hostname: ${MAIL_DOMAIN}  # (The DNS MX record should point to this value)
+    ports:
+      - "${MAIL_HOST_IP}:25:25"    # SMTP  (explicit TLS => STARTTLS)
+      - "${MAIL_HOST_IP}:143:143"  # IMAP4 (explicit TLS => STARTTLS)
+      - "${MAIL_HOST_IP}:465:465"  # ESMTP (implicit TLS)
+      - "${MAIL_HOST_IP}:587:587"  # ESMTP (explicit TLS => STARTTLS)
+      - "${MAIL_HOST_IP}:993:993"  # IMAP4 (implicit TLS)
     volumes:
       - mails_data_volume:/var/mail
       - certificates:/etc/letsencrypt
-    networks:
-      - mail_network
-    ports:
-      - "${MAIL_HOST_IP}:25:25"
-      - "${MAIL_HOST_IP}:465:465"
-      - "${MAIL_HOST_IP}:587:587"
-    labels:
-      ofelia.enabled: "true"
-      ofelia.job-exec.reload_smtpd_for_certificates.schedule: "@weekly"
-      ofelia.job-exec.reload_smtpd_for_certificates.command: 'killall smtpd' # wait 60s max and then the container stops and restarts
+      - mails_state_volume:/var/mail-state/
+    environment:
+      - LOG_LEVEL=debug
+      - OVERRIDE_HOSTNAME=${MAIL_DOMAIN}
+      - TZ=Europe/Paris
+      - ENABLE_RSPAMD=1
+      - ENABLE_OPENDKIM=0
+      - ENABLE_OPENDMARC=0
+      - ENABLE_POLICYD_SPF=0
+      - ENABLE_AMAVIS=0
+      - ENABLE_SPAMASSASSIN=0
+      - ENABLE_CLAMAV=1
+      - ENABLE_FAIL2BAN=1
+      - SSL_TYPE=letsencrypt
+      - SSL_DOMAIN=${MAIL_DOMAIN}
+      - POSTFIX_MESSAGE_SIZE_LIMIT=20480000  # 20 MB
+      - POSTMASTER_ADDRESS=postmaster@${TOP_DOMAIN}
+    cap_add:
+      - NET_ADMIN # For Fail2Ban to work
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 30s
+      retries: 0
 
   # This container :
   #  - exposes a traefik endpoint so that certificates for MAIL_DOMAIN are created and renewed by Traefik via labels
@@ -261,35 +254,6 @@ services:
       - "traefik.http.routers.mail.tls=true"
       - "traefik.http.routers.mail.tls.certresolver=default"
       - "traefik.http.routers.mail.middlewares=security@file"
-
-  # This container :
-  #  - periodically exports the Traefik certificates to .pem files, in a shared volume
-  #    so that dovecot and opensmtpd containers can consume them
-  mail-certificates-dumper:
-    image: ldez/traefik-certs-dumper:v2.8.1
-    container_name: mail-certificates-dumper
-    restart: unless-stopped
-    entrypoint: sh -c '
-      traefik-certs-dumper file --version v2
-        --crt-name=fullchain --crt-ext=.pem
-        --key-name=privkey --key-ext=.pem
-        --domain-subdir
-        --source /letsencrypt/acme.json --dest /letsencrypt/live/.
-        --watch'
-    volumes:
-      - certificates:/letsencrypt
-
-  # Cron scheduler - restarts dovecot and smtpd periodically so that new certificates are picked up correctly
-  ofelia:
-    image: mcuadros/ofelia:latest
-    container_name: mail-ofelia
-    restart: unless-stopped
-    depends_on:
-      - smtpd
-      - dovecot
-    command: daemon --docker
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
 
   # kvtiles (Maps)
   maps:
@@ -368,7 +332,7 @@ services:
       - GITEA__mailer__ENABLED=true
       - GITEA__mailer__MAILER_TYPE=smtp
       - GITEA__mailer__HOST=${MAIL_HOST}:${MAIL_PORT}
-      - GITEA__mailer__USER=no-reply
+      - GITEA__mailer__USER=no-reply@${TOP_DOMAIN}
       - GITEA__mailer__PASSWD=${MAIL_NO_REPLY_PASSWORD}
       - GITEA__mailer__FROM=no-reply@${TOP_DOMAIN}
       - GITEA__openid__ENABLE_OPENID_SIGNIN=false
@@ -473,6 +437,12 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/mails/data
+  mails_state_volume: # It stores the mail "state" (redis db, etc)
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/mails/state
   files_webdav_volume: # It stores the webdav data
     driver: local
     driver_opts:
