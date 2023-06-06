@@ -40,6 +40,7 @@ services:
     image: mariadb:custom
     container_name: mysql
     environment:
+      - MARIADB_AUTO_UPGRADE=1
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - PASSBOLT_DATABASE=${PASSBOLT_DATABASE}
       - PASSBOLT_DB_USERNAME=${PASSBOLT_DB_USERNAME}
