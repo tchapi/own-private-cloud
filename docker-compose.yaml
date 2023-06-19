@@ -32,6 +32,12 @@ services:
       - "traefik.http.middlewares.auth.basicauth.users=${STATUS_CREDENTIALS}"
       - "traefik.http.routers.api.middlewares=auth"
       - "traefik.http.routers.api.middlewares=security@file"
+    healthcheck:
+      test: traefik healthcheck
+      interval: 120s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   mysql:
     build:
@@ -58,6 +64,13 @@ services:
       - passwords_network
       - dav_network
       - git_network
+    # Waiting for https://github.com/MariaDB/mariadb-docker/pull/508
+    # healthcheck:
+    #   test: healthcheck.sh --su-mysql --connect --innodb_initialized
+    #   interval: 120s
+    #   retries: 5
+    #   start_period: 30s
+    #   timeout: 10s
 
   passbolt:
     build:
@@ -96,6 +109,12 @@ services:
       - "traefik.http.routers.passbolt.tls=true"
       - "traefik.http.routers.passbolt.tls.certresolver=default"
       - "traefik.http.routers.passbolt.middlewares=security@file"
+    healthcheck:
+      test: curl --fail http://localhost:80 || exit 1
+      interval: 120s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   # Filebrowser (cloud files server)
   filebrowser:
@@ -140,6 +159,12 @@ services:
       - "traefik.http.routers.davis.tls=true"
       - "traefik.http.routers.davis.tls.certresolver=default"
       - "traefik.http.routers.davis.middlewares=security@file"
+    healthcheck:
+      test: curl --fail http://localhost:80 || exit 1
+      interval: 120s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   davis:
     image: ghcr.io/tchapi/davis:v3.3.0
@@ -184,6 +209,12 @@ services:
       - "traefik.http.routers.linkding.tls=true"
       - "traefik.http.routers.linkding.tls.certresolver=default"
       - "traefik.http.routers.linkding.middlewares=security@file"
+    healthcheck:
+      test: curl --fail http://localhost:9090/login/ || exit 1
+      interval: 120s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   # Mails (bound on a specific IP for the reverse to be unique)
   mailserver:
@@ -255,6 +286,12 @@ services:
       - "traefik.http.routers.mail.tls=true"
       - "traefik.http.routers.mail.tls.certresolver=default"
       - "traefik.http.routers.mail.middlewares=security@file"
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1
+      interval: 120s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   # kvtiles (Maps)
   maps:
@@ -314,6 +351,12 @@ services:
       - "traefik.http.middlewares.custom2.headers.contentSecurityPolicy=default-src 'none'; child-src https://${CRYPTPAD_DOMAIN}; worker-src 'self'; media-src blob:; style-src 'unsafe-inline' 'self' https://${CRYPTPAD_DOMAIN}; script-src 'self' 'unsafe-eval' 'unsafe-inline' resource: https://${CRYPTPAD_DOMAIN}; connect-src 'self' https://${CRYPTPAD_DOMAIN} blob: wss://${CRYPTPAD_DOMAIN} https://${CRYPTPAD_SANDBOX_DOMAIN}; font-src 'self' data: https://${CRYPTPAD_DOMAIN}; img-src 'self' data: blob: https://${CRYPTPAD_DOMAIN}; frame-src 'self' https://${CRYPTPAD_SANDBOX_DOMAIN} blob:; frame-ancestors 'self' https://${CRYPTPAD_DOMAIN}"
       - "traefik.http.middlewares.cryptpad-unsafe-chain.chain.middlewares=custom2,cryptpad@file,security@file"
       - "traefik.http.routers.cryptpad-unsafe.middlewares=cryptpad-unsafe-chain"
+    healthcheck:
+      test: curl --fail http://localhost:3000/ || exit 1
+      interval: 120s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   # Gitea (git)
   # See https://docs.gitea.io/en-us/install-with-docker/
@@ -372,6 +415,12 @@ services:
       - "traefik.http.routers.gitea.tls.certresolver=default"
       - "traefik.http.routers.gitea.middlewares=security@file"
       - "traefik.http.services.gitea.loadbalancer.server.port=3000"
+    healthcheck:
+      test: curl --fail http://localhost:3000/api/healthz || exit 1
+      interval: 120s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
 networks:
   passwords_network: ~
