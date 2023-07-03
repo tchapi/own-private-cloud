@@ -209,7 +209,7 @@ On the Docker host:
 Create `/etc/cron.d/backup_daily` with :
 
     PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-    42 01 * * * root duplicity incr --full-if-older-than 365D --volsize 1024 --asynchronous-upload --no-encryption --include /mnt/databases --include /mnt/files --exclude '**' /mnt/ s3://<S3_HOST>/<S3_BUCKET_NAME> >> /var/log/duplicity.log 2>&1
+    42 01 * * * root duplicity incr --full-if-older-than 365D --volsize 1024 --asynchronous-upload --no-encryption --include /mnt/databases --include /mnt/files --file-prefix "cloud_" --exclude '**' /mnt/ s3://<S3_HOST>/<S3_BUCKET_NAME> >> /var/log/duplicity.log 2>&1
 
 > This will run every day, at 01:42 AM, as the `root` user.
 
@@ -222,9 +222,13 @@ Options (see http://duplicity.nongnu.org/vers8/duplicity.1.html):
 
 ## Bonus: additional cli commands to work on backups
 
+### Make a full backup (in case you need to start fresh)
+
+    duplicity full --volsize 1024 --asynchronous-upload --file-prefix "cloud_" --no-encryption --include /mnt/databases --include /mnt/files --exclude '**' --progress /mnt/ s3://<S3_HOST>/<S3_BUCKET_NAME>
+
 #### List all backed-up files
 
-    duplicity list-current-files s3://<S3_HOST>/<S3_BUCKET_NAME>
+    duplicity list-current-files --file-prefix "cloud_" s3://<S3_HOST>/<S3_BUCKET_NAME>
 
 #### Verify data (_in depth_) and its recoverability
 
@@ -232,6 +236,7 @@ Options (see http://duplicity.nongnu.org/vers8/duplicity.1.html):
         --no-encryption \
         --include /mnt/databases \
         --include /mnt/files \
+        --file-prefix "cloud_" \
         --exclude '**' \
         --compare-data \
         s3://<S3_HOST>/<S3_BUCKET_NAME> /mnt/
