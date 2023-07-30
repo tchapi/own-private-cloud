@@ -27,6 +27,9 @@ expandVars ./configurations/cryptpad/config.js.template ./configurations/cryptpa
 expandVars ./configurations/mails/config/rspamd/override.d/dkim_signing.conf.template ./configurations/mails/config/rspamd/override.d/dkim_signing.conf
 expandVars ./configurations/mails/config/postfix-virtual.cf.template ./configurations/mails/config/postfix-virtual.cf
 expandVars ./configurations/mails/config/user-patches.sh.template ./configurations/mails/config/user-patches.sh
+# Webmail
+expandVars ./configurations/snappymail/application.ini.template ./configurations/snappymail/application.ini
+expandVars ./configurations/snappymail/domain.json.template ./configurations/snappymail/domain.json
 
 # Create 1024 DKIM key
 if [ ! -f ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt ]; then

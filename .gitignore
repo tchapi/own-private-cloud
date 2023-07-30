@@ -16,3 +16,6 @@ configurations/mails/config/rspamd/override.d/dkim_signing.conf
 configurations/mails/config/postfix-accounts.cf
 configurations/mails/config/postfix-virtual.cf
 configurations/mails/config/user-patches.sh
+
+configurations/snappymail/application.ini
+configurations/snappymail/domain.json

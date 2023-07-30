@@ -265,18 +265,19 @@ services:
       timeout: 30s
       retries: 0
 
-  # This container :
-  #  - exposes a traefik endpoint so that certificates for MAIL_DOMAIN are created and renewed by Traefik via labels
-  # NB: Could be replaced by a webmail client
-  mail-certificates-endpoint:
+  # This container is used by traefik as the endpoint
+  # to get certificates for MAIL_DOMAIN
+  webmail-proxy:
     build:
       context: ./
-      dockerfile: ./build/Dockerfile-mailendpoint
-      args:
-        mail_domain: ${MAIL_DOMAIN}
-    image: mail-endpoint:custom
-    container_name: mail-certificates-endpoint
+      dockerfile: ./build/Dockerfile-snappymail-proxy
+    image: snappymail-proxy:custom
+    container_name: snappymail-proxy
     restart: unless-stopped
+    depends_on:
+      - webmail
+    volumes:
+      - snappymail_www:/snappymail
     networks:
       - mail_network
     labels:
@@ -287,12 +288,28 @@ services:
       - "traefik.http.routers.mail.tls.certresolver=default"
       - "traefik.http.routers.mail.middlewares=security@file"
     healthcheck:
-      test: wget --no-verbose --tries=1 --spider http://localhost:80 || exit 1
+      test: curl --fail http://localhost:80 || exit 1
       interval: 120s
       retries: 5
       start_period: 30s
       timeout: 10s
 
+  webmail:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-snappymail
+      args:
+        version: "2.28.4"
+        top_domain: ${TOP_DOMAIN}
+        webmail_admin_password: ${WEBMAIL_ADMIN_PASSWORD}
+    image: snappymail:custom
+    container_name: snappymail
+    restart: unless-stopped
+    volumes:
+      - snappymail_www:/snappymail
+    networks:
+      - mail_network
+  
   # kvtiles (Maps)
   maps:
     # See https://hub.docker.com/r/akhenakh/kvtiles/tags for available tags / zooms
@@ -444,6 +461,8 @@ volumes:
     name: certificates
   davis_www:
     name: davis_www 
+  snappymail_www:
+    name: snappymail_www 
   # These volumes are actually attached OpenStack Block storage
   passbolt_gpg_volume:
     driver: local
