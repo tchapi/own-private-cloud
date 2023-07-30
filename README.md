@@ -11,6 +11,7 @@ Services :
   - kvtiles — An open-source map tiles server in Go, Apache 2.0 License
   - Cryptpad — An AGPLv3 encrypted collaboration suite
   - Docker Mailserver — a MIT fullstack mail server
+  - Snappymail — an AGPLv3 simple and lightweight webmail forked from RainLoop
   - Gitea — a MIT self-hosted git service with a web UI
 
 > All services are served through the Træfik reverse-proxy, certificates are provided by Let's Encrypt, and renewed automatically via Træfik.
@@ -255,13 +256,19 @@ Options (see http://duplicity.nongnu.org/vers8/duplicity.1.html):
 
 Update Dockerfiles or the `docker-compose.yml` file, then rebuild the images with `docker-compose build`. You can then recreate each container with the newly built images with `docker-compose up -d {container}`.
 
-For some containers using a shared volume such as Davis (`/var/www/davis`), you need to scrap the underlying volume before updating so that the code is really updated.
+For some containers using a shared volume such as Davis (`/var/www/davis`) or Snappymail, you need to scrap the underlying volume before updating so that the code is _really_ updated on rebuild.
 
 For instance:
 
     docker rm -f davis davis-proxy && docker volume rm davis_www
     docker container prune && docker image prune
     docker-compose up -d --force-recreate --build davis-proxy davis
+
+or
+
+    docker rm -f snappymail snappymail-proxy && docker volume rm snappymail_www
+    docker container prune && docker image prune
+    docker-compose up -d --force-recreate --build webmail-proxy webmail
 
 # SSL
 

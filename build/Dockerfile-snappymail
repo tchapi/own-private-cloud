@@ -1,0 +1,101 @@
+# syntax=docker/dockerfile:1
+FROM alpine:3.15 AS build
+
+LABEL maintainer="tchap@tchap.me"
+
+ARG version
+ARG top_domain
+ARG webmail_admin_password
+
+# Install requirements to clone repository and install deps
+RUN apk add --no-cache git curl unzip tar argon2
+
+# Download release, see https://github.com/the-djmaze/snappymail/releases
+RUN mkdir -p /tmp/code
+WORKDIR /tmp/code
+RUN curl --silent -o snappymail.tar.gz -L https://github.com/the-djmaze/snappymail/releases/download/v${version}/snappymail-${version}.tar.gz \
+ && tar xvzf snappymail.tar.gz \
+ && rm snappymail.tar.gz \
+ && mv -f /tmp/code /snappymail
+
+WORKDIR /snappymail
+
+# Remove unused files
+RUN rm -rf data/_data_/_default_/domains/* \
+    && rm -rf _include.php README.md .htaccess
+
+# Add domain file and configuration file
+COPY configurations/snappymail/domain.json "data/_data_/_default_/domains/${top_domain}.json"
+RUN echo "outlook.com,qq.com,yahoo.com,gmail.com,hotmail.com,*" > data/_data_/_default_/domains/disabled
+COPY configurations/snappymail/application.ini "data/_data_/_default_/configs/application.ini"
+
+# Set admin password, starting a subshell to avoid exporting the var
+# ⚠️ it will show up in the build logs though
+RUN echo -n "${webmail_admin_password}" | argon2 "${top_domain}" -l 32 -e > /tmp/admin_password \
+    && ( \
+        ADMIN_PASSWORD="`head -1 /tmp/admin_password`"; \
+        sed "s|^admin_password = .*|admin_password = \"${ADMIN_PASSWORD}\"|" -i data/_data_/_default_/configs/application.ini \
+    ) \
+    && rm -rf /tmp/admin_password
+RUN 
+
+# Set current version
+RUN sed "s/^current = .*/current = \"${version}\"/" -i data/_data_/_default_/configs/application.ini
+
+# Create actual snappymail image
+FROM php:8.2-fpm-alpine
+
+# gd
+RUN set -eux; \
+    apk add --no-cache freetype libjpeg-turbo libpng; \
+    apk add --no-cache --virtual .deps freetype-dev libjpeg-turbo-dev libpng-dev; \
+    docker-php-ext-configure gd --with-freetype --with-jpeg; \
+    docker-php-ext-install gd; \
+    apk del .deps
+# gnupg
+RUN set -eux; \
+    apk add --no-cache gnupg gpgme; \
+    apk add --no-cache --virtual .deps gpgme-dev; \
+    apk add --no-cache --virtual .build-dependencies $PHPIZE_DEPS; \
+    pecl install gnupg; \
+    docker-php-ext-enable gnupg; \
+    docker-php-source delete; \
+    apk del .build-dependencies; \
+    apk del .deps
+# intl
+RUN set -eux; \
+    apk add --no-cache icu-libs; \
+    apk add --no-cache --virtual .deps icu-dev; \
+    docker-php-ext-configure intl; \
+    docker-php-ext-install intl; \
+    apk del .deps
+# zip
+RUN set -eux; \
+    apk add --no-cache libzip; \
+    apk add --no-cache --virtual .deps libzip-dev; \
+    docker-php-ext-install zip; \
+    apk del .deps
+
+# Set timezone correctly
+RUN echo -ne 'date.timezone = "Europe/Paris";\n' > /usr/local/etc/php/conf.d/timezone.ini
+
+# Set upload size to 32M
+RUN echo -ne "upload_max_filesize = 32M;\npost_max_size = 32M;\n" > /usr/local/etc/php/conf.d/uploads.ini
+
+# Copy snappymail with installed modules
+COPY --from=build /snappymail /snappymail
+
+WORKDIR /snappymail
+
+# PHP-FPM healthcheck
+RUN set -xe && echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+RUN curl https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/v0.5.0/php-fpm-healthcheck \
+    -o /usr/local/bin/php-fpm-healthcheck -s \
+    && chmod +x /usr/local/bin/php-fpm-healthcheck
+
+# Cleanup (only useful when using --squash)
+RUN docker-php-source delete
+
+RUN chown -R www-data:www-data /snappymail
+
+HEALTHCHECK --interval=30s --timeout=1s CMD php-fpm-healthcheck || exit 1
