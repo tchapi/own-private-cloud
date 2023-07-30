@@ -105,21 +105,21 @@ Build configuration files first (_so that environment variables are replaced cor
 
 And then build the images :
 
-    docker-compose build
+    docker compose build
 
-> If you want to extend the Docker Compose services definitions, you can create an addendum `docker-compose.supplementary.yaml` file for instance, and run `docker-compose` using both files to merge the configurations:
+> If you want to extend the Docker Compose services definitions, you can create an addendum `docker-compose.supplementary.yaml` file for instance, and run `docker compose` using both files to merge the configurations:
 > 
->     docker-compose -f docker-compose.yaml -f docker-compose.supplementary.yaml ps
+>     docker compose -f docker-compose.yaml -f docker-compose.supplementary.yaml ps
 >
 > You can check that your configuration is merged correctly with:
 > 
->     docker-compose -f docker-compose.yaml -f docker-compose.supplementary.yaml config
+>     docker compose -f docker-compose.yaml -f docker-compose.supplementary.yaml config
 >   
 > See [this Medium post](https://pscheit.medium.com/docker-compose-advanced-configuration-541356d121de) for more details
 
 ## Provision the whole thing in daemon mode
 
-    docker-compose up -d
+    docker compose up -d
 
 🎉
 
@@ -254,7 +254,7 @@ Options (see http://duplicity.nongnu.org/vers8/duplicity.1.html):
 
 # Updating
 
-Update Dockerfiles or the `docker-compose.yml` file, then rebuild the images with `docker-compose build`. You can then recreate each container with the newly built images with `docker-compose up -d {container}`.
+Update Dockerfiles or the `docker-compose.yml` file, then rebuild the images with `docker compose build`. You can then recreate each container with the newly built images with `docker compose up -d {container}`.
 
 For some containers using a shared volume such as Davis (`/var/www/davis`) or Snappymail, you need to scrap the underlying volume before updating so that the code is _really_ updated on rebuild.
 
@@ -262,13 +262,13 @@ For instance:
 
     docker rm -f davis davis-proxy && docker volume rm davis_www
     docker container prune && docker image prune
-    docker-compose up -d --force-recreate --build davis-proxy davis
+    docker compose up -d --force-recreate --build davis-proxy davis
 
 or
 
     docker rm -f snappymail snappymail-proxy && docker volume rm snappymail_www
     docker container prune && docker image prune
-    docker-compose up -d --force-recreate --build webmail-proxy webmail
+    docker compose up -d --force-recreate --build webmail-proxy webmail
 
 # SSL
 
