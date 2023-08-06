@@ -118,7 +118,7 @@ services:
 
   # Filebrowser (cloud files server)
   filebrowser:
-    image: filebrowser/filebrowser:v2.23.0
+    image: filebrowser/filebrowser:v2.24.1
     container_name: filebrowser
     environment:
       - FB_PASSWORD=${FILEBROWSER_PASSWORD_HASHED}
@@ -379,7 +379,7 @@ services:
   # See https://docs.gitea.io/en-us/install-with-docker/
   # and https://github.com/go-gitea/gitea for the version
   gitea:
-    image: gitea/gitea:1.19.3
+    image: gitea/gitea:1.20.2
     container_name: git
     environment:
       - USER_UID=2022
