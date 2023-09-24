@@ -24,6 +24,7 @@ session:
   name: 'authelia_session'
   domain: $TOP_DOMAIN
   secret: $OIDC_SESSION_SECRET
+  expiration: '1w'
 
 regulation:
   max_retries: 3
@@ -51,7 +52,8 @@ identity_providers:
     hmac_secret: $OIDC_HMAC_SECRET
     issuer_private_key: |
       $OIDC_ISSUER_PRIVATE_KEY
-
+    lifespans:
+      access_token: '1w'
     clients:
     - id: outline
       description: Outline
@@ -66,6 +68,8 @@ identity_providers:
         - profile
         - email
       userinfo_signing_algorithm: none
+      consent_mode: 'pre-configured'
+      pre_configured_consent_duration: '1Y'
 #     - id: davis
 #       description: Davis
 #       secret: NONE_YET
