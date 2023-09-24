@@ -39,6 +39,7 @@ services:
       start_period: 30s
       timeout: 10s
 
+  # MySQL (database)
   mysql:
     build:
       context: ./
@@ -71,6 +72,28 @@ services:
       start_period: 30s
       timeout: 10s
 
+  # Authelia (OIDC provider)
+  authelia:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-authelia
+    image: authelia:custom
+    container_name: authelia
+    restart: unless-stopped
+    networks:
+      - auth_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.authelia.entrypoints=websecure"
+      - "traefik.http.routers.authelia.rule=Host(`${AUTH_DOMAIN}`)"
+      - "traefik.http.routers.authelia.tls=true"
+      - "traefik.http.routers.authelia.tls.certresolver=default"
+      - "traefik.http.routers.authelia.middlewares=security@file"
+    #   - 'traefik.http.middlewares.authelia.forwardauth.address=https://${AUTH_DOMAIN}/api/authz/forward-auth?authelia_url=https://${AUTH_DOMAIN}'
+    #   - 'traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true'
+    #   - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
+
+  # Passbolt (password manager)
   passbolt:
     build:
       context: ./
@@ -422,6 +445,7 @@ services:
       timeout: 10s
 
 networks:
+  auth_network: ~
   passwords_network: ~
   cloud_network: ~
   dav_network: ~

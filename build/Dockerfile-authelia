@@ -1,0 +1,8 @@
+# https://hub.docker.com/r/authelia/authelia/tags
+FROM authelia/authelia:latest
+
+LABEL maintainer="tchap@tchap.me"
+
+# Configuration
+COPY configurations/authelia/configuration.yml /config/configuration.yml
+COPY configurations/authelia/users_database.yml /config/users_database.yml
