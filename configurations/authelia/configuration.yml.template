@@ -1,0 +1,81 @@
+###############################################################
+#                   Authelia configuration                    #
+###############################################################
+
+theme: 'auto'
+
+jwt_secret: $OIDC_JWT_SECRET
+default_redirection_url: https://$TOP_DOMAIN
+
+log:
+  level: info
+
+totp:
+  issuer: $AUTH_DOMAIN
+
+authentication_backend:
+  file:
+    path: /config/users_database.yml
+
+access_control:
+  default_policy: one_factor
+
+session:
+  name: 'authelia_session'
+  domain: $TOP_DOMAIN
+  secret: $OIDC_SESSION_SECRET
+
+regulation:
+  max_retries: 3
+  find_time: 120
+  ban_time: 300
+
+storage:
+  encryption_key: $OIDC_STORAGE_ENCRYPTION_KEY
+  local:
+    path: /config/db.sqlite3
+
+notifier:
+  smtp:
+    username: no-reply@$TOP_DOMAIN
+    password: $MAIL_NO_REPLY_PASSWORD
+    host: $MAIL_DOMAIN
+    port: $MAIL_PORT
+    sender: no-reply@$TOP_DOMAIN
+
+##
+## Identity Providers
+##
+identity_providers:
+  oidc:
+    hmac_secret: $OIDC_HMAC_SECRET
+    issuer_private_key: |
+      $OIDC_ISSUER_PRIVATE_KEY
+
+    clients:
+    - id: outline
+      description: Outline
+      secret: "$OUTLINE_OIDC_HASHED_CLIENT_SECRET"
+      public: false
+      authorization_policy: one_factor
+      redirect_uris:
+        - https://$NOTES_DOMAIN/auth/oidc.callback
+      scopes:
+        - openid
+        - offline_access
+        - profile
+        - email
+      userinfo_signing_algorithm: none
+#     - id: davis
+#       description: Davis
+#       secret: NONE_YET
+#       public: false
+#       authorization_policy: two_factor
+#       redirect_uris:
+#         - https://$DAV_DOMAIN/auth/oidc.callback
+#       scopes:
+#         - openid
+#         - offline_access
+#         - profile
+#         - email
+#       userinfo_signing_algorithm: none
