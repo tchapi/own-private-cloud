@@ -21,6 +21,7 @@ services:
       - cryptpad_network
       - mail_network
       - git_network
+      - notes_network
     ports:
       - "443:443"
     labels:
@@ -71,6 +72,41 @@ services:
       retries: 5
       start_period: 30s
       timeout: 10s
+
+  # PostgreSQL (database)
+  postgres:
+    build:
+      context: ./
+      dockerfile: ./build/Dockerfile-pgsql
+    image: postgres:custom
+    container_name: postgres
+    environment:
+      - POSTGRES_PASSWORD=${PGSQL_ROOT_PASSWORD}
+      - OUTLINE_DATABASE=${OUTLINE_DATABASE}
+      - OUTLINE_DB_USERNAME=${OUTLINE_DB_USERNAME}
+      - OUTLINE_DB_PASSWORD=${OUTLINE_DB_PASSWORD}
+    restart: unless-stopped
+    volumes:
+      - database_pgsql_volume:/var/lib/postgresql/data
+    networks:
+      - notes_network
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  # Redis (RAM storage)
+  redis:
+    image: redis
+    restart: unless-stopped
+    networks:
+      - notes_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 30s
+      retries: 3
 
   # Authelia (OIDC provider)
   authelia:
@@ -444,6 +480,49 @@ services:
       start_period: 30s
       timeout: 10s
 
+  # Outline (Notion)
+  # See https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+  outline:
+    image: outlinewiki/outline:0.72.0-3
+    environment:
+      - NODE_ENV=production
+      - PGSSLMODE=disable
+      - SECRET_KEY=${OUTLINE_SECRET_KEY}
+      - UTILS_SECRET=${OUTLINE_UTILS_SECRET}
+      - DATABASE_URL=postgres://${OUTLINE_DB_USERNAME}:${OUTLINE_DB_PASSWORD}@postgres:5432/${OUTLINE_DATABASE}
+      - REDIS_URL=redis://redis:6379
+      - URL=https://${NOTES_DOMAIN}
+      - FORCE_HTTPS=false
+      - ENABLE_UPDATES=false
+      - SMTP_HOST=${MAIL_HOST}
+      - SMTP_PORT=${MAIL_PORT}
+      - SMTP_USERNAME=no-reply@${TOP_DOMAIN}
+      - SMTP_PASSWORD=${MAIL_NO_REPLY_PASSWORD}
+      - SMTP_FROM_EMAIL=no-reply@${TOP_DOMAIN}
+      - SMTP_REPLY_EMAIL=no-reply@${TOP_DOMAIN}
+      - SMTP_SECURE=true
+      - OIDC_CLIENT_ID=outline
+      - OIDC_CLIENT_SECRET=${OUTLINE_OIDC_CLIENT_SECRET}
+      - OIDC_AUTH_URI=https://${AUTH_DOMAIN}/api/oidc/authorization
+      - OIDC_TOKEN_URI=https://${AUTH_DOMAIN}/api/oidc/token
+      - OIDC_USERINFO_URI=https://${AUTH_DOMAIN}/api/oidc/userinfo
+      - OIDC_USERNAME_CLAIM=preferred_username
+      - OIDC_DISPLAY_NAME=🔑 ${AUTH_DOMAIN}
+      - OIDC_SCOPES="openid offline_access profile email"
+    networks:
+      - notes_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.outline.entrypoints=websecure"
+      - "traefik.http.routers.outline.rule=Host(`${NOTES_DOMAIN}`)"
+      - "traefik.http.routers.outline.tls=true"
+      - "traefik.http.routers.outline.tls.certresolver=default"
+      - "traefik.http.routers.outline.middlewares=security@file"
+    depends_on:
+      - postgres
+      - redis
+      - authelia
+
 networks:
   auth_network: ~
   passwords_network: ~
@@ -461,6 +540,7 @@ networks:
   maps_network: ~
   cryptpad_network: ~
   git_network: ~
+  notes_network: ~
 
 volumes:
   certificates:
@@ -488,6 +568,12 @@ volumes:
       o: bind
       type: none
       device: /mnt/databases/mysql
+  database_pgsql_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/databases/pgsql
   database_filebrowser_volume:
     driver: local
     driver_opts:

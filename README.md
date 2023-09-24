@@ -13,6 +13,7 @@ Services :
   - Docker Mailserver — a MIT fullstack mail server
   - Snappymail — an AGPLv3 simple and lightweight webmail forked from RainLoop
   - Gitea — a MIT self-hosted git service with a web UI
+  - Outline — a BSL 1.1 knowledge base app with a web UI, _akin to Notion_
 
 > All services are served through the Træfik reverse-proxy, certificates are provided by Let's Encrypt, and renewed automatically via Træfik.
 
@@ -53,7 +54,7 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdb # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdb1'
     docker-machine ssh default 'sudo mkdir /mnt/databases && sudo mount /dev/sdb1 /mnt/databases'
-    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/filebrowser'
+    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/mysql /mnt/databases/filebrowser'
 
 #### The files volume :
 
