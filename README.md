@@ -4,6 +4,7 @@
 
 Services :
 
+  - Authelia — an Apache 2.0 OIDC provider
   - Filebrowser — An Apache 2.0 simple web files browser / uploader and sharing interface
   - Passbolt — A free, open-source, extensible, OpenPGP-based password manager
   - Linkding — A MIT simple bookmarking service
@@ -54,14 +55,14 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdb # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdb1'
     docker-machine ssh default 'sudo mkdir /mnt/databases && sudo mount /dev/sdb1 /mnt/databases'
-    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/mysql /mnt/databases/filebrowser'
+    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/pgsql /mnt/databases/filebrowser'
 
 #### The files volume :
 
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/filebrowser /mnt/files/cryptpad /mnt/files/mails/data /mnt/files/mails/state /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav /mnt/files/linkding'
+    docker-machine ssh default 'sudo mkdir /mnt/files/filebrowser /mnt/files/cryptpad /mnt/files/mails/data /mnt/files/mails/state /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav /mnt/files/linkding /mnt/files/outline'
 
 ## Get environment variables to target the remote docker instance
 

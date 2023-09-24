@@ -13,6 +13,7 @@ services:
       - certificates:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
+      - auth_network
       - passwords_network
       - cloud_network
       - dav_network
@@ -40,7 +41,7 @@ services:
       start_period: 30s
       timeout: 10s
 
-  # MySQL (database)
+  # MySQL (database: Passbolt, Davis, Gitea)
   mysql:
     build:
       context: ./
@@ -73,7 +74,7 @@ services:
       start_period: 30s
       timeout: 10s
 
-  # PostgreSQL (database)
+  # PostgreSQL (database: Outline)
   postgres:
     build:
       context: ./
@@ -100,6 +101,7 @@ services:
   redis:
     image: redis
     restart: unless-stopped
+    container_name: redis
     networks:
       - notes_network
     healthcheck:
@@ -483,7 +485,9 @@ services:
   # Outline (Notion)
   # See https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
   outline:
-    image: outlinewiki/outline:0.72.0-3
+    # https://hub.docker.com/r/outlinewiki/outline/tags
+    image: outlinewiki/outline:0.72.2
+    container_name: outline
     environment:
       - NODE_ENV=production
       - PGSSLMODE=disable
@@ -493,6 +497,9 @@ services:
       - REDIS_URL=redis://redis:6379
       - URL=https://${NOTES_DOMAIN}
       - FORCE_HTTPS=false
+      - FILE_STORAGE=local
+      - FILE_STORAGE_LOCAL_ROOT_DIR=/var/lib/outline/data
+      - FILE_STORAGE_UPLOAD_MAX_SIZE=26214400
       - ENABLE_UPDATES=false
       - SMTP_HOST=${MAIL_HOST}
       - SMTP_PORT=${MAIL_PORT}
@@ -508,7 +515,13 @@ services:
       - OIDC_USERINFO_URI=https://${AUTH_DOMAIN}/api/oidc/userinfo
       - OIDC_USERNAME_CLAIM=preferred_username
       - OIDC_DISPLAY_NAME=🔑 ${AUTH_DOMAIN}
-      - OIDC_SCOPES="openid offline_access profile email"
+      - OIDC_SCOPES=openid offline_access profile email
+    depends_on:
+      - postgres
+      - redis
+      - authelia
+    volumes:
+      - files_outline_volume:/var/lib/outline/data  # https://docs.getoutline.com/s/hosting/doc/file-storage-N4M0T6Ypu7
     networks:
       - notes_network
     labels:
@@ -518,10 +531,6 @@ services:
       - "traefik.http.routers.outline.tls=true"
       - "traefik.http.routers.outline.tls.certresolver=default"
       - "traefik.http.routers.outline.middlewares=security@file"
-    depends_on:
-      - postgres
-      - redis
-      - authelia
 
 networks:
   auth_network: ~
@@ -622,3 +631,9 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/linkding
+  files_outline_volume:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: /mnt/files/outline
