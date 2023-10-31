@@ -118,7 +118,8 @@ services:
 
   # Filebrowser (cloud files server)
   filebrowser:
-    image: filebrowser/filebrowser:v2.24.1
+    # https://hub.docker.com/r/filebrowser/filebrowser/tags
+    image: filebrowser/filebrowser:v2.25.0
     container_name: filebrowser
     environment:
       - FB_PASSWORD=${FILEBROWSER_PASSWORD_HASHED}
@@ -195,7 +196,8 @@ services:
       - dav_network
 
   linkding:
-    image: sissbruecker/linkding:latest
+    # https://hub.docker.com/r/sissbruecker/linkding/tags
+    image: sissbruecker/linkding:1.22.2
     container_name: linkding
     restart: unless-stopped
     volumes:
@@ -335,7 +337,8 @@ services:
       context: ./
       dockerfile: ./build/Dockerfile-cryptpad
       args:
-        version: "5.3.0"
+        # https://github.com/xwiki-labs/cryptpad/releases
+        version: "5.5.0"
     image: cryptpad:custom
     container_name: cryptpad
     restart: unless-stopped
@@ -379,7 +382,7 @@ services:
   # See https://docs.gitea.io/en-us/install-with-docker/
   # and https://github.com/go-gitea/gitea for the version
   gitea:
-    image: gitea/gitea:1.20.2
+    image: gitea/gitea:1.20.5
     container_name: git
     environment:
       - USER_UID=2022

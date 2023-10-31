@@ -23,8 +23,7 @@ RUN curl --silent -o cryptpad.tar.gz -L https://github.com/xwiki-labs/cryptpad/a
 WORKDIR /cryptpad
 # Install dependencies
 RUN npm install --production \
-    && npm install -g bower \
-    && bower install --allow-root
+   && npm run install:components
 
 # Create actual cryptpad image
 FROM node:18-buster-slim
