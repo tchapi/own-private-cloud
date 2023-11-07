@@ -8,8 +8,7 @@ sign_local = true;
 use_domain = "header";
 use_redis = false;   # don't change unless Redis also provides the DKIM keys
 use_esld = true;
-
-check_pubkey = true; # you wan't to use this in the beginning
+check_pubkey = true; # you want to use this in the beginning
 
 domain {
     $TOP_DOMAIN {

@@ -11,8 +11,8 @@ ARG mail_no_reply_password
 RUN mkdir -p /tmp/docker-mailserver/rspamd/dkim
 RUN mkdir -p /tmp/docker-mailserver/rspamd/override.d
 
-COPY configurations/mails/config/rspamd/dkim/rsa-* /tmp/docker-mailserver/rspamd/dkim/.
-COPY configurations/mails/config/rspamd/override.d/dkim_signing.conf /tmp/docker-mailserver/rspamd/override.d/dkim_signing.conf
+COPY --chown=_rspamd:_rspamd configurations/mails/config/rspamd/dkim/rsa-* /tmp/docker-mailserver/rspamd/dkim/.
+COPY --chown=_rspamd:_rspamd configurations/mails/config/rspamd/override.d/dkim_signing.conf /tmp/docker-mailserver/rspamd/override.d/dkim_signing.conf
 COPY configurations/mails/config/postfix-main.cf /tmp/docker-mailserver/postfix-main.cf
 COPY configurations/mails/config/postfix-virtual.cf /tmp/docker-mailserver/postfix-virtual.cf
 COPY configurations/mails/config/user-patches.sh /tmp/docker-mailserver/user-patches.sh
