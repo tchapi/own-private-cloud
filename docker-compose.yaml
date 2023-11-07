@@ -197,7 +197,7 @@ services:
 
   linkding:
     # https://hub.docker.com/r/sissbruecker/linkding/tags
-    image: sissbruecker/linkding:1.22.2
+    image: sissbruecker/linkding:1.22.3
     container_name: linkding
     restart: unless-stopped
     volumes:
