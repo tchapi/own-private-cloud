@@ -302,6 +302,18 @@ You can try to login with `A LOGIN {user} {password}` by replacing `{user}` and 
 
     A OK [CAPABILITY IMAP4rev1 SASL-IR LOGIN-REFERRALS ID ENABLE IDLE SORT SORT=DISPLAY THREAD=REFERENCES THREAD=REFS THREAD=ORDEREDSUBJECT MULTIAPPEND URL-PARTIAL CATENATE UNSELECT CHILDREN NAMESPACE UIDPLUS LIST-EXTENDED I18NLEVEL=1 CONDSTORE QRESYNC ESEARCH ESORT SEARCHRES WITHIN CONTEXT=SEARCH LIST-STATUS BINARY MOVE SNIPPET=FUZZY PREVIEW=FUZZY STATUS=SIZE LITERAL+ NOTIFY] Logged in
 
+## Specific mail IP address
+
+When using a separate IP for the mail server, we need to add a rule to the `POSTROUTING` chain in the `nat` table to allow traffic originating from the mail network to go through the correct IP; On the Docker host, run:
+
+    sudo iptables -t nat -I POSTROUTING -s 172.100.0.0/16 -j SNAT --to $MAIL_HOST_IP
+
+> Don't forget to set `MAIL_HOST_IP` beforehand if not done already. "172.100.0.0/16" is the subnet indicated in the docker-compose.yml file for the mail network.
+
+To list all the rules in the `nat` table:
+
+    sudo iptables -t nat -L --line-numbers
+
 # Run & Maintenance
 
 To see the disk usage :
