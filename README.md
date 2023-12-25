@@ -244,13 +244,40 @@ Options (see http://duplicity.nongnu.org/vers8/duplicity.1.html):
 
 #### Move another backup file to S3
 
+With s3cmd:
+
     s3cmd put file.zip s3://{bucket}/{path}/file.zip --storage-class=GLACIER --multipart-chunk-size-mb=100
 
 > It's important to set a multipart chunk size so that the original file size divided by the chunk size doesn't exceed 1000 (chunks) since an upload can have at most 1000 chunks.
 
+With aws cli:
+
+    aws --profile scw_profile s3 cp file.zip s3://{bucket}/{path}/file.zip
+
+> You need to install `pip3 install awscli-plugin-endpoint` and create a profile in  `~/.aws/config` beforehand:
+>
+>    ```
+>    [plugins]
+>    endpoint = awscli_plugin_endpoint
+>    
+>    [profile scw_profile]
+>    region = fr-par
+>    s3 =
+>      endpoint_url = https://s3.fr-par.scw.cloud
+>      multipart_chunksize = 100MB
+>    s3api =
+>      endpoint_url = https://s3.fr-par.scw.cloud
+>    ```
+
 #### Move a file on a S3-compatible storage to a Glacier class
 
+With s3cmd:
+
     s3cmd cp s3://{bucket}/{path} s3://{bucket}/{path} --storage-class=GLACIER --add-header=x-amz-metadata-directive:REPLACE
+
+With aws cli:
+
+    aws s3 cp s3://{bucket}/{path} s3://{bucket}/{path} --storage-class GLACIER
 
 # Updating
 
