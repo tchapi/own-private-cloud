@@ -1,4 +1,4 @@
-FROM traefik:v2.10
+FROM traefik:v2.11
 # From https://hub.docker.com/_/traefik
 
 LABEL maintainer="tchap@tchap.me"
