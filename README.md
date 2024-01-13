@@ -297,6 +297,17 @@ or
     docker container prune && docker image prune
     docker compose up -d --force-recreate --build webmail-proxy webmail
 
+> [!TIP]
+>
+>    For the MySQL container to be updated correctly, you absolutely need to do a complete normal shutdown before bringing the new container up:
+>
+>    1. Update the MySQL version in the `Dockerfile-mysql`` Dockerfile
+>    2. Build the image: `docker compose build mysql`
+>    3. In the actual, running MySQL container, `mysql -uroot -p`
+>    4. Issue a graceful shutdown with `shutdown;` 
+>    5. The container will then stop by itself
+>    6. Bring the new container up:  `docker compose up -d`
+
 # SSL
 
 The given Traefik V2.0 configuration (_SSL params, etc_), along with a proper DNS configuration (including a correct CAA entry — see [here](https://blog.qualys.com/ssllabs/2017/03/13/caa-mandated-by-cabrowser-forum)), will result in a **A+** rating in [SSLLabs](https://www.ssllabs.com) :
