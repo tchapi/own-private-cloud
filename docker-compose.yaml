@@ -168,7 +168,7 @@ services:
       timeout: 10s
 
   davis:
-    image: ghcr.io/tchapi/davis:v3.3.0
+    image: ghcr.io/tchapi/davis:v4.3.0
     container_name: davis
     environment:
       - APP_ENV=prod
