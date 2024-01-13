@@ -486,7 +486,7 @@ services:
   # See https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
   outline:
     # https://hub.docker.com/r/outlinewiki/outline/tags
-    image: outlinewiki/outline:0.72.2
+    image: outlinewiki/outline:0.74.0
     container_name: outline
     environment:
       - NODE_ENV=production
