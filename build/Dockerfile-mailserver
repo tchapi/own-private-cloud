@@ -1,4 +1,4 @@
-FROM ghcr.io/docker-mailserver/docker-mailserver:12.1.0
+FROM ghcr.io/docker-mailserver/docker-mailserver:13.2.0
 # From https://github.com/docker-mailserver/docker-mailserver/pkgs/container/docker-mailserver
 
 LABEL maintainer="tchap@tchap.me"

@@ -315,7 +315,7 @@ services:
   
   # kvtiles (Maps)
   maps:
-    # See https://hub.docker.com/r/akhenakh/kvtiles/tags for available tags / zooms
+    # See https://hub.docker.com/r/akhenakh/kvtiles/tags
     image: akhenakh/kvtiles:planet-10-latest
     container_name: maps
     restart: unless-stopped
@@ -330,6 +330,8 @@ services:
       - "traefik.http.routers.maps.tls.certresolver=default"
       - "traefik.http.routers.maps.middlewares=security@file"
       - "traefik.http.services.maps.loadbalancer.server.port=8080"
+    profiles: # https://stackoverflow.com/a/65957695
+      - donotstart # [deactivated as resource hungry]
 
   # Cryptpad (Documents)
   # See https://github.com/xwiki-labs/cryptpad
