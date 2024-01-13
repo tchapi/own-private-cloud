@@ -1,7 +1,7 @@
-FROM passbolt/passbolt:3.12.2-1-ce
+FROM passbolt/passbolt:4.4.2-1-ce
 # From https://hub.docker.com/r/passbolt/passbolt
 
 LABEL maintainer="tchap@tchap.me"
 
-# Change the too small timeout for sessions to 3 days
-RUN sed -i "s/session.gc_maxlifetime = .*/session.gc_maxlifetime = 259200 ; 3 days/g" /etc/php/7.4/cli/php.ini
+# Change the too small timeout for sessions to 15 days
+RUN sed -i "s/session.gc_maxlifetime = .*/session.gc_maxlifetime = 1296000 ; 15 days/g" /etc/php/8.2/fpm/php.ini
