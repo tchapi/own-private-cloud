@@ -168,11 +168,12 @@ services:
       timeout: 10s
 
   davis:
-    image: ghcr.io/tchapi/davis:v4.4.0
+    image: ghcr.io/tchapi/davis:v4.4.1
     container_name: davis
     environment:
       - APP_ENV=prod
       - APP_SECRET=${DAVIS_APP_SECRET}
+      - APP_TIMEZONE=Europe/Paris
       - DATABASE_DRIVER=mysql
       - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}?charset=utf8mb4&serverVersion=mariadb-10.6.10
       - MAILER_DSN=smtp://no-reply%40${TOP_DOMAIN}:${MAIL_NO_REPLY_PASSWORD}@${MAIL_HOST}:${MAIL_PORT} # %40 = encoded @
