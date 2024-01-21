@@ -89,6 +89,7 @@ WORKDIR /snappymail
 
 # PHP-FPM healthcheck
 RUN set -xe && echo "pm.status_path = /status" >> /usr/local/etc/php-fpm.d/zz-docker.conf
+RUN apk add --no-cache fcgi
 RUN curl https://raw.githubusercontent.com/renatomefi/php-fpm-healthcheck/v0.5.0/php-fpm-healthcheck \
     -o /usr/local/bin/php-fpm-healthcheck -s \
     && chmod +x /usr/local/bin/php-fpm-healthcheck

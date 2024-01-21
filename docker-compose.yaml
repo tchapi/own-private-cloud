@@ -64,13 +64,12 @@ services:
       - passwords_network
       - dav_network
       - git_network
-    # Waiting for https://github.com/MariaDB/mariadb-docker/pull/508
-    # healthcheck:
-    #   test: healthcheck.sh --su-mysql --connect --innodb_initialized
-    #   interval: 120s
-    #   retries: 5
-    #   start_period: 30s
-    #   timeout: 10s
+    healthcheck:
+      test: healthcheck.sh --su-mysql --connect --innodb_initialized
+      interval: 120s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   passbolt:
     build:

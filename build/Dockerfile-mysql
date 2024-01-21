@@ -1,4 +1,4 @@
-FROM mariadb:11.1.3
+FROM mariadb:11.2.2
 # From https://hub.docker.com/_/mariadb
 
 LABEL maintainer="tchap@tchap.me"
