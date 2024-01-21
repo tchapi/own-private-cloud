@@ -31,6 +31,10 @@ expandVars ./configurations/mails/config/user-patches.sh.template ./configuratio
 expandVars ./configurations/snappymail/application.ini.template ./configurations/snappymail/application.ini
 expandVars ./configurations/snappymail/domain.json.template ./configurations/snappymail/domain.json
 
+# Authelia
+expandVars ./configurations/authelia/configuration.yml.template ./configurations/authelia/configuration.yml
+expandVars ./configurations/authelia/users_database.yml.template ./configurations/authelia/users_database.yml
+
 # Create 1024 DKIM key
 if [ ! -f ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt ]; then
   echo "### Generating DKIM keys"

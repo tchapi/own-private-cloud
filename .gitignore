@@ -19,3 +19,6 @@ configurations/mails/config/user-patches.sh
 
 configurations/snappymail/application.ini
 configurations/snappymail/domain.json
+
+configurations/authelia/configuration.yml
+configurations/authelia/users_database.yml
