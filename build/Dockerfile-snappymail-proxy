@@ -1,7 +1,0 @@
-FROM nginx:1.25.1-alpine
-# From https://hub.docker.com/_/nginx
-
-LABEL maintainer="tchap@tchap.me"
-
-WORKDIR /etc/nginx/
-COPY configurations/snappymail/nginx.conf nginx.conf

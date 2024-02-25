@@ -61,12 +61,13 @@ mysql_ssl_verify = On
 
 ; HIGH
 mysql_ssl_ciphers = ""
+sqlite_global = Off
 suggestions_limit = 20
 
 [security]
 custom_server_signature = "Webmail" ; MODIFIED FROM STANDARD
 x_xss_protection_header = "1; mode=block"
-openpgp = Off
+openpgp = On
 
 ; Access settings
 allow_admin_panel = On
@@ -90,7 +91,7 @@ content_security_policy = ""
 csp_report = Off
 
 ; A valid cipher method from https://php.net/openssl_get_cipher_methods
-encrypt_cipher = "aes-192-cfb8"
+encrypt_cipher = "aes-256-cbc-hmac-sha1"
 
 ; Strict, Lax or None
 cookie_samesite = "Strict"
@@ -193,16 +194,19 @@ show_images = Off
 ;   "always" - show always
 view_images = "ask"
 contacts_autosave = On
+mail_list_grouped = Off
 mail_use_threads = Off
 allow_draft_autosave = On
 mail_reply_same_folder = Off
 
 ; 1 - reply, 2 - reply all
 msg_default_action = 1
+collapse_blockquotes = On
+allow_spellcheck = Off
 
 [logs]
 ; Enable logging
-enable = Off
+enable = On
 
 ; Path where log files will be stored
 path = ""
@@ -254,8 +258,8 @@ time_zone = "UTC"
 filename = "stderr"
 
 ; Enable auth logging in a separate file (for fail2ban)
-auth_logging = Off
-auth_logging_filename = "fail2ban/auth-{date:Y-m-d}.txt"
+auth_logging = On
+auth_logging_filename = "auth.log"
 auth_logging_format = "[{date:Y-m-d H:i:s}] Auth failed: ip={request:ip} user={imap:login} host={imap:host} port={imap:port}"
 
 ; Enable auth logging to syslog for fail2ban
@@ -342,4 +346,4 @@ dev_password = ""
 
 [version]
 current = "<will be filled later on container build>" ; MODIFIED FROM STANDARD
-saved = "Sat, 29 Jul 2023 20:11:19 +0000" ; MODIFIED FROM STANDARD
+saved = "Mon, 1 Jan 2024 23:59:59 +0000" ; MODIFIED FROM STANDARD

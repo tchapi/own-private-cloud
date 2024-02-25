@@ -27,9 +27,12 @@ expandVars ./configurations/cryptpad/config.js.template ./configurations/cryptpa
 expandVars ./configurations/mails/config/rspamd/override.d/dkim_signing.conf.template ./configurations/mails/config/rspamd/override.d/dkim_signing.conf
 expandVars ./configurations/mails/config/postfix-virtual.cf.template ./configurations/mails/config/postfix-virtual.cf
 expandVars ./configurations/mails/config/user-patches.sh.template ./configurations/mails/config/user-patches.sh
+
 # Webmail
 expandVars ./configurations/snappymail/application.ini.template ./configurations/snappymail/application.ini
 expandVars ./configurations/snappymail/domain.json.template ./configurations/snappymail/domain.json
+SALTED_HASHED_ADMIN_PWD=$(echo -n "${WEBMAIL_ADMIN_PASSWORD}" | argon2 "${TOP_DOMAIN}" -l 32 -e)
+sed -i '' "s|^admin_password = .*|admin_password = \"${SALTED_HASHED_ADMIN_PWD}\"|" ./configurations/snappymail/application.ini
 
 # Create 1024 DKIM key
 if [ ! -f ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt ]; then

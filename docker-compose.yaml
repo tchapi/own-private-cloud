@@ -267,19 +267,17 @@ services:
       timeout: 30s
       retries: 0
 
-  # This container is used by traefik as the endpoint
-  # to get certificates for MAIL_DOMAIN
-  webmail-proxy:
+  # This container is also used by traefik as the endpoint
+  # to get certificates for MAIL_DOMAIN.
+  webmail:
     build:
       context: ./
-      dockerfile: ./build/Dockerfile-snappymail-proxy
-    image: snappymail-proxy:custom
-    container_name: snappymail-proxy
+      dockerfile: ./build/Dockerfile-snappymail
+      args:
+        top_domain: ${TOP_DOMAIN}
+    image: snappymail:custom
+    container_name: snappymail
     restart: unless-stopped
-    depends_on:
-      - webmail
-    volumes:
-      - snappymail_www:/snappymail
     networks:
       - mail_network
     labels:
@@ -289,29 +287,7 @@ services:
       - "traefik.http.routers.mail.tls=true"
       - "traefik.http.routers.mail.tls.certresolver=default"
       - "traefik.http.routers.mail.middlewares=security@file"
-    healthcheck:
-      test: curl --fail http://localhost:80 || exit 1
-      interval: 120s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
-
-  webmail:
-    build:
-      context: ./
-      dockerfile: ./build/Dockerfile-snappymail
-      args:
-        # https://github.com/the-djmaze/snappymail/releases
-        version: "2.32.0"
-        top_domain: ${TOP_DOMAIN}
-        webmail_admin_password: ${WEBMAIL_ADMIN_PASSWORD}
-    image: snappymail:custom
-    container_name: snappymail
-    restart: unless-stopped
-    volumes:
-      - snappymail_www:/snappymail
-    networks:
-      - mail_network
+      - "traefik.http.services.mail.loadbalancer.server.port=8888"
   
   # kvtiles (Maps)
   maps:
