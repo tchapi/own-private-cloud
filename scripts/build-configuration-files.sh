@@ -34,6 +34,10 @@ expandVars ./configurations/snappymail/domain.json.template ./configurations/sna
 SALTED_HASHED_ADMIN_PWD=$(echo -n "${WEBMAIL_ADMIN_PASSWORD}" | argon2 "${TOP_DOMAIN}" -l 32 -e)
 sed -i '' "s|^admin_password = .*|admin_password = \"${SALTED_HASHED_ADMIN_PWD}\"|" ./configurations/snappymail/application.ini
 
+# Authelia
+expandVars ./configurations/authelia/configuration.yml.template ./configurations/authelia/configuration.yml
+expandVars ./configurations/authelia/users_database.yml.template ./configurations/authelia/users_database.yml
+
 # Create 1024 DKIM key
 if [ ! -f ./configurations/mails/config/rspamd/dkim/rsa-1024-${DKIM_SELECTOR}-${TOP_DOMAIN}.private.txt ]; then
   echo "### Generating DKIM keys"

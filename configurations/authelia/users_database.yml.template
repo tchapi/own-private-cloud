@@ -1,0 +1,14 @@
+###############################################################
+#                         Users Database                      #
+###############################################################
+
+users:
+  $MAIL_PRINCIPAL_USER:
+    disabled: false
+    displayname: $MAIL_PRINCIPAL_USER
+    # echo -n "the_password" | argon2 "thesalt" -t 50 -e
+    password: "$OIDC_PASSWORD"
+    email: $MAIL_PRINCIPAL_USER@$TOP_DOMAIN
+    groups:
+      - admins
+      - dev
