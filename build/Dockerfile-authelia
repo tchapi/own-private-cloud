@@ -1,5 +1,5 @@
 # https://hub.docker.com/r/authelia/authelia/tags
-FROM authelia/authelia:4.37
+FROM authelia/authelia:4.38
 
 LABEL maintainer="tchap@tchap.me"
 

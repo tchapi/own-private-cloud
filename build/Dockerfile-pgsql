@@ -1,4 +1,4 @@
-FROM postgres:16.0
+FROM postgres:16.3
 # From https://hub.docker.com/_/postgres/tags
 
 LABEL maintainer="tchap@tchap.me"
