@@ -197,36 +197,8 @@ services:
       - "traefik.http.routers.filebrowser.tls.certresolver=default"
       - "traefik.http.routers.filebrowser.middlewares=security@file"
 
-  # Caldav / Carddav / Webdav server
-  davis-proxy:
-    build:
-      context: ./
-      dockerfile: ./build/Dockerfile-davis-proxy
-    image: davis-proxy:custom
-    container_name: davis-proxy
-    restart: unless-stopped
-    depends_on:
-      - davis
-    volumes:
-      - davis_www:/var/www/davis
-    networks:
-      - dav_network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.davis.entrypoints=websecure"
-      - "traefik.http.routers.davis.rule=Host(`${DAV_DOMAIN}`)"
-      - "traefik.http.routers.davis.tls=true"
-      - "traefik.http.routers.davis.tls.certresolver=default"
-      - "traefik.http.routers.davis.middlewares=security@file"
-    healthcheck:
-      test: curl --fail http://localhost:80 || exit 1
-      interval: 120s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
-
   davis:
-    image: ghcr.io/tchapi/davis:v4.4.1
+    image: ghcr.io/tchapi/davis-standalone:4.4.4
     container_name: davis
     environment:
       - APP_ENV=prod
@@ -249,10 +221,22 @@ services:
     depends_on:
       - mysql
     volumes:
-      - davis_www:/var/www/davis
       - files_webdav_volume:/webdav
     networks:
       - dav_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.davis.entrypoints=websecure"
+      - "traefik.http.routers.davis.rule=Host(`${DAV_DOMAIN}`)"
+      - "traefik.http.routers.davis.tls=true"
+      - "traefik.http.routers.davis.tls.certresolver=default"
+      - "traefik.http.routers.davis.middlewares=security@file"
+    healthcheck:
+      test: curl --fail http://localhost:9000 || exit 1
+      interval: 120s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
 
   linkding:
     # https://hub.docker.com/r/sissbruecker/linkding/tags
@@ -552,8 +536,6 @@ networks:
 volumes:
   certificates:
     name: certificates
-  davis_www:
-    name: davis_www 
   snappymail_www:
     name: snappymail_www 
   # These volumes are actually attached OpenStack Block storage
