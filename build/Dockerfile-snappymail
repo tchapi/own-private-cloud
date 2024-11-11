@@ -1,5 +1,5 @@
 # https://github.com/the-djmaze/snappymail/pkgs/container/snappymail
-FROM ghcr.io/the-djmaze/snappymail:v2.36.4
+FROM ghcr.io/the-djmaze/snappymail:v2.38.2
 
 LABEL maintainer="tchap@tchap.me"
 

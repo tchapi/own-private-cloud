@@ -360,7 +360,7 @@ services:
       dockerfile: ./build/Dockerfile-cryptpad
       args:
         # https://github.com/xwiki-labs/cryptpad/releases
-        version: "5.7.0"
+        version: "2024.9.0"
     image: cryptpad:custom
     container_name: cryptpad
     restart: unless-stopped
@@ -536,8 +536,6 @@ networks:
 volumes:
   certificates:
     name: certificates
-  snappymail_www:
-    name: snappymail_www 
   # These volumes are actually attached OpenStack Block storage
   passbolt_gpg_volume:
     driver: local

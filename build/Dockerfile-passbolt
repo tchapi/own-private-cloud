@@ -1,4 +1,4 @@
-FROM passbolt/passbolt:4.9.0-1-ce
+FROM passbolt/passbolt:4.9.1-1-ce
 # From https://hub.docker.com/r/passbolt/passbolt
 
 LABEL maintainer="tchap@tchap.me"
