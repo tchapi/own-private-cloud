@@ -68,19 +68,11 @@ Services :
 
     eval $(docker-machine env default)
 
-### Alternatively, you can create a context :
+### Alternatively, you can create a context via SSH:
 
-First, get the host from your `docker-machine env`:
+Use the host user and name to create a new context (you can name it how you like, I used `cloud` here):
 
-    docker-machine env | grep HOST
-
-Which will return something like:
-
-`export DOCKER_HOST="tcp://xx.yy.zz.aa:2376"`
-
-Use this remote host to create a new context (you can name it how you like, I used `cloud` here):
-
-    docker context create cloud --docker "host=tcp://xx.yy.zz.aa:2376,cert=~/.docker/machine/certs/cert.pem,key=~/.docker/machine/certs/key.pem,ca=~/.docker/machine/certs/ca.pem"
+    docker context create cloud --docker "host=ssh://ubuntu@my-cloud.me"
 
 Then, you just have to `docker context use cloud` before being able to run commands as usual.
 
@@ -88,7 +80,7 @@ Then, you just have to `docker context use cloud` before being able to run comma
 >
 >     $ docker context ls
 >     NAME                DESCRIPTION                               DOCKER ENDPOINT               KUBERNETES ENDPOINT   ORCHESTRATOR
->     cloud *                                                       tcp://xx.yy.zz.aa:2376
+>     cloud *                                                       ssh://ubuntu@my-cloud.me
 >     default             Current DOCKER_HOST based configuration   unix:///var/run/docker.sock                         swarm
 
 > Pay attention! `docker-compose` does not know of contexts ...
