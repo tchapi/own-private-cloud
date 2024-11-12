@@ -25,6 +25,9 @@ WORKDIR /cryptpad
 RUN npm install --production \
    && npm run install:components
 
+# https://docs.cryptpad.org/en/admin_guide/installation.html#onlyoffice-optional
+RUN ./install-onlyoffice.sh -a -t
+
 # Create actual cryptpad image
 FROM node:18-buster-slim
 
