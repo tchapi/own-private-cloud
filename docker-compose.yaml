@@ -102,6 +102,8 @@ services:
     container_name: redis
     networks:
       - notes_network
+    volumes:
+      - redis_data:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -118,6 +120,8 @@ services:
     restart: unless-stopped
     networks:
       - auth_network
+    volumes:
+      - authelia_config:/config
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.authelia.entrypoints=websecure"
@@ -323,6 +327,8 @@ services:
     restart: unless-stopped
     networks:
       - mail_network
+    volumes:
+      - snappymail_data:/var/lib/snappymail
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.mail.entrypoints=websecure"
@@ -536,6 +542,10 @@ networks:
 volumes:
   certificates:
     name: certificates
+  # These volumes are named but we don't need them to be persistent
+  redis_data: ~
+  authelia_config: ~
+  snappymail_data: ~
   # These volumes are actually attached OpenStack Block storage
   passbolt_gpg_volume:
     driver: local
