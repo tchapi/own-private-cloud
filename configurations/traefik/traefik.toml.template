@@ -1,3 +1,6 @@
+[core]
+  defaultRuleSyntax = "v2"
+
 [providers.docker]
   exposedByDefault = false
 

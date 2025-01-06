@@ -1,7 +1,6 @@
 [http.middlewares]
   [http.middlewares.security.headers]
     stsSeconds = 31536000
-    sslRedirect = true
   [http.middlewares.cryptpad.headers]
     # See https://github.com/xwiki-labs/cryptpad/blob/main/docs/example.nginx.conf
     browserXssFilter = true # X-XSS-Protection "1; mode=block"
