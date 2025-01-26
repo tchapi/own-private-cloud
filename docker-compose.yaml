@@ -380,7 +380,7 @@ services:
       # See https://github.com/xwiki-labs/cryptpad/blob/main/docs/example.nginx.conf
       # First case (secure)
       - "traefik.http.routers.cryptpad-safe.entrypoints=websecure"
-      - "traefik.http.routers.cryptpad-safe.rule=(Host(`${CRYPTPAD_DOMAIN}`) && !PathPrefix(`/unsafeiframe/inner.html`)) || (Host(`${CRYPTPAD_SANDBOX_DOMAIN}`) && !Path(`/{t:(sheet|doc|presentation)}/inner.html{n:.*}`, `/common/onlyoffice/{n:.*}/{m:.*}.html{r:.*}`))"
+      - "traefik.http.routers.cryptpad-safe.rule=(Host(`${CRYPTPAD_DOMAIN}`) && !PathPrefix(`/unsafeiframe/inner.html`)) || (Host(`${CRYPTPAD_SANDBOX_DOMAIN}`) && !(Path(`/{t:(sheet|doc|presentation)}/inner.html{n:.*}`) || Path(`/common/onlyoffice/{n:.*}/{m:.*}.html{r:.*}`)))"
       - "traefik.http.routers.cryptpad-safe.tls=true"
       - "traefik.http.routers.cryptpad-safe.tls.certresolver=default"
       - "traefik.http.services.cryptpad-safe.loadbalancer.server.port=3000"
@@ -391,7 +391,7 @@ services:
       - "traefik.http.routers.cryptpad-safe.middlewares=cryptpad-safe-chain"
       # Second case (unsafe)
       - "traefik.http.routers.cryptpad-unsafe.entrypoints=websecure"
-      - "traefik.http.routers.cryptpad-unsafe.rule=(Host(`${CRYPTPAD_DOMAIN}`) && PathPrefix(`/unsafeiframe/inner.html`)) || (Host(`${CRYPTPAD_SANDBOX_DOMAIN}`) && Path(`/{t:(sheet|doc|presentation)}/inner.html{n:.*}`, `/common/onlyoffice/{n:.*}/{m:.*}.html{r:.*}`))"
+      - "traefik.http.routers.cryptpad-unsafe.rule=(Host(`${CRYPTPAD_DOMAIN}`) && PathPrefix(`/unsafeiframe/inner.html`)) || (Host(`${CRYPTPAD_SANDBOX_DOMAIN}`) && (Path(`/{t:(sheet|doc|presentation)}/inner.html{n:.*}`) || Path(`/common/onlyoffice/{n:.*}/{m:.*}.html{r:.*}`)))"
       - "traefik.http.routers.cryptpad-unsafe.tls=true"
       - "traefik.http.routers.cryptpad-unsafe.tls.certresolver=default"
       - "traefik.http.services.cryptpad-unsafe.loadbalancer.server.port=3000"
