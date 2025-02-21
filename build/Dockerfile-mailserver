@@ -16,6 +16,7 @@ COPY --chown=_rspamd:_rspamd configurations/mails/config/rspamd/override.d/dkim_
 COPY configurations/mails/config/postfix-main.cf /tmp/docker-mailserver/postfix-main.cf
 COPY configurations/mails/config/postfix-virtual.cf /tmp/docker-mailserver/postfix-virtual.cf
 COPY configurations/mails/config/user-patches.sh /tmp/docker-mailserver/user-patches.sh
+COPY configurations/mails/config/dovecot.cf /tmp/docker-mailserver/dovecot.cf
 
 RUN echo "${mail_principal_user}@${top_domain}|"$(doveadm pw -s SHA512-CRYPT -u "${mail_principal_user}" -p "${mail_principal_password}") > /tmp/docker-mailserver/postfix-accounts.cf
 

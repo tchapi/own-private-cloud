@@ -1,0 +1,2 @@
+# Handle both Postfix and qmail extensions (Postfix 2.11 and later).
+recipient_delimiter = +-
