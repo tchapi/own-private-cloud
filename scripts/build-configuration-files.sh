@@ -20,9 +20,6 @@ echo "### Building configuration files"
 # Traefik configuration
 expandVars ./configurations/traefik/traefik.toml.template ./configurations/traefik/traefik.toml
 
-# Cryptpad configuration
-expandVars ./configurations/cryptpad/config.js.template ./configurations/cryptpad/config.js
-
 # Mail configuration
 expandVars ./configurations/mails/config/rspamd/override.d/dkim_signing.conf.template ./configurations/mails/config/rspamd/override.d/dkim_signing.conf
 expandVars ./configurations/mails/config/postfix-virtual.cf.template ./configurations/mails/config/postfix-virtual.cf

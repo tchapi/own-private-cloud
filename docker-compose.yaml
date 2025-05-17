@@ -17,7 +17,6 @@ services:
       - dav_network
       - bookmarks_network
       - maps_network
-      - cryptpad_network
       - mail_network
       - git_network
       - notes_network
@@ -359,54 +358,6 @@ services:
     profiles: # https://stackoverflow.com/a/65957695
       - donotstart # [deactivated as resource hungry]
 
-  # Cryptpad (Documents)
-  # See https://github.com/xwiki-labs/cryptpad
-  cryptpad:
-    build:
-      context: ./
-      dockerfile: ./build/Dockerfile-cryptpad
-      args:
-        # https://github.com/xwiki-labs/cryptpad/releases
-        version: "2024.12.0"
-    image: cryptpad:custom
-    container_name: cryptpad
-    restart: unless-stopped
-    volumes:
-      - files_cryptpad_volume:/cryptpad/data
-    networks:
-      - cryptpad_network
-    labels:
-      - "traefik.enable=true"
-      # See https://github.com/xwiki-labs/cryptpad/blob/main/docs/example.nginx.conf
-      # First case (secure)
-      - "traefik.http.routers.cryptpad-safe.entrypoints=websecure"
-      - "traefik.http.routers.cryptpad-safe.rule=(Host(`${CRYPTPAD_DOMAIN}`) && !PathPrefix(`/unsafeiframe/inner.html`)) || (Host(`${CRYPTPAD_SANDBOX_DOMAIN}`) && !(Path(`/{t:(sheet|doc|presentation)}/inner.html{n:.*}`) || Path(`/common/onlyoffice/{n:.*}/{m:.*}.html{r:.*}`)))"
-      - "traefik.http.routers.cryptpad-safe.tls=true"
-      - "traefik.http.routers.cryptpad-safe.tls.certresolver=default"
-      - "traefik.http.services.cryptpad-safe.loadbalancer.server.port=3000"
-      - "traefik.http.routers.cryptpad-safe.service=cryptpad-safe"
-      - "traefik.http.middlewares.custom.headers.accessControlAllowOriginList=${CRYPTPAD_SANDBOX_DOMAIN}"
-      - "traefik.http.middlewares.custom.headers.contentSecurityPolicy=default-src 'none'; child-src https://${CRYPTPAD_DOMAIN}; worker-src 'self'; media-src blob:; style-src 'unsafe-inline' 'self' https://${CRYPTPAD_DOMAIN}; script-src 'self' resource: https://${CRYPTPAD_DOMAIN}; connect-src 'self' https://${CRYPTPAD_DOMAIN} blob: wss://${CRYPTPAD_DOMAIN} https://${CRYPTPAD_SANDBOX_DOMAIN}; font-src 'self' data: https://${CRYPTPAD_DOMAIN}; img-src 'self' data: blob: https://${CRYPTPAD_DOMAIN}; frame-src 'self' https://${CRYPTPAD_SANDBOX_DOMAIN} blob:; frame-ancestors 'self' https://${CRYPTPAD_DOMAIN}"
-      - "traefik.http.middlewares.cryptpad-safe-chain.chain.middlewares=custom,cryptpad@file,security@file"
-      - "traefik.http.routers.cryptpad-safe.middlewares=cryptpad-safe-chain"
-      # Second case (unsafe)
-      - "traefik.http.routers.cryptpad-unsafe.entrypoints=websecure"
-      - "traefik.http.routers.cryptpad-unsafe.rule=(Host(`${CRYPTPAD_DOMAIN}`) && PathPrefix(`/unsafeiframe/inner.html`)) || (Host(`${CRYPTPAD_SANDBOX_DOMAIN}`) && (Path(`/{t:(sheet|doc|presentation)}/inner.html{n:.*}`) || Path(`/common/onlyoffice/{n:.*}/{m:.*}.html{r:.*}`)))"
-      - "traefik.http.routers.cryptpad-unsafe.tls=true"
-      - "traefik.http.routers.cryptpad-unsafe.tls.certresolver=default"
-      - "traefik.http.services.cryptpad-unsafe.loadbalancer.server.port=3000"
-      - "traefik.http.routers.cryptpad-unsafe.service=cryptpad-unsafe"
-      - "traefik.http.middlewares.custom2.headers.accessControlAllowOriginList=${CRYPTPAD_SANDBOX_DOMAIN}"
-      - "traefik.http.middlewares.custom2.headers.contentSecurityPolicy=default-src 'none'; child-src https://${CRYPTPAD_DOMAIN}; worker-src 'self'; media-src blob:; style-src 'unsafe-inline' 'self' https://${CRYPTPAD_DOMAIN}; script-src 'self' 'unsafe-eval' 'unsafe-inline' resource: https://${CRYPTPAD_DOMAIN}; connect-src 'self' https://${CRYPTPAD_DOMAIN} blob: wss://${CRYPTPAD_DOMAIN} https://${CRYPTPAD_SANDBOX_DOMAIN}; font-src 'self' data: https://${CRYPTPAD_DOMAIN}; img-src 'self' data: blob: https://${CRYPTPAD_DOMAIN}; frame-src 'self' https://${CRYPTPAD_SANDBOX_DOMAIN} blob:; frame-ancestors 'self' https://${CRYPTPAD_DOMAIN}"
-      - "traefik.http.middlewares.cryptpad-unsafe-chain.chain.middlewares=custom2,cryptpad@file,security@file"
-      - "traefik.http.routers.cryptpad-unsafe.middlewares=cryptpad-unsafe-chain"
-    healthcheck:
-      test: curl --fail http://localhost:3000/ || exit 1
-      interval: 120s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
-
   # Gitea (git)
   # See https://docs.gitea.io/en-us/install-with-docker/
   # and https://github.com/go-gitea/gitea for the version
@@ -536,7 +487,6 @@ networks:
       config:
         - subnet: "172.100.0.0/16"
   maps_network: ~
-  cryptpad_network: ~
   git_network: ~
   notes_network: ~
 
@@ -584,12 +534,6 @@ volumes:
       o: bind
       type: none
       device: /mnt/files/filebrowser
-  files_cryptpad_volume: # It stores the cryptpad data
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/files/cryptpad
   mails_data_volume: # It stores the mail data
     driver: local
     driver_opts:

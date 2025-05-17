@@ -10,7 +10,6 @@ Services :
   - Linkding — A MIT simple bookmarking service
   - Davis — A MIT WebDAV, CalDAV and CardDAV server, based on sabre/dav
   - kvtiles — An open-source map tiles server in Go, Apache 2.0 License
-  - Cryptpad — An AGPLv3 encrypted collaboration suite
   - Docker Mailserver — a MIT fullstack mail server
   - Snappymail — an AGPLv3 simple and lightweight webmail forked from RainLoop
   - Gitea — a MIT self-hosted git service with a web UI
@@ -62,7 +61,7 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdc # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdc1'
     docker-machine ssh default 'sudo mkdir /mnt/files && sudo mount /dev/sdc1 /mnt/files'
-    docker-machine ssh default 'sudo mkdir /mnt/files/filebrowser /mnt/files/cryptpad /mnt/files/mails/data /mnt/files/mails/state /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav /mnt/files/linkding /mnt/files/outline'
+    docker-machine ssh default 'sudo mkdir /mnt/files/filebrowser /mnt/files/mails/data /mnt/files/mails/state /mnt/files/gitea /mnt/files/passbolt /mnt/files/webdav /mnt/files/linkding /mnt/files/outline'
 
 ## Get environment variables to target the remote docker instance
 
