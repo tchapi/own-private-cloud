@@ -181,7 +181,7 @@ services:
   # Filebrowser (cloud files server)
   filebrowser:
     # https://hub.docker.com/r/filebrowser/filebrowser/tags
-    image: filebrowser/filebrowser:v2.31.2
+    image: filebrowser/filebrowser:v2.42.5-s6
     container_name: filebrowser
     environment:
       - FB_PASSWORD=${FILEBROWSER_PASSWORD_HASHED}
@@ -244,7 +244,7 @@ services:
 
   linkding:
     # https://hub.docker.com/r/sissbruecker/linkding/tags
-    image: sissbruecker/linkding:1.36.0
+    image: sissbruecker/linkding:1.42.0
     container_name: linkding
     restart: unless-stopped
     volumes:
@@ -362,7 +362,7 @@ services:
   # See https://docs.gitea.io/en-us/install-with-docker/
   # and https://github.com/go-gitea/gitea for the version
   gitea:
-    image: gitea/gitea:1.22.6
+    image: gitea/gitea:1.24.5
     container_name: git
     environment:
       - USER_UID=2022
@@ -426,7 +426,7 @@ services:
   # See https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
   outline:
     # https://hub.docker.com/r/outlinewiki/outline/tags
-    image: outlinewiki/outline:0.81.1
+    image: outlinewiki/outline:0.86.1
     container_name: outline
     environment:
       - NODE_ENV=production
