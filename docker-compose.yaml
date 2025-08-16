@@ -202,7 +202,7 @@ services:
       - "traefik.http.routers.filebrowser.middlewares=security@file"
 
   davis:
-    image: ghcr.io/tchapi/davis-standalone:5.1.2
+    image: ghcr.io/tchapi/davis-standalone:5.1.3
     container_name: davis
     environment:
       - APP_ENV=prod
@@ -221,6 +221,7 @@ services:
       - WEBDAV_ENABLED=true
       - INVITE_FROM_ADDRESS=no-reply@${TOP_DOMAIN}
       - WEBDAV_PUBLIC_DIR=/webdav
+      - PUBLIC_CALENDARS_ENABLED=true
     restart: unless-stopped
     depends_on:
       - mysql
