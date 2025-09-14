@@ -209,7 +209,7 @@ services:
       - APP_SECRET=${DAVIS_APP_SECRET}
       - APP_TIMEZONE=Europe/Paris
       - DATABASE_DRIVER=mysql
-      - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}?charset=utf8mb4&serverVersion=mariadb-10.6.10
+      - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}?charset=utf8mb4&serverVersion=10.9.3-MariaDB
       - MAILER_DSN=smtp://no-reply%40${TOP_DOMAIN}:${MAIL_NO_REPLY_PASSWORD}@${MAIL_HOST}:${MAIL_PORT} # %40 = encoded @
       - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
       - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
@@ -221,6 +221,7 @@ services:
       - WEBDAV_ENABLED=true
       - INVITE_FROM_ADDRESS=no-reply@${TOP_DOMAIN}
       - WEBDAV_PUBLIC_DIR=/webdav
+      - WEBDAV_TMP_DIR=/tmp
       - PUBLIC_CALENDARS_ENABLED=true
     restart: unless-stopped
     depends_on:
