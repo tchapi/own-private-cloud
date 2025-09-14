@@ -1,5 +1,4 @@
-FROM mariadb:11.2.2
-# Don't try to upgrade to 11.3 without backup
+FROM mariadb:11.8.3
 # From https://hub.docker.com/_/mariadb
 
 LABEL maintainer="tchap@tchap.me"
