@@ -202,7 +202,7 @@ services:
       - "traefik.http.routers.filebrowser.middlewares=security@file"
 
   davis:
-    image: ghcr.io/tchapi/davis-standalone:5.1.3
+    image: ghcr.io/tchapi/davis-standalone:5.4.0
     container_name: davis
     environment:
       - APP_ENV=prod
@@ -429,7 +429,7 @@ services:
   # See https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
   outline:
     # https://hub.docker.com/r/outlinewiki/outline/tags
-    image: outlinewiki/outline:0.87.3
+    image: outlinewiki/outline:1.5.0
     container_name: outline
     environment:
       - NODE_ENV=production

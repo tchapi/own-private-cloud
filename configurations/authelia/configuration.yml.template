@@ -4,9 +4,6 @@
 
 theme: 'auto'
 
-jwt_secret: $OIDC_JWT_SECRET
-default_redirection_url: https://$TOP_DOMAIN
-
 log:
   level: info
 
@@ -23,16 +20,20 @@ access_control:
   default_policy: one_factor
 
 session:
-  name: 'authelia_session'
-  domain: $TOP_DOMAIN
   secret: $OIDC_SESSION_SECRET
-  # expiration: 1M
-  inactivity: 1w
+  cookies:
+    - name: 'authelia_session'
+      domain: $TOP_DOMAIN
+      authelia_url: https://$AUTH_DOMAIN
+      remember_me: 1M
+      expiration: 1M
+      inactivity: 1M
+      default_redirection_url: https://$TOP_DOMAIN
 
 regulation:
   max_retries: 3
   find_time: 120
-  ban_time: 300
+  ban_time: 600
 
 storage:
   encryption_key: $OIDC_STORAGE_ENCRYPTION_KEY
