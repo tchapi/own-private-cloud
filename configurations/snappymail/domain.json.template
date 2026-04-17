@@ -1,7 +1,7 @@
 {
     "name": "$TOP_DOMAIN",
     "IMAP": {
-        "host": "$MAIL_DOMAIN",
+        "host": "mail",
         "port": 143,
         "type": 2,
         "timeout": 60,
@@ -36,7 +36,7 @@
         "search_filter": ""
     },
     "SMTP": {
-        "host": "$MAIL_DOMAIN",
+        "host": "mail",
         "port": 465,
         "type": 1,
         "timeout": 60,
