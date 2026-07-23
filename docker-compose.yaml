@@ -45,6 +45,7 @@ services:
       dockerfile: ./build/Dockerfile-mysql
     image: mariadb:custom
     container_name: mysql
+    restart: unless-stopped
     environment:
       - MARIADB_AUTO_UPGRADE=1
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -57,7 +58,6 @@ services:
       - GITEA_DATABASE=${GITEA_DATABASE}
       - GITEA_DB_USERNAME=${GITEA_DB_USERNAME}
       - GITEA_DB_PASSWORD=${GITEA_DB_PASSWORD}
-    restart: unless-stopped
     volumes:
       - database_mysql_volume:/var/lib/mysql
     networks:
@@ -78,12 +78,12 @@ services:
       dockerfile: ./build/Dockerfile-pgsql
     image: postgres:custom
     container_name: postgres
+    restart: unless-stopped
     environment:
       - POSTGRES_PASSWORD=${PGSQL_ROOT_PASSWORD}
       - OUTLINE_DATABASE=${OUTLINE_DATABASE}
       - OUTLINE_DB_USERNAME=${OUTLINE_DB_USERNAME}
       - OUTLINE_DB_PASSWORD=${OUTLINE_DB_PASSWORD}
-    restart: unless-stopped
     volumes:
       - database_pgsql_volume:/var/lib/postgresql/data
     networks:
@@ -97,8 +97,8 @@ services:
   # Redis (RAM storage)
   redis:
     image: redis
-    restart: unless-stopped
     container_name: redis
+    restart: unless-stopped
     networks:
       - notes_network
     volumes:
@@ -139,6 +139,7 @@ services:
       dockerfile: ./build/Dockerfile-passbolt
     image: passbolt:custom
     container_name: passbolt
+    restart: unless-stopped
     environment:
       - APP_FULL_BASE_URL=https://${PASSWORDS_DOMAIN}
       - DATASOURCES_DEFAULT_HOST=mysql
@@ -154,7 +155,6 @@ services:
       - PASSBOLT_PLUGINS_JWT_AUTHENTICATION_ENABLED=TRUE
       - PASSBOLT_PLUGINS_MOBILE_ENABLED=TRUE
       - PASSBOLT_SECURITY_SMTP_SETTINGS_ENDPOINTS_DISABLED=TRUE
-    restart: unless-stopped
     command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
     tty: true
     depends_on:
@@ -183,11 +183,11 @@ services:
     # https://hub.docker.com/r/filebrowser/filebrowser/tags
     image: filebrowser/filebrowser:v2.63.5-s6
     container_name: filebrowser
+    restart: unless-stopped
     environment:
       - FB_PASSWORD=${FILEBROWSER_PASSWORD_HASHED}
       - FB_USERNAME=${FILEBROWSER_USERNAME}
       - FB_DATABASE=/database/filebrowser.db
-    restart: unless-stopped
     volumes:
       - files_filebrowser_volume:/srv
       - database_filebrowser_volume:/database
@@ -204,6 +204,7 @@ services:
   davis:
     image: ghcr.io/tchapi/davis-standalone:5.4.1
     container_name: davis
+    restart: unless-stopped
     environment:
       - APP_ENV=prod
       - APP_SECRET=${DAVIS_APP_SECRET}
@@ -224,7 +225,6 @@ services:
       - WEBDAV_TMP_DIR=/tmp
       - PUBLIC_CALENDARS_ENABLED=true
       - SYMFONY_TRUSTED_PROXIES=REMOTE_ADDR
-    restart: unless-stopped
     depends_on:
       - mysql
     volumes:
@@ -367,6 +367,7 @@ services:
   gitea:
     image: gitea/gitea:1.26.2
     container_name: git
+    restart: unless-stopped
     environment:
       - USER_UID=2022
       - USER_GID=2022
@@ -398,7 +399,6 @@ services:
       # You need to copy the custom files to files_gitea_volume for this to work
       # - GITEA__ui__THEMES=github,github-dark
       # - GITEA__ui__DEFAULT_THEME=github-dark
-    restart: unless-stopped
     depends_on:
       - mysql
     volumes:
@@ -431,6 +431,7 @@ services:
     # https://hub.docker.com/r/outlinewiki/outline/tags
     image: outlinewiki/outline:1.7.1
     container_name: outline
+    restart: unless-stopped
     environment:
       - NODE_ENV=production
       - PGSSLMODE=disable
