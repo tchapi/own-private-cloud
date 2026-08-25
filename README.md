@@ -337,13 +337,20 @@ You can try to login with `A LOGIN {user} {password}` by replacing `{user}` and 
 
 When using a separate IP for the mail server, we need to add a rule to the `POSTROUTING` chain in the `nat` table to allow traffic originating from the mail network to go through the correct IP; On the Docker host, run:
 
-    sudo iptables -t nat -I POSTROUTING -s 172.100.0.0/16 -j SNAT --to $MAIL_HOST_IP
+    sudo iptables -t nat -I POSTROUTING -s 172.100.0.0/16 ! -d 172.100.0.0/16 -j SNAT --to $MAIL_HOST_IP
 
 > Don't forget to set `MAIL_HOST_IP` beforehand if not done already. "172.100.0.0/16" is the subnet indicated in the docker-compose.yml file for the mail network.
 
 To list all the rules in the `nat` table:
 
     sudo iptables -t nat -L --line-numbers
+
+You can also create a service with the mail-snat.service file in the repo
+
+    sudo vi /etc/systemd/system/mail-snat.service
+    sudo systemctl daemon-reload
+    sudo systemctl enable mail-snat.service
+    sudo systemctl start mail-snat.service
 
 # Run & Maintenance
 

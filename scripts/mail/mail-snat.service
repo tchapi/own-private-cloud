@@ -1,0 +1,12 @@
+# /etc/systemd/system/mail-snat.service
+[Unit]
+Description=SNAT mail_network egress to 178.32.97.170
+After=network-pre.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c '/usr/sbin/iptables -t nat -C POSTROUTING -s 172.100.0.0/16 ! -d 172.100.0.0/16 -j SNAT --to 178.32.97.170 2>/dev/null || /usr/sbin/iptables -t nat -A POSTROUTING -s 172.100.0.0/16 ! -d 172.100.0.0/16 -j SNAT --to 178.32.97.170'
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

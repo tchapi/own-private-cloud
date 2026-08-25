@@ -487,6 +487,8 @@ networks:
   # the outgoing packets go through a specific IP.
   # See https://stackoverflow.com/a/46493740/1741150
   mail_network:
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
     ipam:
       config:
         - subnet: "172.100.0.0/16"
