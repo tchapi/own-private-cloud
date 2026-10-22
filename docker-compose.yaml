@@ -202,7 +202,7 @@ services:
       - "traefik.http.routers.filebrowser.middlewares=security@file"
 
   davis:
-    image: ghcr.io/tchapi/davis-standalone:5.4.1
+    image: ghcr.io/tchapi/davis-standalone:5.5.1
     container_name: davis
     restart: unless-stopped
     environment:
