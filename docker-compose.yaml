@@ -337,7 +337,7 @@ services:
   # This container is also used by traefik as the endpoint
   # to get certificates for MAIL_DOMAIN.
   webmail:
-    image: ghcr.io/tchapi/webmail:0.1.0
+    image: ghcr.io/tchapi/postel:1.0.0
     container_name: webmail
     restart: unless-stopped
     environment:
@@ -359,8 +359,6 @@ services:
       - DAVIS_APP_SECRET=${DAVIS_WEBMAIL_APP_SECRET}
       - DAVIS_LOGIN_ATTRIBUTE=username #	Which header is the Davis login: username (Remote-User) or email (Remote-Email)
       - LOGOUT_URL=https://${AUTH_DOMAIN}/logout
-      - APP_DATA_DIR=/app/var/data
-      - DATABASE_URL=sqlite:////app/var/data/webmail.db
     networks:
       - mail_network
       - dav_network
@@ -374,6 +372,7 @@ services:
       - "traefik.http.routers.mail.tls.certresolver=default"
       - "traefik.http.routers.mail.middlewares=security@file,authelia@docker"
       - "traefik.http.services.mail.loadbalancer.server.port=8080"
+      - "traefik.docker.network=own-private-cloud_mail_network"
 
   # kvtiles (Maps)
   maps:
