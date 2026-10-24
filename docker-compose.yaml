@@ -129,9 +129,10 @@ services:
       - "traefik.http.routers.authelia.tls=true"
       - "traefik.http.routers.authelia.tls.certresolver=default"
       - "traefik.http.routers.authelia.middlewares=security@file"
-    #   - 'traefik.http.middlewares.authelia.forwardauth.address=https://${AUTH_DOMAIN}/api/authz/forward-auth?authelia_url=https://${AUTH_DOMAIN}'
-    #   - 'traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true'
-    #   - 'traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email'
+      # Forward-auth middleware for the other services (Traefik reaches Authelia directly on auth_network)
+      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth"
+      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
+      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 
   # Passbolt (password manager)
   passbolt:
@@ -213,8 +214,9 @@ services:
       - DATABASE_DRIVER=mysql
       - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}?charset=utf8mb4&serverVersion=10.9.3-MariaDB
       - MAILER_DSN=smtp://no-reply%40${TOP_DOMAIN}:${MAIL_NO_REPLY_PASSWORD}@${MAIL_HOST}:${MAIL_PORT} # %40 = encoded @
-      - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
-      - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
+      # - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
+      # - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
+      - ADMIN_AUTH_BYPASS=true # The admin is behind Authelia (see the labels), only /dav and /.well-known are not
       - AUTH_REALM=${DAVIS_AUTH_REALM}
       - AUTH_METHOD=Basic
       - IMAP_AUTH_URL=null
@@ -239,7 +241,16 @@ services:
       - "traefik.http.routers.davis.rule=Host(`${DAV_DOMAIN}`)"
       - "traefik.http.routers.davis.tls=true"
       - "traefik.http.routers.davis.tls.certresolver=default"
-      - "traefik.http.routers.davis.middlewares=security@file"
+      - "traefik.http.routers.davis.middlewares=security@file,authelia@docker"
+      - "traefik.http.routers.davis.service=davis"
+      # DAV clients (and their discovery) authenticate with Davis directly, so no Authelia there
+      - "traefik.http.routers.davis-dav.entrypoints=websecure"
+      - "traefik.http.routers.davis-dav.rule=Host(`${DAV_DOMAIN}`) && (PathPrefix(`/dav`) || PathPrefix(`/.well-known`))"
+      - "traefik.http.routers.davis-dav.tls=true"
+      - "traefik.http.routers.davis-dav.tls.certresolver=default"
+      - "traefik.http.routers.davis-dav.middlewares=security@file"
+      - "traefik.http.routers.davis-dav.service=davis"
+      - "traefik.http.services.davis.loadbalancer.server.port=9000"
     healthcheck:
       test: curl --fail http://localhost:9000 || exit 1
       interval: 120s
@@ -361,7 +372,7 @@ services:
       - "traefik.http.routers.mail.rule=Host(`${MAIL_DOMAIN}`)"
       - "traefik.http.routers.mail.tls=true"
       - "traefik.http.routers.mail.tls.certresolver=default"
-      - "traefik.http.routers.mail.middlewares=security@file"
+      - "traefik.http.routers.mail.middlewares=security@file,authelia@docker"
       - "traefik.http.services.mail.loadbalancer.server.port=8080"
 
   # kvtiles (Maps)
