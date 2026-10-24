@@ -350,7 +350,7 @@ services:
       - mail_network
       - dav_network
     volumes:
-      - webmail_data:/app/var/data
+      - database_webmail_volume:/app/var/data
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.mail.entrypoints=websecure"
