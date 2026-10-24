@@ -11,15 +11,16 @@ services:
       - certificates:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - auth_network
-      - passwords_network
-      - cloud_network
-      - dav_network
-      - bookmarks_network
-      - maps_network
-      - mail_network
-      - git_network
-      - notes_network
+      auth_network:
+      passwords_network:
+      cloud_network:
+      dav_network:
+      bookmarks_network:
+      maps_network:
+      mail_network:
+        ipv4_address: 172.100.0.2 # Fixed, so the webmail can trust it to set Remote-User
+      git_network:
+      notes_network:
     ports:
       - "443:443"
     labels:
@@ -285,7 +286,9 @@ services:
     container_name: mail
     restart: unless-stopped
     networks:
-      - mail_network
+      mail_network:
+        aliases:
+          - ${MAIL_DOMAIN}
     hostname: ${MAIL_DOMAIN}  # (The DNS MX record should point to this value)
     ports:
       - "${MAIL_HOST_IP}:25:25"    # SMTP  (explicit TLS => STARTTLS)
@@ -328,24 +331,23 @@ services:
     restart: unless-stopped
     environment:
       - APP_SECRET=${WEBMAIL_APP_SECRET}
-      - TRUSTED_PROXIES= #		Comma-separated proxies allowed to set Remote-User. Set it to the reverse proxy, or nobody can log in
-      - SYMFONY_TRUSTED_PROXIES=REMOTE_ADDR
-      - IMAP_HOST=mailserver
+      - TRUSTED_PROXIES=172.100.0.2 # Traefik, on mail_network
+      - IMAP_HOST=${MAIL_DOMAIN}
       - IMAP_PORT=143
-      - IMAP_ENCRYPTION=false #	false, ssl or tls (STARTTLS)
+      - IMAP_ENCRYPTION=tls
       - IMAP_VALIDATE_CERT=true
       - IMAP_MASTER_USER=${MAIL_MASTER_USER}
-      - IMAP_MASTER_PASSWORD= ${MAIL_MASTER_PASSWORD}
+      - IMAP_MASTER_PASSWORD=${MAIL_MASTER_PASSWORD}
       - IMAP_LOGIN_ATTRIBUTE=email	# Which header is the IMAP login: email (Remote-Email) or username (Remote-User)
-      - SMTP_HOST=mailserver #	SMTP submission server, authenticated with the same master user
+      - SMTP_HOST=${MAIL_DOMAIN}
       - SMTP_PORT=587
-      - SMTP_ENCRYPTION=tls	# false, ssl or tls (STARTTLS)
+      - SMTP_ENCRYPTION=tls
       - SMTP_VALIDATE_CERT=true
-      - DAVIS_URL=https://davis/dav
-      - DAVIS_APP_ID=${DAVIS_APP_ID}
-      - DAVIS_APP_SECRET=${DAVIS_APP_SECRET}
+      - DAVIS_URL=http://davis:9000/dav/
+      - DAVIS_APP_ID=${DAVIS_WEBMAIL_APP_ID}
+      - DAVIS_APP_SECRET=${DAVIS_WEBMAIL_APP_SECRET}
       - DAVIS_LOGIN_ATTRIBUTE=username #	Which header is the Davis login: username (Remote-User) or email (Remote-Email)
-      # - LOGOUT_URL=''
+      - LOGOUT_URL=https://${AUTH_DOMAIN}/logout
       - APP_DATA_DIR=/app/var/data
       - DATABASE_URL=sqlite:////app/var/data/webmail.db
     networks:
@@ -360,9 +362,9 @@ services:
       - "traefik.http.routers.mail.tls=true"
       - "traefik.http.routers.mail.tls.certresolver=default"
       - "traefik.http.routers.mail.middlewares=security@file"
-      - "traefik.http.services.mail.loadbalancer.server.port=8888"
+      - "traefik.http.services.mail.loadbalancer.server.port=8080"
     healthcheck:
-      test: curl --fail http://localhost:9000 || exit 1
+      test: curl --fail http://localhost:8080 || exit 1
       interval: 120s
       retries: 5
       start_period: 30s
@@ -516,6 +518,7 @@ networks:
     ipam:
       config:
         - subnet: "172.100.0.0/16"
+          ip_range: "172.100.1.0/24" # Dynamic IPs only, so they never take Traefik's fixed one
   maps_network: ~
   git_network: ~
   notes_network: ~
