@@ -366,7 +366,7 @@ services:
   # See https://docs.gitea.io/en-us/install-with-docker/
   # and https://github.com/go-gitea/gitea for the version
   gitea:
-    image: gitea/gitea:1.27.3
+    image: gitea/gitea:28.2
     container_name: git
     restart: unless-stopped
     environment:
@@ -379,8 +379,8 @@ services:
       - GITEA__database__USER=${GITEA_DB_USERNAME}
       - GITEA__database__PASSWD=${GITEA_DB_PASSWORD}
       - GITEA__mailer__ENABLED=true
-      - GITEA__mailer__MAILER_TYPE=smtp
-      - GITEA__mailer__HOST=${MAIL_HOST}:${MAIL_PORT}
+      - GITEA__mailer__PROTOCOL=smtp
+      - GITEA__mailer__SMTP_ADDR=${MAIL_HOST}:${MAIL_PORT}
       - GITEA__mailer__USER=no-reply@${TOP_DOMAIN}
       - GITEA__mailer__PASSWD=${MAIL_NO_REPLY_PASSWORD}
       - GITEA__mailer__FROM=no-reply@${TOP_DOMAIN}
@@ -397,9 +397,6 @@ services:
       - GITEA__security__INSTALL_LOCK=true
       - GITEA__i18n__LANGS=en-US
       - GITEA__i18n__NAMES=English
-      # You need to copy the custom files to files_gitea_volume for this to work
-      # - GITEA__ui__THEMES=github,github-dark
-      # - GITEA__ui__DEFAULT_THEME=github-dark
     depends_on:
       - mysql
     volumes:
