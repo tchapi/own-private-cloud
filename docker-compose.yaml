@@ -278,6 +278,8 @@ services:
         mail_principal_user: ${MAIL_PRINCIPAL_USER}
         mail_principal_password: ${MAIL_PRINCIPAL_PASSWORD}
         mail_no_reply_password: ${MAIL_NO_REPLY_PASSWORD}
+        mail_master_user: ${MAIL_MASTER_USER}
+        mail_master_password: ${MAIL_MASTER_PASSWORD}
         top_domain: ${TOP_DOMAIN}
     image: mailserver:custom
     container_name: mail
@@ -332,8 +334,8 @@ services:
       - IMAP_PORT=143
       - IMAP_ENCRYPTION=false #	false, ssl or tls (STARTTLS)
       - IMAP_VALIDATE_CERT=true
-      - IMAP_MASTER_USER=${DOVECOT_MASTER_USER}
-      - IMAP_MASTER_PASSWORD= ${DOVECOT_MASTER_USER_PASSWORD}
+      - IMAP_MASTER_USER=${MAIL_MASTER_USER}
+      - IMAP_MASTER_PASSWORD= ${MAIL_MASTER_PASSWORD}
       - IMAP_LOGIN_ATTRIBUTE=email	# Which header is the IMAP login: email (Remote-Email) or username (Remote-User)
       - SMTP_HOST=mailserver #	SMTP submission server, authenticated with the same master user
       - SMTP_PORT=587
