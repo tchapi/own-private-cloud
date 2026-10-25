@@ -442,6 +442,7 @@ services:
     volumes:
       - files_gitea_volume:/data
       - /home/git/.ssh/:/data/git/.ssh
+      - /usr/share/zoneinfo:/usr/share/zoneinfo:ro # The image has no tzdata, so TZ would silently fall back to UTC
     networks:
       - git_network
     ports:
