@@ -337,7 +337,7 @@ services:
   # This container is also used by traefik as the endpoint
   # to get certificates for MAIL_DOMAIN.
   webmail:
-    image: ghcr.io/tchapi/postel:1.0.0
+    image: ghcr.io/tchapi/postel:1.0.1
     container_name: webmail
     restart: unless-stopped
     environment:
@@ -345,14 +345,14 @@ services:
       - TRUSTED_PROXIES=172.100.0.2 # Traefik, on mail_network
       - IMAP_HOST=${MAIL_DOMAIN}
       - IMAP_PORT=143
-      - IMAP_ENCRYPTION=tls
+      - IMAP_ENCRYPTION=starttls
       - IMAP_VALIDATE_CERT=true
       - IMAP_MASTER_USER=${MAIL_MASTER_USER}
       - IMAP_MASTER_PASSWORD=${MAIL_MASTER_PASSWORD}
       - IMAP_LOGIN_ATTRIBUTE=email	# Which header is the IMAP login: email (Remote-Email) or username (Remote-User)
       - SMTP_HOST=${MAIL_DOMAIN}
       - SMTP_PORT=587
-      - SMTP_ENCRYPTION=tls
+      - SMTP_ENCRYPTION=starttls
       - SMTP_VALIDATE_CERT=true
       - DAVIS_URL=http://davis:9000/dav/
       - DAVIS_APP_ID=${DAVIS_WEBMAIL_APP_ID}
