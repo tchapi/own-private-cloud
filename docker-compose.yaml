@@ -55,9 +55,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=Host(`${STATUS_DOMAIN}`)"
       - "traefik.http.routers.api.service=api@internal"
-      - "traefik.http.routers.api.tls=true"
-      - "traefik.http.routers.api.tls.certresolver=default"
-      - "traefik.http.routers.api.middlewares=security@file,authelia@docker"
+      - "traefik.http.routers.api.middlewares=authelia@docker"
     healthcheck:
       <<: *healthcheck-defaults
       test: traefik healthcheck
@@ -149,11 +147,7 @@ services:
       - auth_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.authelia.entrypoints=websecure"
       - "traefik.http.routers.authelia.rule=Host(`${AUTH_DOMAIN}`)"
-      - "traefik.http.routers.authelia.tls=true"
-      - "traefik.http.routers.authelia.tls.certresolver=default"
-      - "traefik.http.routers.authelia.middlewares=security@file"
       # Forward-auth middleware for the other services (Traefik reaches Authelia directly on auth_network)
       - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth"
       - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
@@ -197,11 +191,7 @@ services:
       - passwords_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.passbolt.entrypoints=websecure"
       - "traefik.http.routers.passbolt.rule=Host(`${PASSWORDS_DOMAIN}`)"
-      - "traefik.http.routers.passbolt.tls=true"
-      - "traefik.http.routers.passbolt.tls.certresolver=default"
-      - "traefik.http.routers.passbolt.middlewares=security@file"
     healthcheck:
       <<: *healthcheck-defaults
       test: curl --fail http://localhost:80 || exit 1
@@ -224,11 +214,7 @@ services:
       - cloud_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.filebrowser.entrypoints=websecure"
       - "traefik.http.routers.filebrowser.rule=Host(`${CLOUD_DOMAIN}`)"
-      - "traefik.http.routers.filebrowser.tls=true"
-      - "traefik.http.routers.filebrowser.tls.certresolver=default"
-      - "traefik.http.routers.filebrowser.middlewares=security@file"
 
   # Davis — CalDAV / CardDAV / WebDAV server
   # Tags: https://github.com/tchapi/davis/pkgs/container/davis-standalone
@@ -268,18 +254,11 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.davis.loadbalancer.server.port=9000"
-      - "traefik.http.routers.davis.entrypoints=websecure"
       - "traefik.http.routers.davis.rule=Host(`${DAV_DOMAIN}`)"
-      - "traefik.http.routers.davis.tls=true"
-      - "traefik.http.routers.davis.tls.certresolver=default"
-      - "traefik.http.routers.davis.middlewares=security@file,authelia@docker"
+      - "traefik.http.routers.davis.middlewares=authelia@docker"
       - "traefik.http.routers.davis.service=davis"
       # DAV clients (and their discovery) authenticate with Davis directly, so no Authelia there
-      - "traefik.http.routers.davis-dav.entrypoints=websecure"
       - "traefik.http.routers.davis-dav.rule=Host(`${DAV_DOMAIN}`) && (PathPrefix(`/dav`) || PathPrefix(`/.well-known`))"
-      - "traefik.http.routers.davis-dav.tls=true"
-      - "traefik.http.routers.davis-dav.tls.certresolver=default"
-      - "traefik.http.routers.davis-dav.middlewares=security@file"
       - "traefik.http.routers.davis-dav.service=davis"
     healthcheck:
       <<: *healthcheck-defaults
@@ -299,11 +278,7 @@ services:
       - bookmarks_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.linkding.entrypoints=websecure"
       - "traefik.http.routers.linkding.rule=Host(`${BOOKMARKS_DOMAIN}`)"
-      - "traefik.http.routers.linkding.tls=true"
-      - "traefik.http.routers.linkding.tls.certresolver=default"
-      - "traefik.http.routers.linkding.middlewares=security@file"
     healthcheck:
       <<: *healthcheck-defaults
       test: curl --fail http://localhost:9090/login/ || exit 1
@@ -397,11 +372,8 @@ services:
       - "traefik.enable=true"
       - "traefik.docker.network=own-private-cloud_mail_network"
       - "traefik.http.services.mail.loadbalancer.server.port=8080"
-      - "traefik.http.routers.mail.entrypoints=websecure"
       - "traefik.http.routers.mail.rule=Host(`${MAIL_DOMAIN}`)"
-      - "traefik.http.routers.mail.tls=true"
-      - "traefik.http.routers.mail.tls.certresolver=default"
-      - "traefik.http.routers.mail.middlewares=security@file,authelia@docker"
+      - "traefik.http.routers.mail.middlewares=authelia@docker"
 
   # kvtiles — maps
   # Tags: https://hub.docker.com/r/akhenakh/kvtiles/tags
@@ -420,11 +392,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.maps.loadbalancer.server.port=8080"
-      - "traefik.http.routers.maps.entrypoints=websecure"
       - "traefik.http.routers.maps.rule=Host(`${MAPS_DOMAIN}`)"
-      - "traefik.http.routers.maps.tls=true"
-      - "traefik.http.routers.maps.tls.certresolver=default"
-      - "traefik.http.routers.maps.middlewares=security@file"
 
   # Gitea — git forge
   # Docs: https://docs.gitea.io/en-us/install-with-docker/
@@ -475,11 +443,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.services.gitea.loadbalancer.server.port=3000"
-      - "traefik.http.routers.gitea.entrypoints=websecure"
       - "traefik.http.routers.gitea.rule=Host(`${GIT_DOMAIN}`)"
-      - "traefik.http.routers.gitea.tls=true"
-      - "traefik.http.routers.gitea.tls.certresolver=default"
-      - "traefik.http.routers.gitea.middlewares=security@file"
     healthcheck:
       <<: *healthcheck-defaults
       test: curl --fail http://localhost:3000/api/healthz || exit 1
@@ -530,11 +494,7 @@ services:
       - notes_network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.outline.entrypoints=websecure"
       - "traefik.http.routers.outline.rule=Host(`${NOTES_DOMAIN}`)"
-      - "traefik.http.routers.outline.tls=true"
-      - "traefik.http.routers.outline.tls.certresolver=default"
-      - "traefik.http.routers.outline.middlewares=security@file"
 
 networks:
   auth_network: ~

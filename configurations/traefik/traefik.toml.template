@@ -12,6 +12,11 @@
 [entryPoints]
   [entryPoints.websecure]
     address = ":443"
+    # Defaults for every router on this entrypoint (no need to repeat them in the labels)
+    [entryPoints.websecure.http]
+      middlewares = ["security@file"]
+      [entryPoints.websecure.http.tls]
+        certResolver = "default"
 
 [certificatesResolvers]
   [certificatesResolvers.default.acme]
