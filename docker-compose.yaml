@@ -166,7 +166,8 @@ services:
     image: passbolt:custom
     container_name: passbolt
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
     environment:
       TZ: ${TIMEZONE}
@@ -223,7 +224,8 @@ services:
     image: ghcr.io/tchapi/davis-standalone:5.6.1
     container_name: davis
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       TZ: ${TIMEZONE}
       APP_ENV: prod
@@ -343,6 +345,9 @@ services:
     <<: *service-defaults
     image: ghcr.io/tchapi/postel:1.0.1
     container_name: webmail
+    depends_on:
+      mailserver:
+        condition: service_started # Only needed at login time
     environment:
       TZ: ${TIMEZONE}
       APP_SECRET: ${WEBMAIL_APP_SECRET}
@@ -402,7 +407,8 @@ services:
     image: gitea/gitea:28.2
     container_name: git
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     environment:
       TZ: ${TIMEZONE}
       USER_UID: 2022
@@ -456,9 +462,12 @@ services:
     image: outlinewiki/outline:1.12.0
     container_name: outline
     depends_on:
-      - postgres
-      - redis
-      - authelia
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      authelia:
+        condition: service_started # Only needed at login time
     environment:
       TZ: ${TIMEZONE}
       NODE_ENV: production
