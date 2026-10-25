@@ -346,7 +346,7 @@ services:
   # Also used by Traefik as the endpoint to get the certificates for MAIL_DOMAIN
   webmail:
     <<: *service-defaults
-    image: ghcr.io/tchapi/postel:1.0.2
+    image: ghcr.io/tchapi/postel:1.0.3
     container_name: webmail
     depends_on:
       mailserver:
