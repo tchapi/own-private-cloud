@@ -6,12 +6,18 @@ name: own-private-cloud
 
 x-service-defaults: &service-defaults
   restart: unless-stopped
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "3"
 
 x-healthcheck-defaults: &healthcheck-defaults
   interval: 120s
   timeout: 10s
   retries: 5
   start_period: 30s
+  start_interval: 5s # Probe faster during start_period (Docker Engine >= 25)
 
 services:
 
@@ -27,9 +33,11 @@ services:
       dockerfile: build/Dockerfile-traefik
     image: traefik:custom
     container_name: traefik
+    environment:
+      TZ: ${TIMEZONE}
     volumes:
       - certificates:/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
       auth_network:
       passwords_network:
@@ -49,12 +57,13 @@ services:
       - "traefik.http.routers.api.service=api@internal"
       - "traefik.http.routers.api.tls=true"
       - "traefik.http.routers.api.tls.certresolver=default"
-      - "traefik.http.middlewares.auth.basicauth.users=${STATUS_CREDENTIALS}"
-      - "traefik.http.routers.api.middlewares=auth"
-      - "traefik.http.routers.api.middlewares=security@file"
+      - "traefik.http.routers.api.middlewares=security@file,authelia@docker"
     healthcheck:
       <<: *healthcheck-defaults
       test: traefik healthcheck
+
+  # Databases (mysql, postgres, redis) intentionally stay on UTC, no TZ:
+  # changing it would shift how existing dates are interpreted.
 
   # MariaDB — database for Passbolt, Davis, Gitea
   mysql:
@@ -132,6 +141,8 @@ services:
       dockerfile: build/Dockerfile-authelia
     image: authelia:custom
     container_name: authelia
+    environment:
+      TZ: ${TIMEZONE}
     volumes:
       - authelia_data:/data
     networks:
@@ -163,8 +174,8 @@ services:
     depends_on:
       - mysql
     command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
-    tty: true
     environment:
+      TZ: ${TIMEZONE}
       APP_FULL_BASE_URL: https://${PASSWORDS_DOMAIN}
       DATASOURCES_DEFAULT_HOST: mysql
       DATASOURCES_DEFAULT_DATABASE: ${PASSBOLT_DATABASE}
@@ -202,6 +213,7 @@ services:
     image: filebrowser/filebrowser:v2.63.23-s6
     container_name: filebrowser
     environment:
+      TZ: ${TIMEZONE}
       FB_PASSWORD: ${FILEBROWSER_PASSWORD_HASHED}
       FB_USERNAME: ${FILEBROWSER_USERNAME}
       FB_DATABASE: /database/filebrowser.db
@@ -227,9 +239,10 @@ services:
     depends_on:
       - mysql
     environment:
+      TZ: ${TIMEZONE}
       APP_ENV: prod
       APP_SECRET: ${DAVIS_APP_SECRET}
-      APP_TIMEZONE: Europe/Paris
+      APP_TIMEZONE: ${TIMEZONE}
       APP_KEYS_ENABLED: "true"
       DATABASE_DRIVER: mysql
       DATABASE_URL: mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}?charset=utf8mb4&serverVersion=10.9.3-MariaDB
@@ -278,6 +291,8 @@ services:
     <<: *service-defaults
     image: sissbruecker/linkding:1.47.0
     container_name: linkding
+    environment:
+      TZ: ${TIMEZONE}
     volumes:
       - files_linkding_volume:/etc/linkding/data
     networks:
@@ -313,8 +328,8 @@ services:
     cap_add:
       - NET_ADMIN # For Fail2Ban to work
     environment:
+      TZ: ${TIMEZONE}
       LOG_LEVEL: info
-      TZ: Europe/Paris
       OVERRIDE_HOSTNAME: ${MAIL_DOMAIN}
       POSTMASTER_ADDRESS: postmaster@${TOP_DOMAIN}
       POSTFIX_MESSAGE_SIZE_LIMIT: 204800000 # 200 MB, useful for moving large threads with images
@@ -343,9 +358,9 @@ services:
       - "${MAIL_HOST_IP}:587:587" # ESMTP (explicit TLS => STARTTLS)
       - "${MAIL_HOST_IP}:993:993" # IMAP4 (implicit TLS)
     healthcheck:
+      <<: *healthcheck-defaults
       test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
-      timeout: 30s
-      retries: 0
+      start_period: 120s # ClamAV and Rspamd are slow to start
 
   # Postel — webmail
   # Also used by Traefik as the endpoint to get the certificates for MAIL_DOMAIN
@@ -354,6 +369,7 @@ services:
     image: ghcr.io/tchapi/postel:1.0.1
     container_name: webmail
     environment:
+      TZ: ${TIMEZONE}
       APP_SECRET: ${WEBMAIL_APP_SECRET}
       TRUSTED_PROXIES: 172.100.0.2 # Traefik, on mail_network
       LOGOUT_URL: https://${AUTH_DOMAIN}/logout
@@ -394,6 +410,8 @@ services:
     <<: *service-defaults
     image: akhenakh/kvtiles:planet-10-latest
     container_name: maps
+    environment:
+      TZ: ${TIMEZONE}
     profiles:
       - donotstart
     command: ["-tilesKey=${MAPS_API_KEY}"] # The entrypoint is ["./kvtilesd"]
@@ -418,6 +436,7 @@ services:
     depends_on:
       - mysql
     environment:
+      TZ: ${TIMEZONE}
       USER_UID: 2022
       USER_GID: 2022
       GITEA__APP_NAME: ${GIT_DOMAIN}
@@ -429,8 +448,9 @@ services:
       GITEA__database__USER: ${GITEA_DB_USERNAME}
       GITEA__database__PASSWD: ${GITEA_DB_PASSWORD}
       GITEA__mailer__ENABLED: "true"
-      GITEA__mailer__PROTOCOL: smtp
-      GITEA__mailer__SMTP_ADDR: ${MAIL_HOST}:${MAIL_PORT}
+      GITEA__mailer__PROTOCOL: smtp+starttls
+      GITEA__mailer__SMTP_ADDR: ${MAIL_HOST}
+      GITEA__mailer__SMTP_PORT: ${MAIL_PORT}
       GITEA__mailer__USER: no-reply@${TOP_DOMAIN}
       GITEA__mailer__PASSWD: ${MAIL_NO_REPLY_PASSWORD}
       GITEA__mailer__FROM: no-reply@${TOP_DOMAIN}
@@ -448,8 +468,6 @@ services:
     volumes:
       - files_gitea_volume:/data
       - /home/git/.ssh/:/data/git/.ssh
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
     networks:
       - git_network
     ports:
@@ -478,6 +496,7 @@ services:
       - redis
       - authelia
     environment:
+      TZ: ${TIMEZONE}
       NODE_ENV: production
       URL: https://${NOTES_DOMAIN}
       FORCE_HTTPS: "false"
@@ -496,7 +515,7 @@ services:
       SMTP_PASSWORD: ${MAIL_NO_REPLY_PASSWORD}
       SMTP_FROM_EMAIL: no-reply@${TOP_DOMAIN}
       SMTP_REPLY_EMAIL: no-reply@${TOP_DOMAIN}
-      SMTP_SECURE: "true"
+      SMTP_SECURE: "false" # Port 587: STARTTLS (true = implicit TLS, port 465 only)
       OIDC_CLIENT_ID: outline
       OIDC_CLIENT_SECRET: ${OUTLINE_OIDC_CLIENT_SECRET}
       OIDC_AUTH_URI: https://${AUTH_DOMAIN}/api/oidc/authorization
