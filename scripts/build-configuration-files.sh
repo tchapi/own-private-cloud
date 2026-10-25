@@ -25,12 +25,6 @@ expandVars ./configurations/mails/config/rspamd/override.d/dkim_signing.conf.tem
 expandVars ./configurations/mails/config/postfix-virtual.cf.template ./configurations/mails/config/postfix-virtual.cf
 expandVars ./configurations/mails/config/user-patches.sh.template ./configurations/mails/config/user-patches.sh
 
-# Webmail
-expandVars ./configurations/snappymail/application.ini.template ./configurations/snappymail/application.ini
-expandVars ./configurations/snappymail/domain.json.template ./configurations/snappymail/domain.json
-SALTED_HASHED_ADMIN_PWD=$(echo -n "${WEBMAIL_ADMIN_PASSWORD}" | argon2 "${TOP_DOMAIN}" -l 32 -e)
-sed -i '' "s|^admin_password = .*|admin_password = \"${SALTED_HASHED_ADMIN_PWD}\"|" ./configurations/snappymail/application.ini
-
 # Authelia
 expandVars ./configurations/authelia/configuration.yml.template ./configurations/authelia/configuration.yml
 expandVars ./configurations/authelia/users_database.yml.template ./configurations/authelia/users_database.yml
