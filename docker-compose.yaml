@@ -32,6 +32,7 @@ services:
       context: .
       dockerfile: build/Dockerfile-traefik
     image: traefik:custom
+    pull_policy: build # Always rebuild on `up`, so config files copied into the image are never stale
     container_name: traefik
     environment:
       TZ: ${TIMEZONE}
@@ -70,6 +71,7 @@ services:
       context: .
       dockerfile: build/Dockerfile-mysql
     image: mariadb:custom
+    pull_policy: build # Always rebuild on `up`, so config files copied into the image are never stale
     container_name: mysql
     environment:
       MARIADB_AUTO_UPGRADE: 1
@@ -100,6 +102,7 @@ services:
       context: .
       dockerfile: build/Dockerfile-pgsql
     image: postgres:custom
+    pull_policy: build # Always rebuild on `up`, so config files copied into the image are never stale
     container_name: postgres
     environment:
       POSTGRES_PASSWORD: ${PGSQL_ROOT_PASSWORD}
@@ -138,6 +141,7 @@ services:
       context: .
       dockerfile: build/Dockerfile-authelia
     image: authelia:custom
+    pull_policy: build # Always rebuild on `up`, so config files copied into the image are never stale
     container_name: authelia
     environment:
       TZ: ${TIMEZONE}
@@ -164,6 +168,7 @@ services:
       context: .
       dockerfile: build/Dockerfile-passbolt
     image: passbolt:custom
+    pull_policy: build # Always rebuild on `up`, so config files copied into the image are never stale
     container_name: passbolt
     depends_on:
       mysql:
@@ -300,6 +305,7 @@ services:
         mail_master_password: ${MAIL_MASTER_PASSWORD}
         top_domain: ${TOP_DOMAIN}
     image: mailserver:custom
+    pull_policy: build # Always rebuild on `up`, so config files copied into the image are never stale
     container_name: mail
     hostname: ${MAIL_DOMAIN} # The DNS MX record should point to this value
     cap_add:
