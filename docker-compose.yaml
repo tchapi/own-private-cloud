@@ -1,12 +1,32 @@
+name: own-private-cloud
+
+# ---------------------------------------------------------------------------
+# Shared defaults
+# ---------------------------------------------------------------------------
+
+x-service-defaults: &service-defaults
+  restart: unless-stopped
+
+x-healthcheck-defaults: &healthcheck-defaults
+  interval: 120s
+  timeout: 10s
+  retries: 5
+  start_period: 30s
+
 services:
 
+  # ---------------------------------------------------------------------------
+  # Infrastructure
+  # ---------------------------------------------------------------------------
+
+  # Traefik — reverse proxy, TLS certificates
   traefik:
+    <<: *service-defaults
     build:
-      context: ./
-      dockerfile: ./build/Dockerfile-traefik
+      context: .
+      dockerfile: build/Dockerfile-traefik
     image: traefik:custom
     container_name: traefik
-    restart: unless-stopped
     volumes:
       - certificates:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
@@ -33,32 +53,29 @@ services:
       - "traefik.http.routers.api.middlewares=auth"
       - "traefik.http.routers.api.middlewares=security@file"
     healthcheck:
+      <<: *healthcheck-defaults
       test: traefik healthcheck
-      interval: 120s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
 
-  # MySQL (database: Passbolt, Davis, Gitea)
+  # MariaDB — database for Passbolt, Davis, Gitea
   mysql:
+    <<: *service-defaults
     build:
-      context: ./
-      dockerfile: ./build/Dockerfile-mysql
+      context: .
+      dockerfile: build/Dockerfile-mysql
     image: mariadb:custom
     container_name: mysql
-    restart: unless-stopped
     environment:
-      - MARIADB_AUTO_UPGRADE=1
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - PASSBOLT_DATABASE=${PASSBOLT_DATABASE}
-      - PASSBOLT_DB_USERNAME=${PASSBOLT_DB_USERNAME}
-      - PASSBOLT_DB_PASSWORD=${PASSBOLT_DB_PASSWORD}
-      - DAVIS_DATABASE=${DAVIS_DATABASE}
-      - DAVIS_DB_USERNAME=${DAVIS_DB_USERNAME}
-      - DAVIS_DB_PASSWORD=${DAVIS_DB_PASSWORD}
-      - GITEA_DATABASE=${GITEA_DATABASE}
-      - GITEA_DB_USERNAME=${GITEA_DB_USERNAME}
-      - GITEA_DB_PASSWORD=${GITEA_DB_PASSWORD}
+      MARIADB_AUTO_UPGRADE: 1
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      PASSBOLT_DATABASE: ${PASSBOLT_DATABASE}
+      PASSBOLT_DB_USERNAME: ${PASSBOLT_DB_USERNAME}
+      PASSBOLT_DB_PASSWORD: ${PASSBOLT_DB_PASSWORD}
+      DAVIS_DATABASE: ${DAVIS_DATABASE}
+      DAVIS_DB_USERNAME: ${DAVIS_DB_USERNAME}
+      DAVIS_DB_PASSWORD: ${DAVIS_DB_PASSWORD}
+      GITEA_DATABASE: ${GITEA_DATABASE}
+      GITEA_DB_USERNAME: ${GITEA_DB_USERNAME}
+      GITEA_DB_PASSWORD: ${GITEA_DB_PASSWORD}
     volumes:
       - database_mysql_volume:/var/lib/mysql
     networks:
@@ -66,25 +83,22 @@ services:
       - dav_network
       - git_network
     healthcheck:
+      <<: *healthcheck-defaults
       test: healthcheck.sh --su-mysql --connect --innodb_initialized
-      interval: 120s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
 
-  # PostgreSQL (database: Outline)
+  # PostgreSQL — database for Outline
   postgres:
+    <<: *service-defaults
     build:
-      context: ./
-      dockerfile: ./build/Dockerfile-pgsql
+      context: .
+      dockerfile: build/Dockerfile-pgsql
     image: postgres:custom
     container_name: postgres
-    restart: unless-stopped
     environment:
-      - POSTGRES_PASSWORD=${PGSQL_ROOT_PASSWORD}
-      - OUTLINE_DATABASE=${OUTLINE_DATABASE}
-      - OUTLINE_DB_USERNAME=${OUTLINE_DB_USERNAME}
-      - OUTLINE_DB_PASSWORD=${OUTLINE_DB_PASSWORD}
+      POSTGRES_PASSWORD: ${PGSQL_ROOT_PASSWORD}
+      OUTLINE_DATABASE: ${OUTLINE_DATABASE}
+      OUTLINE_DB_USERNAME: ${OUTLINE_DB_USERNAME}
+      OUTLINE_DB_PASSWORD: ${OUTLINE_DB_PASSWORD}
     volumes:
       - database_pgsql_volume:/var/lib/postgresql/data
     networks:
@@ -95,33 +109,33 @@ services:
       timeout: 20s
       retries: 3
 
-  # Redis (RAM storage)
+  # Redis — in-memory store for Outline
   redis:
+    <<: *service-defaults
     image: redis
     container_name: redis
-    restart: unless-stopped
-    networks:
-      - notes_network
     volumes:
       - redis_data:/data
+    networks:
+      - notes_network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 30s
       retries: 3
 
-  # Authelia (OIDC provider)
+  # Authelia — SSO: OIDC provider + Traefik forward-auth
   authelia:
+    <<: *service-defaults
     build:
-      context: ./
-      dockerfile: ./build/Dockerfile-authelia
+      context: .
+      dockerfile: build/Dockerfile-authelia
     image: authelia:custom
     container_name: authelia
-    restart: unless-stopped
-    networks:
-      - auth_network
     volumes:
       - authelia_data:/data
+    networks:
+      - auth_network
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.authelia.entrypoints=websecure"
@@ -134,33 +148,37 @@ services:
       - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
       - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
 
-  # Passbolt (password manager)
+  # ---------------------------------------------------------------------------
+  # Applications
+  # ---------------------------------------------------------------------------
+
+  # Passbolt — password manager
   passbolt:
+    <<: *service-defaults
     build:
-      context: ./
-      dockerfile: ./build/Dockerfile-passbolt
+      context: .
+      dockerfile: build/Dockerfile-passbolt
     image: passbolt:custom
     container_name: passbolt
-    restart: unless-stopped
-    environment:
-      - APP_FULL_BASE_URL=https://${PASSWORDS_DOMAIN}
-      - DATASOURCES_DEFAULT_HOST=mysql
-      - DATASOURCES_DEFAULT_DATABASE=${PASSBOLT_DATABASE}
-      - DATASOURCES_DEFAULT_USERNAME=${PASSBOLT_DB_USERNAME}
-      - DATASOURCES_DEFAULT_PASSWORD=${PASSBOLT_DB_PASSWORD}
-      - EMAIL_DEFAULT_FROM=no-reply@${TOP_DOMAIN}
-      - EMAIL_TRANSPORT_DEFAULT_HOST=${MAIL_HOST}
-      - EMAIL_TRANSPORT_DEFAULT_PORT=${MAIL_PORT}
-      - EMAIL_TRANSPORT_DEFAULT_TLS=true
-      - EMAIL_TRANSPORT_DEFAULT_USERNAME=no-reply@${TOP_DOMAIN}
-      - EMAIL_TRANSPORT_DEFAULT_PASSWORD=${MAIL_NO_REPLY_PASSWORD}
-      - PASSBOLT_PLUGINS_JWT_AUTHENTICATION_ENABLED=TRUE
-      - PASSBOLT_PLUGINS_MOBILE_ENABLED=TRUE
-      - PASSBOLT_SECURITY_SMTP_SETTINGS_ENDPOINTS_DISABLED=TRUE
-    command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
-    tty: true
     depends_on:
       - mysql
+    command: ["/usr/bin/wait-for.sh", "mysql:3306", "--", "/docker-entrypoint.sh"]
+    tty: true
+    environment:
+      APP_FULL_BASE_URL: https://${PASSWORDS_DOMAIN}
+      DATASOURCES_DEFAULT_HOST: mysql
+      DATASOURCES_DEFAULT_DATABASE: ${PASSBOLT_DATABASE}
+      DATASOURCES_DEFAULT_USERNAME: ${PASSBOLT_DB_USERNAME}
+      DATASOURCES_DEFAULT_PASSWORD: ${PASSBOLT_DB_PASSWORD}
+      EMAIL_DEFAULT_FROM: no-reply@${TOP_DOMAIN}
+      EMAIL_TRANSPORT_DEFAULT_HOST: ${MAIL_HOST}
+      EMAIL_TRANSPORT_DEFAULT_PORT: ${MAIL_PORT}
+      EMAIL_TRANSPORT_DEFAULT_TLS: "true"
+      EMAIL_TRANSPORT_DEFAULT_USERNAME: no-reply@${TOP_DOMAIN}
+      EMAIL_TRANSPORT_DEFAULT_PASSWORD: ${MAIL_NO_REPLY_PASSWORD}
+      PASSBOLT_PLUGINS_JWT_AUTHENTICATION_ENABLED: "TRUE"
+      PASSBOLT_PLUGINS_MOBILE_ENABLED: "TRUE"
+      PASSBOLT_SECURITY_SMTP_SETTINGS_ENDPOINTS_DISABLED: "TRUE"
     volumes:
       - passbolt_gpg_volume:/etc/passbolt/gpg:ro
       - passbolt_jwt_volume:/etc/passbolt/jwt:ro
@@ -174,22 +192,19 @@ services:
       - "traefik.http.routers.passbolt.tls.certresolver=default"
       - "traefik.http.routers.passbolt.middlewares=security@file"
     healthcheck:
+      <<: *healthcheck-defaults
       test: curl --fail http://localhost:80 || exit 1
-      interval: 120s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
 
-  # Filebrowser (cloud files server)
+  # Filebrowser — cloud files
+  # Tags: https://hub.docker.com/r/filebrowser/filebrowser/tags
   filebrowser:
-    # https://hub.docker.com/r/filebrowser/filebrowser/tags
+    <<: *service-defaults
     image: filebrowser/filebrowser:v2.63.23-s6
     container_name: filebrowser
-    restart: unless-stopped
     environment:
-      - FB_PASSWORD=${FILEBROWSER_PASSWORD_HASHED}
-      - FB_USERNAME=${FILEBROWSER_USERNAME}
-      - FB_DATABASE=/database/filebrowser.db
+      FB_PASSWORD: ${FILEBROWSER_PASSWORD_HASHED}
+      FB_USERNAME: ${FILEBROWSER_USERNAME}
+      FB_DATABASE: /database/filebrowser.db
     volumes:
       - files_filebrowser_volume:/srv
       - database_filebrowser_volume:/database
@@ -203,40 +218,43 @@ services:
       - "traefik.http.routers.filebrowser.tls.certresolver=default"
       - "traefik.http.routers.filebrowser.middlewares=security@file"
 
+  # Davis — CalDAV / CardDAV / WebDAV server
+  # Tags: https://github.com/tchapi/davis/pkgs/container/davis-standalone
   davis:
+    <<: *service-defaults
     image: ghcr.io/tchapi/davis-standalone:5.6.1
     container_name: davis
-    restart: unless-stopped
-    environment:
-      - APP_ENV=prod
-      - APP_SECRET=${DAVIS_APP_SECRET}
-      - APP_TIMEZONE=Europe/Paris
-      - DATABASE_DRIVER=mysql
-      - DATABASE_URL=mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}?charset=utf8mb4&serverVersion=10.9.3-MariaDB
-      - MAILER_DSN=smtp://no-reply%40${TOP_DOMAIN}:${MAIL_NO_REPLY_PASSWORD}@${MAIL_HOST}:${MAIL_PORT} # %40 = encoded @
-      # - ADMIN_LOGIN=${DAVIS_ADMIN_LOGIN}
-      # - ADMIN_PASSWORD=${DAVIS_ADMIN_PASSWORD}
-      - ADMIN_AUTH_BYPASS=true # The admin is behind Authelia (see the labels), only /dav and /.well-known are not
-      - AUTH_REALM=${DAVIS_AUTH_REALM}
-      - AUTH_METHOD=Basic
-      - IMAP_AUTH_URL=null
-      - CALDAV_ENABLED=true
-      - CARDDAV_ENABLED=true
-      - WEBDAV_ENABLED=true
-      - INVITE_FROM_ADDRESS=no-reply@${TOP_DOMAIN}
-      - WEBDAV_PUBLIC_DIR=/webdav
-      - WEBDAV_TMP_DIR=/tmp
-      - PUBLIC_CALENDARS_ENABLED=true
-      - SYMFONY_TRUSTED_PROXIES=REMOTE_ADDR
-      - APP_KEYS_ENABLED=true
     depends_on:
       - mysql
+    environment:
+      APP_ENV: prod
+      APP_SECRET: ${DAVIS_APP_SECRET}
+      APP_TIMEZONE: Europe/Paris
+      APP_KEYS_ENABLED: "true"
+      DATABASE_DRIVER: mysql
+      DATABASE_URL: mysql://${DAVIS_DB_USERNAME}:${DAVIS_DB_PASSWORD}@mysql:3306/${DAVIS_DATABASE}?charset=utf8mb4&serverVersion=10.9.3-MariaDB
+      MAILER_DSN: smtp://no-reply%40${TOP_DOMAIN}:${MAIL_NO_REPLY_PASSWORD}@${MAIL_HOST}:${MAIL_PORT} # %40 = encoded @
+      INVITE_FROM_ADDRESS: no-reply@${TOP_DOMAIN}
+      # ADMIN_LOGIN: ${DAVIS_ADMIN_LOGIN}
+      # ADMIN_PASSWORD: ${DAVIS_ADMIN_PASSWORD}
+      ADMIN_AUTH_BYPASS: "true" # The admin is behind Authelia (see the labels), only /dav and /.well-known are not
+      AUTH_REALM: ${DAVIS_AUTH_REALM}
+      AUTH_METHOD: Basic
+      IMAP_AUTH_URL: "null"
+      CALDAV_ENABLED: "true"
+      CARDDAV_ENABLED: "true"
+      WEBDAV_ENABLED: "true"
+      WEBDAV_PUBLIC_DIR: /webdav
+      WEBDAV_TMP_DIR: /tmp
+      PUBLIC_CALENDARS_ENABLED: "true"
+      SYMFONY_TRUSTED_PROXIES: REMOTE_ADDR
     volumes:
       - files_webdav_volume:/webdav
     networks:
       - dav_network
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.davis.loadbalancer.server.port=9000"
       - "traefik.http.routers.davis.entrypoints=websecure"
       - "traefik.http.routers.davis.rule=Host(`${DAV_DOMAIN}`)"
       - "traefik.http.routers.davis.tls=true"
@@ -250,19 +268,16 @@ services:
       - "traefik.http.routers.davis-dav.tls.certresolver=default"
       - "traefik.http.routers.davis-dav.middlewares=security@file"
       - "traefik.http.routers.davis-dav.service=davis"
-      - "traefik.http.services.davis.loadbalancer.server.port=9000"
     healthcheck:
+      <<: *healthcheck-defaults
       test: curl --fail http://localhost:9000 || exit 1
-      interval: 120s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
 
+  # Linkding — bookmarks
+  # Tags: https://hub.docker.com/r/sissbruecker/linkding/tags
   linkding:
-    # https://hub.docker.com/r/sissbruecker/linkding/tags
+    <<: *service-defaults
     image: sissbruecker/linkding:1.47.0
     container_name: linkding
-    restart: unless-stopped
     volumes:
       - files_linkding_volume:/etc/linkding/data
     networks:
@@ -275,17 +290,16 @@ services:
       - "traefik.http.routers.linkding.tls.certresolver=default"
       - "traefik.http.routers.linkding.middlewares=security@file"
     healthcheck:
+      <<: *healthcheck-defaults
       test: curl --fail http://localhost:9090/login/ || exit 1
-      interval: 120s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
 
-  # Mails (bound on a specific IP for the reverse to be unique)
+  # docker-mailserver — SMTP / IMAP
+  # Bound on a specific IP so that the reverse DNS is unique
   mailserver:
+    <<: *service-defaults
     build:
-      context: ./
-      dockerfile: ./build/Dockerfile-mailserver
+      context: .
+      dockerfile: build/Dockerfile-mailserver
       args:
         mail_principal_user: ${MAIL_PRINCIPAL_USER}
         mail_principal_password: ${MAIL_PRINCIPAL_PASSWORD}
@@ -295,142 +309,142 @@ services:
         top_domain: ${TOP_DOMAIN}
     image: mailserver:custom
     container_name: mail
-    restart: unless-stopped
-    networks:
-      mail_network:
-        aliases:
-          - ${MAIL_DOMAIN}
-    hostname: ${MAIL_DOMAIN}  # (The DNS MX record should point to this value)
-    ports:
-      - "${MAIL_HOST_IP}:25:25"    # SMTP  (explicit TLS => STARTTLS)
-      - "${MAIL_HOST_IP}:143:143"  # IMAP4 (explicit TLS => STARTTLS)
-      - "${MAIL_HOST_IP}:465:465"  # ESMTP (implicit TLS)
-      - "${MAIL_HOST_IP}:587:587"  # ESMTP (explicit TLS => STARTTLS)
-      - "${MAIL_HOST_IP}:993:993"  # IMAP4 (implicit TLS)
+    hostname: ${MAIL_DOMAIN} # The DNS MX record should point to this value
+    cap_add:
+      - NET_ADMIN # For Fail2Ban to work
+    environment:
+      LOG_LEVEL: info
+      TZ: Europe/Paris
+      OVERRIDE_HOSTNAME: ${MAIL_DOMAIN}
+      POSTMASTER_ADDRESS: postmaster@${TOP_DOMAIN}
+      POSTFIX_MESSAGE_SIZE_LIMIT: 204800000 # 200 MB, useful for moving large threads with images
+      SSL_TYPE: letsencrypt
+      SSL_DOMAIN: ${MAIL_DOMAIN}
+      ENABLE_RSPAMD: 1
+      ENABLE_CLAMAV: 1
+      ENABLE_FAIL2BAN: 1
+      ENABLE_OPENDKIM: 0
+      ENABLE_OPENDMARC: 0
+      ENABLE_POLICYD_SPF: 0
+      ENABLE_AMAVIS: 0
+      ENABLE_SPAMASSASSIN: 0
     volumes:
       - mails_data_volume:/var/mail
       - certificates:/etc/letsencrypt
       - mails_state_volume:/var/mail-state/
-    environment:
-      - LOG_LEVEL=info
-      - OVERRIDE_HOSTNAME=${MAIL_DOMAIN}
-      - TZ=Europe/Paris
-      - ENABLE_RSPAMD=1
-      - ENABLE_OPENDKIM=0
-      - ENABLE_OPENDMARC=0
-      - ENABLE_POLICYD_SPF=0
-      - ENABLE_AMAVIS=0
-      - ENABLE_SPAMASSASSIN=0
-      - ENABLE_CLAMAV=1
-      - ENABLE_FAIL2BAN=1
-      - SSL_TYPE=letsencrypt
-      - SSL_DOMAIN=${MAIL_DOMAIN}
-      - POSTFIX_MESSAGE_SIZE_LIMIT=204800000  # 200 MB, useful for moving large threads with images
-      - POSTMASTER_ADDRESS=postmaster@${TOP_DOMAIN}
-    cap_add:
-      - NET_ADMIN # For Fail2Ban to work
+    networks:
+      mail_network:
+        aliases:
+          - ${MAIL_DOMAIN}
+    ports:
+      - "${MAIL_HOST_IP}:25:25"   # SMTP  (explicit TLS => STARTTLS)
+      - "${MAIL_HOST_IP}:143:143" # IMAP4 (explicit TLS => STARTTLS)
+      - "${MAIL_HOST_IP}:465:465" # ESMTP (implicit TLS)
+      - "${MAIL_HOST_IP}:587:587" # ESMTP (explicit TLS => STARTTLS)
+      - "${MAIL_HOST_IP}:993:993" # IMAP4 (implicit TLS)
     healthcheck:
       test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
       timeout: 30s
       retries: 0
 
-  # This container is also used by traefik as the endpoint
-  # to get certificates for MAIL_DOMAIN.
+  # Postel — webmail
+  # Also used by Traefik as the endpoint to get the certificates for MAIL_DOMAIN
   webmail:
+    <<: *service-defaults
     image: ghcr.io/tchapi/postel:1.0.1
     container_name: webmail
-    restart: unless-stopped
     environment:
-      - APP_SECRET=${WEBMAIL_APP_SECRET}
-      - TRUSTED_PROXIES=172.100.0.2 # Traefik, on mail_network
-      - IMAP_HOST=${MAIL_DOMAIN}
-      - IMAP_PORT=143
-      - IMAP_ENCRYPTION=starttls
-      - IMAP_VALIDATE_CERT=true
-      - IMAP_MASTER_USER=${MAIL_MASTER_USER}
-      - IMAP_MASTER_PASSWORD=${MAIL_MASTER_PASSWORD}
-      - IMAP_LOGIN_ATTRIBUTE=email	# Which header is the IMAP login: email (Remote-Email) or username (Remote-User)
-      - SMTP_HOST=${MAIL_DOMAIN}
-      - SMTP_PORT=587
-      - SMTP_ENCRYPTION=starttls
-      - SMTP_VALIDATE_CERT=true
-      - DAVIS_URL=http://davis:9000/dav/
-      - DAVIS_APP_ID=${DAVIS_WEBMAIL_APP_ID}
-      - DAVIS_APP_SECRET=${DAVIS_WEBMAIL_APP_SECRET}
-      - DAVIS_LOGIN_ATTRIBUTE=username #	Which header is the Davis login: username (Remote-User) or email (Remote-Email)
-      - LOGOUT_URL=https://${AUTH_DOMAIN}/logout
+      APP_SECRET: ${WEBMAIL_APP_SECRET}
+      TRUSTED_PROXIES: 172.100.0.2 # Traefik, on mail_network
+      LOGOUT_URL: https://${AUTH_DOMAIN}/logout
+      IMAP_HOST: ${MAIL_DOMAIN}
+      IMAP_PORT: 143
+      IMAP_ENCRYPTION: starttls
+      IMAP_VALIDATE_CERT: "true"
+      IMAP_MASTER_USER: ${MAIL_MASTER_USER}
+      IMAP_MASTER_PASSWORD: ${MAIL_MASTER_PASSWORD}
+      IMAP_LOGIN_ATTRIBUTE: email # Which header is the IMAP login: email (Remote-Email) or username (Remote-User)
+      SMTP_HOST: ${MAIL_DOMAIN}
+      SMTP_PORT: 587
+      SMTP_ENCRYPTION: starttls
+      SMTP_VALIDATE_CERT: "true"
+      DAVIS_URL: http://davis:9000/dav/
+      DAVIS_APP_ID: ${DAVIS_WEBMAIL_APP_ID}
+      DAVIS_APP_SECRET: ${DAVIS_WEBMAIL_APP_SECRET}
+      DAVIS_LOGIN_ATTRIBUTE: username # Which header is the Davis login: username (Remote-User) or email (Remote-Email)
+    volumes:
+      - database_webmail_volume:/app/var/data
     networks:
       - mail_network
       - dav_network
-    volumes:
-      - database_webmail_volume:/app/var/data
     labels:
       - "traefik.enable=true"
+      - "traefik.docker.network=own-private-cloud_mail_network"
+      - "traefik.http.services.mail.loadbalancer.server.port=8080"
       - "traefik.http.routers.mail.entrypoints=websecure"
       - "traefik.http.routers.mail.rule=Host(`${MAIL_DOMAIN}`)"
       - "traefik.http.routers.mail.tls=true"
       - "traefik.http.routers.mail.tls.certresolver=default"
       - "traefik.http.routers.mail.middlewares=security@file,authelia@docker"
-      - "traefik.http.services.mail.loadbalancer.server.port=8080"
-      - "traefik.docker.network=own-private-cloud_mail_network"
 
-  # kvtiles (Maps)
+  # kvtiles — maps
+  # Tags: https://hub.docker.com/r/akhenakh/kvtiles/tags
+  # Deactivated (resource hungry): only started with `--profile donotstart`, see https://stackoverflow.com/a/65957695
   maps:
-    # See https://hub.docker.com/r/akhenakh/kvtiles/tags
+    <<: *service-defaults
     image: akhenakh/kvtiles:planet-10-latest
     container_name: maps
-    restart: unless-stopped
-    command: ["-tilesKey=${MAPS_API_KEY}"] # entrypoint is ["./kvtilesd"]
+    profiles:
+      - donotstart
+    command: ["-tilesKey=${MAPS_API_KEY}"] # The entrypoint is ["./kvtilesd"]
     networks:
       - maps_network
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.maps.loadbalancer.server.port=8080"
       - "traefik.http.routers.maps.entrypoints=websecure"
       - "traefik.http.routers.maps.rule=Host(`${MAPS_DOMAIN}`)"
       - "traefik.http.routers.maps.tls=true"
       - "traefik.http.routers.maps.tls.certresolver=default"
       - "traefik.http.routers.maps.middlewares=security@file"
-      - "traefik.http.services.maps.loadbalancer.server.port=8080"
-    profiles: # https://stackoverflow.com/a/65957695
-      - donotstart # [deactivated as resource hungry]
 
-  # Gitea (git)
-  # See https://docs.gitea.io/en-us/install-with-docker/
-  # and https://github.com/go-gitea/gitea for the version
+  # Gitea — git forge
+  # Docs: https://docs.gitea.io/en-us/install-with-docker/
+  # Versions: https://github.com/go-gitea/gitea
   gitea:
+    <<: *service-defaults
     image: gitea/gitea:28.2
     container_name: git
-    restart: unless-stopped
-    environment:
-      - USER_UID=2022
-      - USER_GID=2022
-      - GITEA__APP_NAME=${GIT_DOMAIN}
-      - GITEA__database__DB_TYPE=mysql
-      - GITEA__database__HOST=mysql:3306
-      - GITEA__database__NAME=${GITEA_DATABASE}
-      - GITEA__database__USER=${GITEA_DB_USERNAME}
-      - GITEA__database__PASSWD=${GITEA_DB_PASSWORD}
-      - GITEA__mailer__ENABLED=true
-      - GITEA__mailer__PROTOCOL=smtp
-      - GITEA__mailer__SMTP_ADDR=${MAIL_HOST}:${MAIL_PORT}
-      - GITEA__mailer__USER=no-reply@${TOP_DOMAIN}
-      - GITEA__mailer__PASSWD=${MAIL_NO_REPLY_PASSWORD}
-      - GITEA__mailer__FROM=no-reply@${TOP_DOMAIN}
-      - GITEA__openid__ENABLE_OPENID_SIGNIN=false
-      - GITEA__openid__ENABLE_OPENID_SIGNUP=false
-      - GITEA__service__DISABLE_REGISTRATION=true
-      - GITEA__service__ENABLE_TIMETRACKING=false
-      - GITEA__service__NO_REPLY_ADDRESS=noreply.git
-      - GITEA__service.explore__REQUIRE_SIGNIN_VIEW=true
-      - GITEA__service.explore__DISABLE_USERS_PAGE=true
-      - GITEA__server__ROOT_URL=https://${GIT_DOMAIN}
-      - GITEA__server__SSH_DOMAIN=${GIT_DOMAIN}
-      - GITEA__admin__DISABLE_REGULAR_ORG_CREATION=true
-      - GITEA__security__INSTALL_LOCK=true
-      - GITEA__i18n__LANGS=en-US
-      - GITEA__i18n__NAMES=English
     depends_on:
       - mysql
+    environment:
+      USER_UID: 2022
+      USER_GID: 2022
+      GITEA__APP_NAME: ${GIT_DOMAIN}
+      GITEA__server__ROOT_URL: https://${GIT_DOMAIN}
+      GITEA__server__SSH_DOMAIN: ${GIT_DOMAIN}
+      GITEA__database__DB_TYPE: mysql
+      GITEA__database__HOST: mysql:3306
+      GITEA__database__NAME: ${GITEA_DATABASE}
+      GITEA__database__USER: ${GITEA_DB_USERNAME}
+      GITEA__database__PASSWD: ${GITEA_DB_PASSWORD}
+      GITEA__mailer__ENABLED: "true"
+      GITEA__mailer__PROTOCOL: smtp
+      GITEA__mailer__SMTP_ADDR: ${MAIL_HOST}:${MAIL_PORT}
+      GITEA__mailer__USER: no-reply@${TOP_DOMAIN}
+      GITEA__mailer__PASSWD: ${MAIL_NO_REPLY_PASSWORD}
+      GITEA__mailer__FROM: no-reply@${TOP_DOMAIN}
+      GITEA__openid__ENABLE_OPENID_SIGNIN: "false"
+      GITEA__openid__ENABLE_OPENID_SIGNUP: "false"
+      GITEA__service__DISABLE_REGISTRATION: "true"
+      GITEA__service__ENABLE_TIMETRACKING: "false"
+      GITEA__service__NO_REPLY_ADDRESS: noreply.git
+      GITEA__service.explore__REQUIRE_SIGNIN_VIEW: "true"
+      GITEA__service.explore__DISABLE_USERS_PAGE: "true"
+      GITEA__admin__DISABLE_REGULAR_ORG_CREATION: "true"
+      GITEA__security__INSTALL_LOCK: "true"
+      GITEA__i18n__LANGS: en-US
+      GITEA__i18n__NAMES: English
     volumes:
       - files_gitea_volume:/data
       - /home/git/.ssh/:/data/git/.ssh
@@ -442,60 +456,57 @@ services:
       - "127.0.0.1:2222:22"
     labels:
       - "traefik.enable=true"
+      - "traefik.http.services.gitea.loadbalancer.server.port=3000"
       - "traefik.http.routers.gitea.entrypoints=websecure"
       - "traefik.http.routers.gitea.rule=Host(`${GIT_DOMAIN}`)"
       - "traefik.http.routers.gitea.tls=true"
       - "traefik.http.routers.gitea.tls.certresolver=default"
       - "traefik.http.routers.gitea.middlewares=security@file"
-      - "traefik.http.services.gitea.loadbalancer.server.port=3000"
     healthcheck:
+      <<: *healthcheck-defaults
       test: curl --fail http://localhost:3000/api/healthz || exit 1
-      interval: 120s
-      retries: 5
-      start_period: 30s
-      timeout: 10s
 
-  # Outline (Notion)
-  # See https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+  # Outline — notes / wiki
+  # Docs: https://docs.getoutline.com/s/hosting/doc/docker-7pfeLP5a8t
+  # Tags: https://hub.docker.com/r/outlinewiki/outline/tags
   outline:
-    # https://hub.docker.com/r/outlinewiki/outline/tags
+    <<: *service-defaults
     image: outlinewiki/outline:1.12.0
     container_name: outline
-    restart: unless-stopped
-    environment:
-      - NODE_ENV=production
-      - PGSSLMODE=disable
-      - SECRET_KEY=${OUTLINE_SECRET_KEY}
-      - UTILS_SECRET=${OUTLINE_UTILS_SECRET}
-      - DATABASE_URL=postgres://${OUTLINE_DB_USERNAME}:${OUTLINE_DB_PASSWORD}@postgres:5432/${OUTLINE_DATABASE}
-      - REDIS_URL=redis://redis:6379
-      - URL=https://${NOTES_DOMAIN}
-      - FORCE_HTTPS=false
-      - FILE_STORAGE=local
-      - FILE_STORAGE_LOCAL_ROOT_DIR=/var/lib/outline/data
-      - FILE_STORAGE_UPLOAD_MAX_SIZE=26214400
-      - ENABLE_UPDATES=false
-      - SMTP_HOST=${MAIL_HOST}
-      - SMTP_PORT=${MAIL_PORT}
-      - SMTP_USERNAME=no-reply@${TOP_DOMAIN}
-      - SMTP_PASSWORD=${MAIL_NO_REPLY_PASSWORD}
-      - SMTP_FROM_EMAIL=no-reply@${TOP_DOMAIN}
-      - SMTP_REPLY_EMAIL=no-reply@${TOP_DOMAIN}
-      - SMTP_SECURE=true
-      - OIDC_CLIENT_ID=outline
-      - OIDC_CLIENT_SECRET=${OUTLINE_OIDC_CLIENT_SECRET}
-      - OIDC_AUTH_URI=https://${AUTH_DOMAIN}/api/oidc/authorization
-      - OIDC_TOKEN_URI=https://${AUTH_DOMAIN}/api/oidc/token
-      - OIDC_USERINFO_URI=https://${AUTH_DOMAIN}/api/oidc/userinfo
-      - OIDC_USERNAME_CLAIM=preferred_username
-      - OIDC_DISPLAY_NAME=🔑 ${AUTH_DOMAIN}
-      - OIDC_SCOPES=openid profile email
     depends_on:
       - postgres
       - redis
       - authelia
+    environment:
+      NODE_ENV: production
+      URL: https://${NOTES_DOMAIN}
+      FORCE_HTTPS: "false"
+      ENABLE_UPDATES: "false"
+      SECRET_KEY: ${OUTLINE_SECRET_KEY}
+      UTILS_SECRET: ${OUTLINE_UTILS_SECRET}
+      DATABASE_URL: postgres://${OUTLINE_DB_USERNAME}:${OUTLINE_DB_PASSWORD}@postgres:5432/${OUTLINE_DATABASE}
+      PGSSLMODE: disable
+      REDIS_URL: redis://redis:6379
+      FILE_STORAGE: local
+      FILE_STORAGE_LOCAL_ROOT_DIR: /var/lib/outline/data
+      FILE_STORAGE_UPLOAD_MAX_SIZE: 26214400
+      SMTP_HOST: ${MAIL_HOST}
+      SMTP_PORT: ${MAIL_PORT}
+      SMTP_USERNAME: no-reply@${TOP_DOMAIN}
+      SMTP_PASSWORD: ${MAIL_NO_REPLY_PASSWORD}
+      SMTP_FROM_EMAIL: no-reply@${TOP_DOMAIN}
+      SMTP_REPLY_EMAIL: no-reply@${TOP_DOMAIN}
+      SMTP_SECURE: "true"
+      OIDC_CLIENT_ID: outline
+      OIDC_CLIENT_SECRET: ${OUTLINE_OIDC_CLIENT_SECRET}
+      OIDC_AUTH_URI: https://${AUTH_DOMAIN}/api/oidc/authorization
+      OIDC_TOKEN_URI: https://${AUTH_DOMAIN}/api/oidc/token
+      OIDC_USERINFO_URI: https://${AUTH_DOMAIN}/api/oidc/userinfo
+      OIDC_USERNAME_CLAIM: preferred_username
+      OIDC_DISPLAY_NAME: 🔑 ${AUTH_DOMAIN}
+      OIDC_SCOPES: openid profile email
     volumes:
-      - files_outline_volume:/var/lib/outline/data  # https://docs.getoutline.com/s/hosting/doc/file-storage-N4M0T6Ypu7
+      - files_outline_volume:/var/lib/outline/data # https://docs.getoutline.com/s/hosting/doc/file-storage-N4M0T6Ypu7
     networks:
       - notes_network
     labels:
@@ -512,10 +523,8 @@ networks:
   cloud_network: ~
   dav_network: ~
   bookmarks_network: ~
-  # We force the subnet here, so we can use it in
-  # the iptables routing command afterwards to make
-  # the outgoing packets go through a specific IP.
-  # See https://stackoverflow.com/a/46493740/1741150
+  # The subnet is forced so the iptables rule can match it and make the
+  # outgoing packets go through a specific IP (https://stackoverflow.com/a/46493740/1741150)
   mail_network:
     driver_opts:
       com.docker.network.bridge.enable_ip_masquerade: "false"
@@ -528,93 +537,27 @@ networks:
   notes_network: ~
 
 volumes:
+  # Shared by Traefik (writes) and the mailserver (reads)
   certificates:
     name: certificates
-  # These volumes are named but we don't need them to be persistent
+
+  # Not persisted on the block storage
   redis_data: ~
-  # snappymail_data: ~
-  # These volumes are actually attached OpenStack Block storage
-  authelia_data:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/databases/authelia
-  passbolt_gpg_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/files/passbolt/gpg
-  passbolt_jwt_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/files/passbolt/jwt
-  database_mysql_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/databases/mysql
-  database_pgsql_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/databases/pgsql
-  database_filebrowser_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/databases/filebrowser
-  database_webmail_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/databases/webmail
-  files_filebrowser_volume: # It stores the filebrowser files
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/files/filebrowser
-  mails_data_volume: # It stores the mail data
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/files/mails/data
-  mails_state_volume: # It stores the mail "state" (redis db, etc)
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/files/mails/state
-  files_webdav_volume: # It stores the webdav data
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/files/webdav
-  files_gitea_volume: # It stores the gitea data
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/files/gitea
-  files_linkding_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/files/linkding
-  files_outline_volume:
-    driver: local
-    driver_opts:
-      o: bind
-      type: none
-      device: /mnt/files/outline
+
+  # Bind volumes on the attached OpenStack block storage — databases
+  authelia_data:               { driver: local, driver_opts: { type: none, o: bind, device: /mnt/databases/authelia } }
+  database_mysql_volume:       { driver: local, driver_opts: { type: none, o: bind, device: /mnt/databases/mysql } }
+  database_pgsql_volume:       { driver: local, driver_opts: { type: none, o: bind, device: /mnt/databases/pgsql } }
+  database_filebrowser_volume: { driver: local, driver_opts: { type: none, o: bind, device: /mnt/databases/filebrowser } }
+  database_webmail_volume:     { driver: local, driver_opts: { type: none, o: bind, device: /mnt/databases/webmail } }
+
+  # Bind volumes on the attached OpenStack block storage — files
+  passbolt_gpg_volume:         { driver: local, driver_opts: { type: none, o: bind, device: /mnt/files/passbolt/gpg } }
+  passbolt_jwt_volume:         { driver: local, driver_opts: { type: none, o: bind, device: /mnt/files/passbolt/jwt } }
+  files_filebrowser_volume:    { driver: local, driver_opts: { type: none, o: bind, device: /mnt/files/filebrowser } }
+  files_webdav_volume:         { driver: local, driver_opts: { type: none, o: bind, device: /mnt/files/webdav } }
+  files_linkding_volume:       { driver: local, driver_opts: { type: none, o: bind, device: /mnt/files/linkding } }
+  files_gitea_volume:          { driver: local, driver_opts: { type: none, o: bind, device: /mnt/files/gitea } }
+  files_outline_volume:        { driver: local, driver_opts: { type: none, o: bind, device: /mnt/files/outline } }
+  mails_data_volume:           { driver: local, driver_opts: { type: none, o: bind, device: /mnt/files/mails/data } }  # Mails
+  mails_state_volume:          { driver: local, driver_opts: { type: none, o: bind, device: /mnt/files/mails/state } } # Mail "state" (rspamd redis db, etc)
