@@ -56,7 +56,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.api.rule=Host(`${STATUS_DOMAIN}`)"
       - "traefik.http.routers.api.service=api@internal"
-      - "traefik.http.routers.api.middlewares=authelia@docker"
+      - "traefik.http.routers.api.middlewares=authelia@file"
     healthcheck:
       <<: *healthcheck-defaults
       test: traefik healthcheck
@@ -152,10 +152,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.authelia.rule=Host(`${AUTH_DOMAIN}`)"
-      # Forward-auth middleware for the other services (Traefik reaches Authelia directly on auth_network)
-      - "traefik.http.middlewares.authelia.forwardauth.address=http://authelia:9091/api/authz/forward-auth"
-      - "traefik.http.middlewares.authelia.forwardauth.trustForwardHeader=true"
-      - "traefik.http.middlewares.authelia.forwardauth.authResponseHeaders=Remote-User,Remote-Groups,Remote-Name,Remote-Email"
+      # The forward-auth middleware (authelia@file) is defined in dynamic.toml
 
   # ---------------------------------------------------------------------------
   # Applications
@@ -262,7 +259,7 @@ services:
       - "traefik.enable=true"
       - "traefik.http.services.davis.loadbalancer.server.port=9000"
       - "traefik.http.routers.davis.rule=Host(`${DAV_DOMAIN}`)"
-      - "traefik.http.routers.davis.middlewares=authelia@docker"
+      - "traefik.http.routers.davis.middlewares=authelia@file"
       - "traefik.http.routers.davis.service=davis"
       # DAV clients (and their discovery) authenticate with Davis directly, so no Authelia there
       - "traefik.http.routers.davis-dav.rule=Host(`${DAV_DOMAIN}`) && (PathPrefix(`/dav`) || PathPrefix(`/.well-known`))"
@@ -384,7 +381,7 @@ services:
       - "traefik.docker.network=own-private-cloud_mail_network"
       - "traefik.http.services.mail.loadbalancer.server.port=8080"
       - "traefik.http.routers.mail.rule=Host(`${MAIL_DOMAIN}`)"
-      - "traefik.http.routers.mail.middlewares=authelia@docker"
+      - "traefik.http.routers.mail.middlewares=authelia@file"
 
   # kvtiles — maps
   # Tags: https://hub.docker.com/r/akhenakh/kvtiles/tags

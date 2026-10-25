@@ -2,6 +2,14 @@
   [http.middlewares.security.headers]
     stsSeconds = 31536000
 
+  # Forward-auth to Authelia, used by the routers that have no login of their own (status, davis admin, webmail).
+  # Defined here rather than in Authelia's labels so it exists even while Authelia is starting or down.
+  # Traefik reaches Authelia directly on auth_network.
+  [http.middlewares.authelia.forwardAuth]
+    address = "http://authelia:9091/api/authz/forward-auth"
+    trustForwardHeader = true
+    authResponseHeaders = ["Remote-User", "Remote-Groups", "Remote-Name", "Remote-Email"]
+
 [tls]
   [tls.options]
     [tls.options.default]
