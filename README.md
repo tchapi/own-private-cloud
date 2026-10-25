@@ -54,7 +54,7 @@ Services :
     docker-machine ssh default 'sudo fdisk /dev/sdb # n, p, w'
     docker-machine ssh default 'sudo mkfs.ext4 /dev/sdb1'
     docker-machine ssh default 'sudo mkdir /mnt/databases && sudo mount /dev/sdb1 /mnt/databases'
-    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/pgsql /mnt/databases/filebrowser'
+    docker-machine ssh default 'sudo mkdir /mnt/databases/mysql /mnt/databases/pgsql /mnt/databases/filebrowser /mnt/databases/webmail'
 
 #### The files volume :
 

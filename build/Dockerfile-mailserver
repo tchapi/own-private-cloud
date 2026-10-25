@@ -7,6 +7,8 @@ ARG top_domain
 ARG mail_principal_user
 ARG mail_principal_password
 ARG mail_no_reply_password
+ARG mail_master_user
+ARG mail_master_password
 
 RUN mkdir -p /tmp/docker-mailserver/rspamd/dkim
 RUN mkdir -p /tmp/docker-mailserver/rspamd/override.d
@@ -24,3 +26,6 @@ RUN echo "${mail_principal_user}@${top_domain}|"$(doveadm pw -s SHA512-CRYPT -u 
 # No-reply address: create user for sending (receiving is discarded using Postfix's main.cf and transport, in the user-patches.sh script)
 RUN echo "no-reply@${top_domain}|"$(doveadm pw -s SHA512-CRYPT -u "no-reply" -p "${mail_no_reply_password}") >> /tmp/docker-mailserver/postfix-accounts.cf
 RUN echo "no-reply@${top_domain} discard" > /etc/postfix/transport
+
+# Dovecot master user for the webmail (logs in as "<user>*<master user>"), same as `setup dovecot-master add <master user>`
+RUN echo "${mail_master_user}|"$(doveadm pw -s SHA512-CRYPT -u "${mail_master_user}" -p "${mail_master_password}") > /tmp/docker-mailserver/dovecot-masters.cf
