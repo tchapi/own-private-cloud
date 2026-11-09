@@ -57,6 +57,7 @@ identity_providers:
       - key_id: 'main'
         algorithm: 'RS256'
         use: 'sig'
+        # Block scalar: in .env, every line of OIDC_ISSUER_PRIVATE_KEY after the first must be indented 10 spaces
         key: |
           $OIDC_ISSUER_PRIVATE_KEY
     # access_token_lifespan: 1M
